@@ -11,7 +11,10 @@ AMyCharacter::AMyCharacter()
 	PrimaryActorTick.bCanEverTick = true;
 
 	Scene = CreateDefaultSubobject<USceneComponent>(TEXT("Scene"));
-	SetRootComponent(Scene);
+	Scene->SetupAttachment(GetRootComponent());
+
+	DestinationMarker = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Marker"));
+	DestinationMarker->SetupAttachment(GetRootComponent());
 
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(Scene);
@@ -36,6 +39,12 @@ void AMyCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	UHeadMountedDisplayFunctionLibrary::SetTrackingOrigin(EHMDTrackingOrigin::Floor);
+
+	FVector NewCameraOffset = Camera->GetComponentLocation() - GetActorLocation();
+	NewCameraOffset.Z = 0;
+	AddActorWorldOffset(NewCameraOffset);
+	Scene->AddWorldOffset(-NewCameraOffset);
+
 }
 
 void AMyCharacter::Tick(float DeltaTime)
@@ -49,4 +58,3 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 }
-

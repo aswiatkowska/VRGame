@@ -5,7 +5,7 @@
 			"app_key": "application.generated.ue.vrgame-14830424.ue4editor.exe",
 			"launch_type": "url",
 			"url": "steam://launch/",
-			"action_manifest_path": "C:/Users/aswia/Desktop/UEProjects/VRGame 4.26/Config/SteamVRBindings/steamvr_manifest.json",
+			"action_manifest_path": "C:/Users/aswia/Desktop/UEProjects/VRGame/Config/SteamVRBindings/steamvr_manifest.json",
 			"strings":
 			{
 				"en_us":
