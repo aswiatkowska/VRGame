@@ -5,6 +5,8 @@
 #include "Camera/CameraComponent.h"
 #include "MotionControllerComponent.h" 
 #include "Components/StaticMeshComponent.h"
+#include "NavMesh/RecastNavMesh.h"
+#include "Kismet/GameplayStatics.h"
 
 AMyCharacter::AMyCharacter()
 {
@@ -12,9 +14,6 @@ AMyCharacter::AMyCharacter()
 
 	Scene = CreateDefaultSubobject<USceneComponent>(TEXT("Scene"));
 	Scene->SetupAttachment(GetRootComponent());
-
-	DestinationMarker = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Marker"));
-	DestinationMarker->SetupAttachment(GetRootComponent());
 
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(Scene);
@@ -32,6 +31,8 @@ AMyCharacter::AMyCharacter()
 
 	RightHand = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("RightHand"));
 	RightHand->SetupAttachment(RightMotionController);
+
+	navmesh = dynamic_cast<ARecastNavMesh*>(UGameplayStatics::GetActorOfClass(GetWorld(), ARecastNavMesh::StaticClass()));
 }
 
 void AMyCharacter::BeginPlay()
@@ -57,4 +58,18 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+	PlayerInputComponent->BindAction("Teleport", EInputEvent::IE_Pressed, this, &AMyCharacter::Teleport);
+
+}
+
+void AMyCharacter::Teleport()
+{
+	FHitResult hit;
+	FNavLocation outnav;
+	FVector vector = FVector(100, 100, 100);
+
+	if (navmesh->ProjectPoint(hit.ImpactPoint, outnav, vector))
+	{
+		SetActorLocation(outnav.Location);
+	}
 }

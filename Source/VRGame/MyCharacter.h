@@ -19,9 +19,6 @@ public:
 	class USceneComponent* Scene;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	class UStaticMeshComponent* DestinationMarker;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class UCameraComponent* Camera;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
@@ -36,9 +33,14 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class UStaticMeshComponent* RightHand;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class ARecastNavMesh* navmesh;
+
 private:
 	virtual void BeginPlay() override;
 
 	virtual void Tick(float DeltaTime) override;
+
+	void Teleport();
 
 };

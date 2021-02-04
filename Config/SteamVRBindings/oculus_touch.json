@@ -6,74 +6,7 @@
 	{
 		"/actions/main":
 		{
-			"sources": [
-				{
-					"mode": "button",
-					"path": "/user/hand/left/input/x",
-					"inputs":
-					{
-						"click":
-						{
-							"output": "/actions/main/in/ShowContextualMenu_VR_L"
-						}
-					}
-				},
-				{
-					"mode": "button",
-					"path": "/user/hand/right/input/a",
-					"inputs":
-					{
-						"click":
-						{
-							"output": "/actions/main/in/ShowContextualMenu_VR_R"
-						}
-					}
-				},
-				{
-					"mode": "button",
-					"path": "/user/hand/left/input/y",
-					"inputs":
-					{
-						"click":
-						{
-							"output": "/actions/main/in/VR_Teleport_L"
-						}
-					}
-				},
-				{
-					"mode": "button",
-					"path": "/user/hand/right/input/b",
-					"inputs":
-					{
-						"click":
-						{
-							"output": "/actions/main/in/VR_Teleport_R"
-						}
-					}
-				},
-				{
-					"mode": "trigger",
-					"path": "/user/hand/left/input/trigger",
-					"inputs":
-					{
-						"click":
-						{
-							"output": "/actions/main/in/VR_Trigger_L"
-						}
-					}
-				},
-				{
-					"mode": "trigger",
-					"path": "/user/hand/right/input/trigger",
-					"inputs":
-					{
-						"click":
-						{
-							"output": "/actions/main/in/VR_Trigger_R"
-						}
-					}
-				}
-			],
+			"sources": [],
 			"poses": [
 				{
 					"output": "/actions/main/in/controllerleft",
@@ -107,5 +40,5 @@
 			]
 		}
 	},
-	"description": ""
+	"description": "VRGame-14830424"
 }
