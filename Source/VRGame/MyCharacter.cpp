@@ -7,6 +7,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "NavMesh/RecastNavMesh.h"
 #include "Kismet/GameplayStatics.h"
+#include "Engine/EngineTypes.h"
 
 AMyCharacter::AMyCharacter()
 {
@@ -41,6 +42,12 @@ void AMyCharacter::BeginPlay()
 
 	UHeadMountedDisplayFunctionLibrary::SetTrackingOrigin(EHMDTrackingOrigin::Floor);
 
+}
+
+void AMyCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
 	FVector NewCameraOffset = Camera->GetComponentLocation() - GetActorLocation();
 	NewCameraOffset.Z = 0;
 	AddActorWorldOffset(NewCameraOffset);
@@ -48,17 +55,11 @@ void AMyCharacter::BeginPlay()
 
 }
 
-void AMyCharacter::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
-
 void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	PlayerInputComponent->BindAction("Teleport", EInputEvent::IE_Pressed, this, &AMyCharacter::Teleport);
+	PlayerInputComponent->BindAction(TEXT("Teleport"), EInputEvent::IE_Pressed, this, &AMyCharacter::Teleport);
 
 }
 
@@ -68,8 +69,16 @@ void AMyCharacter::Teleport()
 	FNavLocation outnav;
 	FVector vector = FVector(100, 100, 100);
 
-	if (navmesh->ProjectPoint(hit.ImpactPoint, outnav, vector))
+	TArray<AActor*> ignored;
+	ignored.Add(this);
+
+	if (UKismetSystemLibrary::LineTraceSingle(GetWorld(), LeftMotionController->GetComponentLocation(),
+		LeftMotionController->GetComponentLocation() + (LeftHand->GetUpVector() * 100.0f), UEngineTypes::ConvertToTraceType(ECollisionChannel::ECC_WorldStatic),
+		false, ignored, EDrawDebugTrace::Persistent, hit, true))
 	{
-		SetActorLocation(outnav.Location);
+		if (navmesh->ProjectPoint(hit.ImpactPoint, outnav, vector))
+		{
+			SetActorLocation(outnav.Location);
+		}
 	}
 }
