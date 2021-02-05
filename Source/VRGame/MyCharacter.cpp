@@ -59,7 +59,7 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	PlayerInputComponent->BindAction(TEXT("Teleport"), EInputEvent::IE_Pressed, this, &AMyCharacter::Teleport);
+	PlayerInputComponent->BindAction("Teleport", IE_Pressed, this, &AMyCharacter::Teleport);
 
 }
 
@@ -67,13 +67,13 @@ void AMyCharacter::Teleport()
 {
 	FHitResult hit;
 	FNavLocation outnav;
-	FVector vector = FVector(100, 100, 100);
+	FVector vector = FVector(1000, 1000, 1000);
 
 	TArray<AActor*> ignored;
 	ignored.Add(this);
 
 	if (UKismetSystemLibrary::LineTraceSingle(GetWorld(), LeftMotionController->GetComponentLocation(),
-		LeftMotionController->GetComponentLocation() + (LeftHand->GetUpVector() * 100.0f), UEngineTypes::ConvertToTraceType(ECollisionChannel::ECC_WorldStatic),
+		LeftMotionController->GetComponentLocation() + (LeftHand->GetUpVector() * 1000.0f), UEngineTypes::ConvertToTraceType(ECollisionChannel::ECC_WorldStatic),
 		false, ignored, EDrawDebugTrace::Persistent, hit, true))
 	{
 		if (navmesh->ProjectPoint(hit.ImpactPoint, outnav, vector))

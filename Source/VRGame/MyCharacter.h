@@ -42,5 +42,4 @@ private:
 	virtual void Tick(float DeltaTime) override;
 
 	void Teleport();
-
 };
