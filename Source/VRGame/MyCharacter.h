@@ -41,5 +41,14 @@ private:
 
 	virtual void Tick(float DeltaTime) override;
 
+	UFUNCTION()
 	void Teleport();
+
+	void MoveForward(float Value);
+
+	void ChangeMotion();
+
+	void ClearDebugLine();
+
+	bool SwitchMotion;
 };

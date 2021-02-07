@@ -6,6 +6,8 @@
 #include "MotionControllerComponent.h" 
 #include "Components/StaticMeshComponent.h"
 #include "NavMesh/RecastNavMesh.h"
+#include "Kismet/KismetMathLibrary.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "Engine/EngineTypes.h"
 
@@ -59,26 +61,64 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	PlayerInputComponent->BindAction("Teleport", IE_Pressed, this, &AMyCharacter::Teleport);
+	if (SwitchMotion)
+	{
+		PlayerInputComponent->BindAction("Teleport", IE_Pressed, this, &AMyCharacter::Teleport);
+	}
+	else
+	{
+		PlayerInputComponent->BindAxis("MoveForward", this, &AMyCharacter::MoveForward);
+	}
 
+	PlayerInputComponent->BindAction("ChangeMotion", IE_Pressed, this, &AMyCharacter::ChangeMotion);
+
+}
+
+void AMyCharacter::ChangeMotion()
+{
+	if (SwitchMotion)
+	{
+		SwitchMotion = false;
+	}
+	else
+	{
+		SwitchMotion = true;
+	}
+
+	SetupPlayerInputComponent(this->CreatePlayerInputComponent());
+}
+
+void AMyCharacter::MoveForward(float Value)
+{
+	AddMovementInput(Camera->GetForwardVector(), Value);
 }
 
 void AMyCharacter::Teleport()
 {
 	FHitResult hit;
-	FNavLocation outnav;
 	FVector vector = FVector(1000, 1000, 1000);
+	FVector Start = FVector(LeftMotionController->GetComponentLocation());
+	FVector End = FVector(LeftMotionController->GetComponentLocation() + (LeftHand->GetForwardVector() * 1000.0f));
 
 	TArray<AActor*> ignored;
 	ignored.Add(this);
 
-	if (UKismetSystemLibrary::LineTraceSingle(GetWorld(), LeftMotionController->GetComponentLocation(),
-		LeftMotionController->GetComponentLocation() + (LeftHand->GetUpVector() * 1000.0f), UEngineTypes::ConvertToTraceType(ECollisionChannel::ECC_WorldStatic),
+	if (UKismetSystemLibrary::LineTraceSingle(GetWorld(), Start, End, UEngineTypes::ConvertToTraceType(ECollisionChannel::ECC_WorldStatic),
 		false, ignored, EDrawDebugTrace::Persistent, hit, true))
 	{
+		FTimerHandle handle;
+		GetWorld()->GetTimerManager().SetTimer(handle, this, &AMyCharacter::ClearDebugLine, 0.5);
+
+		FNavLocation outnav;
+
 		if (navmesh->ProjectPoint(hit.ImpactPoint, outnav, vector))
 		{
-			SetActorLocation(outnav.Location);
+			this->SetActorLocation(outnav);
 		}
 	}
+}
+
+void AMyCharacter::ClearDebugLine()
+{
+	UKismetSystemLibrary::FlushPersistentDebugLines(GetWorld());
 }

@@ -150,6 +150,14 @@
 		{
 			"name": "/actions/main/in/Teleport",
 			"type": "boolean"
+		},
+		{
+			"name": "/actions/main/in/ChangeMotion",
+			"type": "boolean"
+		},
+		{
+			"name": "/actions/main/in/MoveForward axis",
+			"type": "vector1"
 		}
 	],
 	"action_sets": [
@@ -393,6 +401,8 @@
 			"/actions/main/out/vibrateright": "Haptic (Right)",
 			"/actions/main/in/open_console": "Open Console",
 			"/actions/main/in/Teleport": "Teleport",
+			"/actions/main/in/ChangeMotion": "ChangeMotion",
+			"/actions/main/in/MoveForward axis": "MoveForward",
 			"/actions/main": "Main Game Actions"
 		}
 	]
