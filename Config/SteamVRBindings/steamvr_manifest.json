@@ -156,6 +156,22 @@
 			"type": "boolean"
 		},
 		{
+			"name": "/actions/main/in/DrawDebugLine",
+			"type": "boolean"
+		},
+		{
+			"name": "/actions/main/in/MoveControllerRight",
+			"type": "boolean"
+		},
+		{
+			"name": "/actions/main/in/MoveControllerLeft",
+			"type": "boolean"
+		},
+		{
+			"name": "/actions/main/in/MoveRight axis",
+			"type": "vector1"
+		},
+		{
 			"name": "/actions/main/in/MoveForward axis",
 			"type": "vector1"
 		}
@@ -402,6 +418,10 @@
 			"/actions/main/in/open_console": "Open Console",
 			"/actions/main/in/Teleport": "Teleport",
 			"/actions/main/in/ChangeMotion": "ChangeMotion",
+			"/actions/main/in/DrawDebugLine": "DrawDebugLine",
+			"/actions/main/in/MoveControllerRight": "MoveControllerRight",
+			"/actions/main/in/MoveControllerLeft": "MoveControllerLeft",
+			"/actions/main/in/MoveRight axis": "MoveRight",
 			"/actions/main/in/MoveForward axis": "MoveForward",
 			"/actions/main": "Main Game Actions"
 		}

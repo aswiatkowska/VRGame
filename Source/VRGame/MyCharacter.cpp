@@ -5,6 +5,8 @@
 #include "Camera/CameraComponent.h"
 #include "MotionControllerComponent.h" 
 #include "Components/StaticMeshComponent.h"
+#include "Components/CapsuleComponent.h"
+#include "GameFramework/PlayerController.h"
 #include "NavMesh/RecastNavMesh.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -44,16 +46,13 @@ void AMyCharacter::BeginPlay()
 
 	UHeadMountedDisplayFunctionLibrary::SetTrackingOrigin(EHMDTrackingOrigin::Floor);
 
+	Scene->SetRelativeLocation(FVector(0.0f, 0.0f, -GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight()));
+
 }
 
 void AMyCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	FVector NewCameraOffset = Camera->GetComponentLocation() - GetActorLocation();
-	NewCameraOffset.Z = 0;
-	AddActorWorldOffset(NewCameraOffset);
-	Scene->AddWorldOffset(-NewCameraOffset);
 
 }
 
@@ -63,14 +62,18 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 	if (SwitchMotion)
 	{
-		PlayerInputComponent->BindAction("Teleport", IE_Pressed, this, &AMyCharacter::Teleport);
+		PlayerInputComponent->BindAction("DrawDebugLine", IE_Pressed, this, &AMyCharacter::DrawDebugLine);
+		PlayerInputComponent->BindAction("Teleport", IE_Released, this, &AMyCharacter::Teleport);
 	}
 	else
 	{
 		PlayerInputComponent->BindAxis("MoveForward", this, &AMyCharacter::MoveForward);
+		PlayerInputComponent->BindAxis("MoveRight", this, &AMyCharacter::MoveRight);
 	}
 
 	PlayerInputComponent->BindAction("ChangeMotion", IE_Pressed, this, &AMyCharacter::ChangeMotion);
+	PlayerInputComponent->BindAction("MoveControllerRight", IE_Pressed, this, &AMyCharacter::MoveControllerRight);
+	PlayerInputComponent->BindAction("MoveControllerLeft", IE_Pressed, this, &AMyCharacter::MoveControllerLeft);
 
 }
 
@@ -93,28 +96,41 @@ void AMyCharacter::MoveForward(float Value)
 	AddMovementInput(Camera->GetForwardVector(), Value);
 }
 
-void AMyCharacter::Teleport()
+void AMyCharacter::MoveRight(float Value)
 {
-	FHitResult hit;
-	FVector vector = FVector(1000, 1000, 1000);
+	AddMovementInput(Camera->GetRightVector(), Value);
+}
+
+void AMyCharacter::MoveControllerRight()
+{
+	
+}
+
+void AMyCharacter::MoveControllerLeft()
+{
+
+}
+
+void AMyCharacter::DrawDebugLine()
+{
 	FVector Start = FVector(LeftMotionController->GetComponentLocation());
 	FVector End = FVector(LeftMotionController->GetComponentLocation() + (LeftHand->GetForwardVector() * 1000.0f));
 
 	TArray<AActor*> ignored;
 	ignored.Add(this);
 
-	if (UKismetSystemLibrary::LineTraceSingle(GetWorld(), Start, End, UEngineTypes::ConvertToTraceType(ECollisionChannel::ECC_WorldStatic),
-		false, ignored, EDrawDebugTrace::Persistent, hit, true))
+	UKismetSystemLibrary::LineTraceSingle(GetWorld(), Start, End, UEngineTypes::ConvertToTraceType(ECollisionChannel::ECC_WorldStatic), 
+		false, ignored, EDrawDebugTrace::Persistent, hit, true);
+}
+
+void AMyCharacter::Teleport()
+{
+	ClearDebugLine();
+	FNavLocation outnav;
+
+	if (navmesh->ProjectPoint(hit.ImpactPoint, outnav, vector))
 	{
-		FTimerHandle handle;
-		GetWorld()->GetTimerManager().SetTimer(handle, this, &AMyCharacter::ClearDebugLine, 0.5);
-
-		FNavLocation outnav;
-
-		if (navmesh->ProjectPoint(hit.ImpactPoint, outnav, vector))
-		{
 			this->SetActorLocation(outnav);
-		}
 	}
 }
 
