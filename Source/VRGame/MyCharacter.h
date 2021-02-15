@@ -36,8 +36,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class ARecastNavMesh* navmesh;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	class UParticleSystemComponent* ImpactParticles;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UParticleSystem* ImpactParticles;
 
 private:
 	virtual void BeginPlay() override;
