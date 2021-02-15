@@ -7,6 +7,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
+//#include "Components/SplineMeshComponent.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "Particles/ParticleSystem.h"
 #include "GameFramework/PlayerController.h"
@@ -39,6 +40,12 @@ AMyCharacter::AMyCharacter()
 
 	RightHandSkeletal = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("RightHand"));
 	RightHandSkeletal->SetupAttachment(RightMotionController);
+
+	GunBarrel = CreateDefaultSubobject<USceneComponent>(TEXT("Barrel"));
+	GunBarrel->SetupAttachment(RightHandSkeletal);
+
+	Marker = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Marker"));
+	Marker->SetupAttachment(LeftMotionController);
 
 	navmesh = dynamic_cast<ARecastNavMesh*>(UGameplayStatics::GetActorOfClass(GetWorld(), ARecastNavMesh::StaticClass()));
 }
@@ -75,7 +82,11 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	}
 
 	PlayerInputComponent->BindAction("ChangeMotion", IE_Pressed, this, &AMyCharacter::ChangeMotion);
-	PlayerInputComponent->BindAction("Shoot", IE_Pressed, this, &AMyCharacter::Shoot);
+
+	if (cooldown == false)
+	{
+		PlayerInputComponent->BindAction("Shoot", IE_Pressed, this, &AMyCharacter::Shoot);
+	}
 
 }
 
@@ -117,14 +128,16 @@ void AMyCharacter::MoveRight(float Value)
 
 void AMyCharacter::DrawDebugLine()
 {
+	Marker->SetVisibility(true);
+
 	FVector Start = FVector(LeftMotionController->GetComponentLocation());
 	FVector End = FVector(LeftMotionController->GetComponentLocation() + (LeftHandMesh->GetForwardVector() * 1000.0f));
 
 	TArray<AActor*> ignored;
 	ignored.Add(this);
 
-	UKismetSystemLibrary::LineTraceSingle(GetWorld(), Start, End, UEngineTypes::ConvertToTraceType(ECollisionChannel::ECC_WorldStatic), 
-		false, ignored, EDrawDebugTrace::Persistent, hit, true);
+	CanTeleport = UKismetSystemLibrary::LineTraceSingle(GetWorld(), Start, End, UEngineTypes::ConvertToTraceType(ECollisionChannel::ECC_WorldStatic), 
+				false, ignored, EDrawDebugTrace::Persistent, hit, true);
 }
 
 void AMyCharacter::Teleport()
@@ -132,9 +145,12 @@ void AMyCharacter::Teleport()
 	ClearDebugLine();
 	FNavLocation outnav;
 
-	if (navmesh->ProjectPoint(hit.ImpactPoint, outnav, vector))
+	if (CanTeleport)
 	{
-		this->SetActorLocation(outnav);
+		if (navmesh->ProjectPoint(hit.ImpactPoint, outnav, vector))
+		{
+			this->SetActorLocation(outnav);
+		}
 	}
 }
 
@@ -145,17 +161,31 @@ void AMyCharacter::ClearDebugLine()
 
 void AMyCharacter::Shoot()
 {
+	FHitResult hitShoot;
 	const float PistolRange = 2000.0f;
-	const FVector Start = RightHandSkeletal->GetComponentLocation();
-	const FVector End = (RightHandSkeletal->GetForwardVector() * PistolRange) + Start;
+	const FVector Start = GunBarrel->GetComponentLocation();
+	const FVector End = (GunBarrel->GetForwardVector() * PistolRange) + Start;
 
 	FCollisionQueryParams QueryParams = FCollisionQueryParams(SCENE_QUERY_STAT(PistolRange), false, this);
 
-	if (GetWorld()->LineTraceSingleByChannel(hit, Start, End, ECC_Visibility, QueryParams))
+	if (GetWorld()->LineTraceSingleByChannel(hitShoot, Start, End, ECC_Visibility, QueryParams))
 	{
 		if (ImpactParticles)
 		{
-			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticles, FTransform(hit.ImpactNormal.Rotation(), hit.ImpactPoint));
+			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticles, FTransform(hitShoot.ImpactNormal.Rotation(), hitShoot.ImpactPoint));
 		}
 	}
+
+	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticles, FTransform(GunBarrel->GetSocketRotation("Barrel"), GunBarrel->GetSocketLocation("Barrel")));
+
+	cooldown = true;
+	SetupPlayerInputComponent(this->CreatePlayerInputComponent());
+	FTimerHandle handle;
+	GetWorld()->GetTimerManager().SetTimer(handle, this, &AMyCharacter::SwitchCoolDown, 0.5);
+}
+
+void AMyCharacter::SwitchCoolDown()
+{
+	cooldown = false;
+	SetupPlayerInputComponent(this->CreatePlayerInputComponent());
 }

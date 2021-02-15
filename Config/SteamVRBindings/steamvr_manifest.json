@@ -166,6 +166,10 @@
 		{
 			"name": "/actions/main/in/MoveForward axis",
 			"type": "vector1"
+		},
+		{
+			"name": "/actions/main/in/Move_X,Move_Y X Y_axis2d",
+			"type": "vector2"
 		}
 	],
 	"action_sets": [
@@ -413,6 +417,7 @@
 			"/actions/main/in/Shoot": "Shoot",
 			"/actions/main/in/MoveRight axis": "MoveRight",
 			"/actions/main/in/MoveForward axis": "MoveForward",
+			"/actions/main/in/Move_X,Move_Y X Y_axis2d": "Move",
 			"/actions/main": "Main Game Actions"
 		}
 	]

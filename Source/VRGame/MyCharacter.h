@@ -39,6 +39,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UParticleSystem* ImpactParticles;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class USceneComponent* GunBarrel;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class UStaticMeshComponent* Marker;
+
 private:
 	virtual void BeginPlay() override;
 
@@ -58,9 +64,15 @@ private:
 
 	void ClearDebugLine();
 
+	void SwitchCoolDown();
+
 	FHitResult hit;
 
 	FVector vector = FVector(1000, 1000, 1000);
 
 	bool SwitchMotion;
+
+	bool cooldown;
+
+	bool CanTeleport;
 };
