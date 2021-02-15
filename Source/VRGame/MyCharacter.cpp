@@ -6,6 +6,8 @@
 #include "MotionControllerComponent.h" 
 #include "Components/StaticMeshComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/SkeletalMeshComponent.h"
+#include "Particles/ParticleSystemComponent.h"
 #include "GameFramework/PlayerController.h"
 #include "NavMesh/RecastNavMesh.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -31,11 +33,11 @@ AMyCharacter::AMyCharacter()
 	RightMotionController->SetupAttachment(Scene);
 	RightMotionController->SetTrackingSource(EControllerHand::Right);
 
-	LeftHand = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("LeftHand"));
-	LeftHand->SetupAttachment(LeftMotionController);
+	LeftHandMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("LeftHand"));
+	LeftHandMesh->SetupAttachment(LeftMotionController);
 
-	RightHand = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("RightHand"));
-	RightHand->SetupAttachment(RightMotionController);
+	RightHandSkeletal = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("RightHand"));
+	RightHandSkeletal->SetupAttachment(RightMotionController);
 
 	navmesh = dynamic_cast<ARecastNavMesh*>(UGameplayStatics::GetActorOfClass(GetWorld(), ARecastNavMesh::StaticClass()));
 }
@@ -62,18 +64,17 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 	if (SwitchMotion)
 	{
-		PlayerInputComponent->BindAction("DrawDebugLine", IE_Pressed, this, &AMyCharacter::DrawDebugLine);
-		PlayerInputComponent->BindAction("Teleport", IE_Released, this, &AMyCharacter::Teleport);
+		PlayerInputComponent->BindAxis("MoveForward", this, &AMyCharacter::MoveForward).bConsumeInput = false;
+		PlayerInputComponent->BindAxis("MoveRight", this, &AMyCharacter::MoveRight);
 	}
 	else
 	{
-		PlayerInputComponent->BindAxis("MoveForward", this, &AMyCharacter::MoveForward);
-		PlayerInputComponent->BindAxis("MoveRight", this, &AMyCharacter::MoveRight);
+		PlayerInputComponent->BindAction("Teleport", IE_Pressed, this, &AMyCharacter::DrawDebugLine).bConsumeInput = false;
+		PlayerInputComponent->BindAction("Teleport", IE_Released, this, &AMyCharacter::Teleport).bConsumeInput = false;
 	}
 
 	PlayerInputComponent->BindAction("ChangeMotion", IE_Pressed, this, &AMyCharacter::ChangeMotion);
-	PlayerInputComponent->BindAction("MoveControllerRight", IE_Pressed, this, &AMyCharacter::MoveControllerRight);
-	PlayerInputComponent->BindAction("MoveControllerLeft", IE_Pressed, this, &AMyCharacter::MoveControllerLeft);
+	PlayerInputComponent->BindAction("Shoot", IE_Pressed, this, &AMyCharacter::Shoot);
 
 }
 
@@ -93,28 +94,30 @@ void AMyCharacter::ChangeMotion()
 
 void AMyCharacter::MoveForward(float Value)
 {
-	AddMovementInput(Camera->GetForwardVector(), Value);
+	//AddMovementInput(Camera->GetForwardVector(), Value);
+
+	const FRotator Rotation = Camera->GetComponentRotation();
+	const FRotator YawRotation(0, Rotation.Yaw, 0);
+
+	const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+	AddMovementInput(Direction, Value);
 }
 
 void AMyCharacter::MoveRight(float Value)
 {
-	AddMovementInput(Camera->GetRightVector(), Value);
-}
+	//AddMovementInput(Camera->GetRightVector(), Value);
 
-void AMyCharacter::MoveControllerRight()
-{
-	
-}
+	const FRotator Rotation = Camera->GetComponentRotation();
+	const FRotator YawRotation(0, Rotation.Yaw, 0);
 
-void AMyCharacter::MoveControllerLeft()
-{
-
+	const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+	AddMovementInput(Direction, Value);
 }
 
 void AMyCharacter::DrawDebugLine()
 {
 	FVector Start = FVector(LeftMotionController->GetComponentLocation());
-	FVector End = FVector(LeftMotionController->GetComponentLocation() + (LeftHand->GetForwardVector() * 1000.0f));
+	FVector End = FVector(LeftMotionController->GetComponentLocation() + (LeftHandMesh->GetForwardVector() * 1000.0f));
 
 	TArray<AActor*> ignored;
 	ignored.Add(this);
@@ -130,11 +133,28 @@ void AMyCharacter::Teleport()
 
 	if (navmesh->ProjectPoint(hit.ImpactPoint, outnav, vector))
 	{
-			this->SetActorLocation(outnav);
+		this->SetActorLocation(outnav);
 	}
 }
 
 void AMyCharacter::ClearDebugLine()
 {
 	UKismetSystemLibrary::FlushPersistentDebugLines(GetWorld());
+}
+
+void AMyCharacter::Shoot()
+{
+	const float PistolRange = 2000.0f;
+	const FVector Start = RightHandSkeletal->GetComponentLocation();
+	const FVector End = (RightHandSkeletal->GetForwardVector() * PistolRange) + Start;
+
+	FCollisionQueryParams QueryParams = FCollisionQueryParams(SCENE_QUERY_STAT(PistolRange), false, this);
+
+	if (GetWorld()->LineTraceSingleByChannel(hit, Start, End, ECC_Visibility, QueryParams))
+	{
+		if (ImpactParticles)
+		{
+			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticles, FTransform(hit.ImpactNormal.Rotation(), hit.ImpactPoint));
+		}
+	}
 }

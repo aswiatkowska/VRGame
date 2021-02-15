@@ -34,47 +34,13 @@
 					}
 				},
 				{
-					"mode": "dpad",
-					"path": "/user/hand/left/input/trackpad",
-					"parameters":
-					{
-						"sub_mode": "click"
-					},
+					"mode": "trigger",
+					"path": "/user/hand/right/input/trigger",
 					"inputs":
 					{
-						"north":
+						"click":
 						{
-							"output": "/actions/main/in/DrawDebugLine"
-						}
-					}
-				},
-				{
-					"mode": "dpad",
-					"path": "/user/hand/right/input/trackpad",
-					"parameters":
-					{
-						"sub_mode": "click"
-					},
-					"inputs":
-					{
-						"east":
-						{
-							"output": "/actions/main/in/MoveControllerRight"
-						}
-					}
-				},
-				{
-					"mode": "dpad",
-					"path": "/user/hand/right/input/trackpad",
-					"parameters":
-					{
-						"sub_mode": "click"
-					},
-					"inputs":
-					{
-						"west":
-						{
-							"output": "/actions/main/in/MoveControllerLeft"
+							"output": "/actions/main/in/Shoot"
 						}
 					}
 				},
@@ -83,7 +49,7 @@
 					"path": "/user/hand/left/input/trackpad",
 					"parameters":
 					{
-						"sub_mode": "click"
+						"sub_mode": "touch"
 					},
 					"inputs":
 					{
@@ -98,7 +64,7 @@
 					"path": "/user/hand/left/input/trackpad",
 					"parameters":
 					{
-						"sub_mode": "click"
+						"sub_mode": "touch"
 					},
 					"inputs":
 					{
@@ -113,7 +79,7 @@
 					"path": "/user/hand/left/input/trackpad",
 					"parameters":
 					{
-						"sub_mode": "click"
+						"sub_mode": "touch"
 					},
 					"inputs":
 					{
@@ -128,7 +94,7 @@
 					"path": "/user/hand/left/input/trackpad",
 					"parameters":
 					{
-						"sub_mode": "click"
+						"sub_mode": "touch"
 					},
 					"inputs":
 					{

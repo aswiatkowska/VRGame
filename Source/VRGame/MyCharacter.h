@@ -28,13 +28,16 @@ public:
 	class UMotionControllerComponent* RightMotionController;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	class UStaticMeshComponent* LeftHand;
+	class UStaticMeshComponent* LeftHandMesh;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	class UStaticMeshComponent* RightHand;
+	class USkeletalMeshComponent* RightHandSkeletal;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class ARecastNavMesh* navmesh;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	class UParticleSystemComponent* ImpactParticles;
 
 private:
 	virtual void BeginPlay() override;
@@ -43,13 +46,11 @@ private:
 
 	void Teleport();
 
+	void Shoot();
+
 	void MoveForward(float Value);
 
 	void MoveRight(float Value);
-
-	void MoveControllerRight();
-
-	void MoveControllerLeft();
 
 	void ChangeMotion();
 
