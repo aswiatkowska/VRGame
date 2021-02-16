@@ -170,11 +170,6 @@ void AMyCharacter::Teleport()
 	}
 }
 
-void AMyCharacter::ClearDebugLine()
-{
-	UKismetSystemLibrary::FlushPersistentDebugLines(GetWorld());
-}
-
 void AMyCharacter::Shoot()
 {
 	FHitResult hitShoot;

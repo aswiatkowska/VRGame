@@ -42,9 +42,6 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class USceneComponent* GunBarrel;
 
-	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	//class UStaticMeshComponent* Marker;
-
 private:
 	virtual void BeginPlay() override;
 
@@ -61,10 +58,6 @@ private:
 	void MoveRight(float Value);
 
 	void ChangeMotion();
-
-	//void DrawDebugLine();
-
-	void ClearDebugLine();
 
 	void SwitchCoolDown();
 
