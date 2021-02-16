@@ -7,7 +7,6 @@
 #include "Components/StaticMeshComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
-//#include "Components/SplineMeshComponent.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "Particles/ParticleSystem.h"
 #include "GameFramework/PlayerController.h"
@@ -44,9 +43,6 @@ AMyCharacter::AMyCharacter()
 	GunBarrel = CreateDefaultSubobject<USceneComponent>(TEXT("Barrel"));
 	GunBarrel->SetupAttachment(RightHandSkeletal);
 
-	Marker = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Marker"));
-	Marker->SetupAttachment(LeftMotionController);
-
 	navmesh = dynamic_cast<ARecastNavMesh*>(UGameplayStatics::GetActorOfClass(GetWorld(), ARecastNavMesh::StaticClass()));
 }
 
@@ -64,6 +60,23 @@ void AMyCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (!SwitchMotion)
+	{
+		TeleportLocation();
+		
+		if (TeleportLocation())
+		{
+			FVector Start = FVector(LeftMotionController->GetComponentLocation());
+			FVector End = FVector(LeftMotionController->GetComponentLocation() + (LeftHandMesh->GetForwardVector() * 1000.0f));
+
+			TArray<AActor*> ignored;
+			ignored.Add(this);
+
+			CanTeleport = UKismetSystemLibrary::LineTraceSingle(GetWorld(), Start, End, UEngineTypes::ConvertToTraceType(ECollisionChannel::ECC_WorldStatic),
+				false, ignored, EDrawDebugTrace::ForOneFrame, hit, true);
+		}
+	}
+
 }
 
 void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -77,8 +90,7 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	}
 	else
 	{
-		PlayerInputComponent->BindAction("Teleport", IE_Pressed, this, &AMyCharacter::DrawDebugLine).bConsumeInput = false;
-		PlayerInputComponent->BindAction("Teleport", IE_Released, this, &AMyCharacter::Teleport).bConsumeInput = false;
+		PlayerInputComponent->BindAction("Teleport", IE_Pressed, this, &AMyCharacter::Teleport).bConsumeInput = false;
 	}
 
 	PlayerInputComponent->BindAction("ChangeMotion", IE_Pressed, this, &AMyCharacter::ChangeMotion);
@@ -126,23 +138,27 @@ void AMyCharacter::MoveRight(float Value)
 	AddMovementInput(Direction, Value);
 }
 
-void AMyCharacter::DrawDebugLine()
+bool AMyCharacter::TeleportLocation()
 {
-	Marker->SetVisibility(true);
+	FHitResult hitTeleport;
+	const float TeleportRange = 1000.0f;
+	const FVector Start = LeftMotionController->GetComponentLocation();
+	const FVector End = (LeftMotionController->GetForwardVector() * TeleportRange) + Start;
 
-	FVector Start = FVector(LeftMotionController->GetComponentLocation());
-	FVector End = FVector(LeftMotionController->GetComponentLocation() + (LeftHandMesh->GetForwardVector() * 1000.0f));
+	FCollisionQueryParams QueryParams = FCollisionQueryParams(SCENE_QUERY_STAT(TeleportRange), false, this);
 
-	TArray<AActor*> ignored;
-	ignored.Add(this);
-
-	CanTeleport = UKismetSystemLibrary::LineTraceSingle(GetWorld(), Start, End, UEngineTypes::ConvertToTraceType(ECollisionChannel::ECC_WorldStatic), 
-				false, ignored, EDrawDebugTrace::Persistent, hit, true);
+	if (GetWorld()->LineTraceSingleByChannel(hitTeleport, Start, End, ECC_Visibility, QueryParams))
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 
 void AMyCharacter::Teleport()
 {
-	ClearDebugLine();
 	FNavLocation outnav;
 
 	if (CanTeleport)
