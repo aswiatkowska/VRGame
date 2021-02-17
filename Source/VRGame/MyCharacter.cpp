@@ -83,22 +83,12 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	if (SwitchMotion)
-	{
-		PlayerInputComponent->BindAxis("MoveForward", this, &AMyCharacter::MoveForward).bConsumeInput = false;
-		PlayerInputComponent->BindAxis("MoveRight", this, &AMyCharacter::MoveRight);
-	}
-	else
-	{
-		PlayerInputComponent->BindAction("Teleport", IE_Pressed, this, &AMyCharacter::Teleport).bConsumeInput = false;
-	}
+	PlayerInputComponent->BindAxis("MoveForward", this, &AMyCharacter::MoveForward).bConsumeInput = false;
+	PlayerInputComponent->BindAxis("MoveRight", this, &AMyCharacter::MoveRight);
+	PlayerInputComponent->BindAction("Teleport", IE_Pressed, this, &AMyCharacter::Teleport).bConsumeInput = false;
 
 	PlayerInputComponent->BindAction("ChangeMotion", IE_Pressed, this, &AMyCharacter::ChangeMotion);
-
-	if (cooldown == false)
-	{
-		PlayerInputComponent->BindAction("Shoot", IE_Pressed, this, &AMyCharacter::Shoot);
-	}
+	PlayerInputComponent->BindAction("Shoot", IE_Pressed, this, &AMyCharacter::Shoot);
 
 }
 
@@ -112,30 +102,34 @@ void AMyCharacter::ChangeMotion()
 	{
 		SwitchMotion = true;
 	}
-
-	SetupPlayerInputComponent(this->CreatePlayerInputComponent());
 }
 
 void AMyCharacter::MoveForward(float Value)
 {
 	//AddMovementInput(Camera->GetForwardVector(), Value);
 
-	const FRotator Rotation = Camera->GetComponentRotation();
-	const FRotator YawRotation(0, Rotation.Yaw, 0);
+	if (SwitchMotion)
+	{
+		const FRotator Rotation = Camera->GetComponentRotation();
+		const FRotator YawRotation(0, Rotation.Yaw, 0);
 
-	const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-	AddMovementInput(Direction, Value);
+		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+		AddMovementInput(Direction, Value);
+	}
 }
 
 void AMyCharacter::MoveRight(float Value)
 {
 	//AddMovementInput(Camera->GetRightVector(), Value);
 
-	const FRotator Rotation = Camera->GetComponentRotation();
-	const FRotator YawRotation(0, Rotation.Yaw, 0);
+	if (SwitchMotion)
+	{
+		const FRotator Rotation = Camera->GetComponentRotation();
+		const FRotator YawRotation(0, Rotation.Yaw, 0);
 
-	const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-	AddMovementInput(Direction, Value);
+		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+		AddMovementInput(Direction, Value);
+	}
 }
 
 bool AMyCharacter::TeleportLocation()
@@ -159,13 +153,16 @@ bool AMyCharacter::TeleportLocation()
 
 void AMyCharacter::Teleport()
 {
-	FNavLocation outnav;
-
-	if (CanTeleport)
+	if (!SwitchMotion)
 	{
-		if (navmesh->ProjectPoint(hit.ImpactPoint, outnav, vector))
+		FNavLocation outnav;
+
+		if (CanTeleport)
 		{
-			this->SetActorLocation(outnav);
+			if (navmesh->ProjectPoint(hit.ImpactPoint, outnav, vector))
+			{
+				this->SetActorLocation(outnav);
+			}
 		}
 	}
 }
@@ -179,18 +176,20 @@ void AMyCharacter::Shoot()
 
 	FCollisionQueryParams QueryParams = FCollisionQueryParams(SCENE_QUERY_STAT(PistolRange), false, this);
 
-	if (GetWorld()->LineTraceSingleByChannel(hitShoot, Start, End, ECC_Visibility, QueryParams))
+	if (cooldown == false)
 	{
-		if (ImpactParticles)
+		if (GetWorld()->LineTraceSingleByChannel(hitShoot, Start, End, ECC_Visibility, QueryParams))
 		{
-			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticles, FTransform(hitShoot.ImpactNormal.Rotation(), hitShoot.ImpactPoint));
+			if (ImpactParticles)
+			{
+				UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticles, FTransform(hitShoot.ImpactNormal.Rotation(), hitShoot.ImpactPoint));
+			}
 		}
+
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticles, FTransform(GunBarrel->GetSocketRotation("Barrel"), GunBarrel->GetSocketLocation("Barrel")));
 	}
 
-	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticles, FTransform(GunBarrel->GetSocketRotation("Barrel"), GunBarrel->GetSocketLocation("Barrel")));
-
 	cooldown = true;
-	SetupPlayerInputComponent(this->CreatePlayerInputComponent());
 	FTimerHandle handle;
 	GetWorld()->GetTimerManager().SetTimer(handle, this, &AMyCharacter::SwitchCoolDown, 0.5);
 }
@@ -198,5 +197,4 @@ void AMyCharacter::Shoot()
 void AMyCharacter::SwitchCoolDown()
 {
 	cooldown = false;
-	SetupPlayerInputComponent(this->CreatePlayerInputComponent());
 }
