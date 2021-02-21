@@ -32,6 +32,17 @@
 							"output": "/actions/main/in/ChangeMotion"
 						}
 					}
+				},
+				{
+					"mode": "trigger",
+					"path": "/user/hand/right/input/trigger",
+					"inputs":
+					{
+						"click":
+						{
+							"output": "/actions/main/in/Shoot"
+						}
+					}
 				}
 			],
 			"poses": [

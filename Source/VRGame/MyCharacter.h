@@ -3,6 +3,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Bullet.h"
 #include "MyCharacter.generated.h"
 
 UCLASS()
@@ -42,6 +43,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class USceneComponent* GunBarrel;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<ABullet> Bullet;
+
 private:
 	virtual void BeginPlay() override;
 
@@ -57,9 +61,17 @@ private:
 
 	void MoveRight(float Value);
 
+	void MoveBackwards(float Value);
+
+	void MoveLeft(float Value);
+
 	void ChangeMotion();
 
 	void SwitchCoolDown();
+
+	void TurnRight();
+
+	void TurnLeft();
 
 	FHitResult hit;
 
@@ -70,4 +82,6 @@ private:
 	bool cooldown;
 
 	bool CanTeleport;
+
+	ABullet* BulletClass;
 };

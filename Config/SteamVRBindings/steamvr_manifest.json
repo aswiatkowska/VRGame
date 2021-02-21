@@ -160,6 +160,14 @@
 			"type": "boolean"
 		},
 		{
+			"name": "/actions/main/in/TurnRight",
+			"type": "boolean"
+		},
+		{
+			"name": "/actions/main/in/TurnLeft",
+			"type": "boolean"
+		},
+		{
 			"name": "/actions/main/in/MoveRight axis",
 			"type": "vector1"
 		},
@@ -170,6 +178,14 @@
 		{
 			"name": "/actions/main/in/Move_X,Move_Y X Y_axis2d",
 			"type": "vector2"
+		},
+		{
+			"name": "/actions/main/in/MoveBackwards axis",
+			"type": "vector1"
+		},
+		{
+			"name": "/actions/main/in/MoveLeft axis",
+			"type": "vector1"
 		}
 	],
 	"action_sets": [
@@ -415,9 +431,13 @@
 			"/actions/main/in/Teleport": "Teleport",
 			"/actions/main/in/ChangeMotion": "ChangeMotion",
 			"/actions/main/in/Shoot": "Shoot",
+			"/actions/main/in/TurnRight": "TurnRight",
+			"/actions/main/in/TurnLeft": "TurnLeft",
 			"/actions/main/in/MoveRight axis": "MoveRight",
 			"/actions/main/in/MoveForward axis": "MoveForward",
 			"/actions/main/in/Move_X,Move_Y X Y_axis2d": "Move",
+			"/actions/main/in/MoveBackwards axis": "MoveBackwards",
+			"/actions/main/in/MoveLeft axis": "MoveLeft",
 			"/actions/main": "Main Game Actions"
 		}
 	]

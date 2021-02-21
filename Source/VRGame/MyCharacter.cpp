@@ -51,7 +51,6 @@ void AMyCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	UHeadMountedDisplayFunctionLibrary::SetTrackingOrigin(EHMDTrackingOrigin::Floor);
-
 	Scene->SetRelativeLocation(FVector(0.0f, 0.0f, -GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight()));
 
 }
@@ -83,12 +82,17 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	PlayerInputComponent->BindAxis("MoveForward", this, &AMyCharacter::MoveForward).bConsumeInput = false;
+	PlayerInputComponent->BindAxis("MoveForward", this, &AMyCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AMyCharacter::MoveRight);
-	PlayerInputComponent->BindAction("Teleport", IE_Pressed, this, &AMyCharacter::Teleport).bConsumeInput = false;
+	PlayerInputComponent->BindAxis("MoveBackwards", this, &AMyCharacter::MoveBackwards);
+	PlayerInputComponent->BindAxis("MoveLeft", this, &AMyCharacter::MoveLeft);
 
+
+	PlayerInputComponent->BindAction("Teleport", IE_Pressed, this, &AMyCharacter::Teleport);
 	PlayerInputComponent->BindAction("ChangeMotion", IE_Pressed, this, &AMyCharacter::ChangeMotion);
 	PlayerInputComponent->BindAction("Shoot", IE_Pressed, this, &AMyCharacter::Shoot);
+	PlayerInputComponent->BindAction("TurnRight", IE_Pressed, this, &AMyCharacter::TurnRight);
+	PlayerInputComponent->BindAction("TurnLeft", IE_Pressed, this, &AMyCharacter::TurnLeft);
 
 }
 
@@ -106,30 +110,48 @@ void AMyCharacter::ChangeMotion()
 
 void AMyCharacter::MoveForward(float Value)
 {
-	//AddMovementInput(Camera->GetForwardVector(), Value);
-
 	if (SwitchMotion)
 	{
-		const FRotator Rotation = Camera->GetComponentRotation();
-		const FRotator YawRotation(0, Rotation.Yaw, 0);
-
-		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-		AddMovementInput(Direction, Value);
+		AddMovementInput(Camera->GetForwardVector(), Value);
 	}
 }
 
 void AMyCharacter::MoveRight(float Value)
 {
-	//AddMovementInput(Camera->GetRightVector(), Value);
-
 	if (SwitchMotion)
 	{
-		const FRotator Rotation = Camera->GetComponentRotation();
-		const FRotator YawRotation(0, Rotation.Yaw, 0);
-
-		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-		AddMovementInput(Direction, Value);
+		AddMovementInput(Camera->GetRightVector(), Value);
 	}
+}
+
+void AMyCharacter::MoveBackwards(float Value)
+{
+	if (SwitchMotion)
+	{
+		AddMovementInput(Camera->GetForwardVector(), -Value);
+	}
+}
+
+void AMyCharacter::MoveLeft(float Value)
+{
+	if (SwitchMotion)
+	{
+		AddMovementInput(Camera->GetRightVector(), -Value);
+	}
+}
+
+void AMyCharacter::TurnRight()
+{
+	FRotator ActorRotation = this->GetActorRotation();
+	FRotator NewRotation(0, ActorRotation.Yaw + 30.0f, 0);
+	this->SetActorRotation(NewRotation);
+}
+
+void AMyCharacter::TurnLeft()
+{
+	FRotator ActorRotation = this->GetActorRotation();
+	FRotator NewRotation(0, ActorRotation.Yaw - 30.0f, 0);
+	this->SetActorRotation(NewRotation);
 }
 
 bool AMyCharacter::TeleportLocation()
@@ -178,6 +200,8 @@ void AMyCharacter::Shoot()
 
 	if (cooldown == false)
 	{
+		GetWorld()->SpawnActor<AActor>(Bullet, Start, GunBarrel->GetComponentRotation());
+
 		if (GetWorld()->LineTraceSingleByChannel(hitShoot, Start, End, ECC_Visibility, QueryParams))
 		{
 			if (ImpactParticles)
