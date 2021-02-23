@@ -75,6 +75,17 @@
 					}
 				},
 				{
+					"mode": "button",
+					"path": "/user/hand/right/input/application_menu",
+					"inputs":
+					{
+						"click":
+						{
+							"output": "/actions/main/in/GrabWeapon"
+						}
+					}
+				},
+				{
 					"mode": "dpad",
 					"path": "/user/hand/left/input/trackpad",
 					"parameters":

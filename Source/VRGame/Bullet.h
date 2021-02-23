@@ -16,6 +16,8 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
+	void OnDestroy();
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UStaticMeshComponent* BulletMesh;
 
@@ -23,7 +25,7 @@ public:
 	UArrowComponent* BulletArrowComponent = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	float BulletForce = 30.0f;
+	float BulletForce = 50.0f;
 
 private:
 	virtual void BeginPlay() override;

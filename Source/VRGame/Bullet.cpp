@@ -28,3 +28,8 @@ void ABullet::Tick(float DeltaTime)
 
 }
 
+void ABullet::OnDestroy()
+{
+	Destroy();
+}
+

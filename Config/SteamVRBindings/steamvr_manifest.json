@@ -168,6 +168,10 @@
 			"type": "boolean"
 		},
 		{
+			"name": "/actions/main/in/GrabWeapon",
+			"type": "boolean"
+		},
+		{
 			"name": "/actions/main/in/MoveRight axis",
 			"type": "vector1"
 		},
@@ -433,6 +437,7 @@
 			"/actions/main/in/Shoot": "Shoot",
 			"/actions/main/in/TurnRight": "TurnRight",
 			"/actions/main/in/TurnLeft": "TurnLeft",
+			"/actions/main/in/GrabWeapon": "GrabWeapon",
 			"/actions/main/in/MoveRight axis": "MoveRight",
 			"/actions/main/in/MoveForward axis": "MoveForward",
 			"/actions/main/in/Move_X,Move_Y X Y_axis2d": "Move",

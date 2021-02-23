@@ -7,8 +7,6 @@
 #include "Components/StaticMeshComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
-#include "Particles/ParticleSystemComponent.h"
-#include "Particles/ParticleSystem.h"
 #include "GameFramework/PlayerController.h"
 #include "NavMesh/RecastNavMesh.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -39,10 +37,8 @@ AMyCharacter::AMyCharacter()
 
 	RightHandSkeletal = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("RightHand"));
 	RightHandSkeletal->SetupAttachment(RightMotionController);
-	RightHandSkeletal->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 
-	GunBarrel = CreateDefaultSubobject<USceneComponent>(TEXT("Barrel"));
-	GunBarrel->SetupAttachment(RightHandSkeletal);
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel1, ECollisionResponse::ECR_Overlap);
 
 	navmesh = dynamic_cast<ARecastNavMesh*>(UGameplayStatics::GetActorOfClass(GetWorld(), ARecastNavMesh::StaticClass()));
 }
@@ -92,9 +88,11 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 	PlayerInputComponent->BindAction("Teleport", IE_Pressed, this, &AMyCharacter::Teleport);
 	PlayerInputComponent->BindAction("ChangeMotion", IE_Pressed, this, &AMyCharacter::ChangeMotion);
-	PlayerInputComponent->BindAction("Shoot", IE_Pressed, this, &AMyCharacter::Shoot);
 	PlayerInputComponent->BindAction("TurnRight", IE_Pressed, this, &AMyCharacter::TurnRight);
 	PlayerInputComponent->BindAction("TurnLeft", IE_Pressed, this, &AMyCharacter::TurnLeft);
+
+	PlayerInputComponent->BindAction("Shoot", IE_Pressed, Weapon, &AWeapon::Shoot);
+	PlayerInputComponent->BindAction("GrabWeapon", IE_Pressed, this, &AMyCharacter::GrabWeapon);
 
 }
 
@@ -187,33 +185,8 @@ void AMyCharacter::Teleport()
 	}
 }
 
-void AMyCharacter::Shoot()
+void AMyCharacter::GrabWeapon()
 {
-	FHitResult hitShoot;
-	const float PistolRange = 2000.0f;
-	const FVector Start = GunBarrel->GetComponentLocation();
-	const FVector End = (GunBarrel->GetForwardVector() * PistolRange) + Start;
-
-	FCollisionQueryParams QueryParams = FCollisionQueryParams(SCENE_QUERY_STAT(PistolRange), false, this);
-
-	if (cooldown == false)
-	{
-		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticles, FTransform(GunBarrel->GetComponentRotation(), GunBarrel->GetComponentLocation()));
-
-		if (GetWorld()->LineTraceSingleByChannel(hitShoot, Start, End, ECC_Visibility, QueryParams))
-		{
-			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticles, FTransform(hitShoot.ImpactNormal.Rotation(), hitShoot.ImpactPoint));
-		}
-
-		GetWorld()->SpawnActor<AActor>(Bullet, Start, FRotator::ZeroRotator);
-	}
-
-	cooldown = true;
-	FTimerHandle handle;
-	GetWorld()->GetTimerManager().SetTimer(handle, this, &AMyCharacter::SwitchCoolDown, 0.5);
-}
-
-void AMyCharacter::SwitchCoolDown()
-{
-	cooldown = false;
+	RightHandSkeletal->HideBone(0, PBO_None);
+	Gun->WeaponMesh->SetupAttachment(RightMotionController);
 }
