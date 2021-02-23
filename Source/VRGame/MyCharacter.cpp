@@ -39,6 +39,7 @@ AMyCharacter::AMyCharacter()
 
 	RightHandSkeletal = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("RightHand"));
 	RightHandSkeletal->SetupAttachment(RightMotionController);
+	RightHandSkeletal->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 
 	GunBarrel = CreateDefaultSubobject<USceneComponent>(TEXT("Barrel"));
 	GunBarrel->SetupAttachment(RightHandSkeletal);
@@ -53,6 +54,7 @@ void AMyCharacter::BeginPlay()
 	UHeadMountedDisplayFunctionLibrary::SetTrackingOrigin(EHMDTrackingOrigin::Floor);
 	Scene->SetRelativeLocation(FVector(0.0f, 0.0f, -GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight()));
 
+	playerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 }
 
 void AMyCharacter::Tick(float DeltaTime)
@@ -142,16 +144,12 @@ void AMyCharacter::MoveLeft(float Value)
 
 void AMyCharacter::TurnRight()
 {
-	FRotator ActorRotation = this->GetActorRotation();
-	FRotator NewRotation(0, ActorRotation.Yaw + 30.0f, 0);
-	this->SetActorRotation(NewRotation);
+	playerController->AddYawInput(30.0f / playerController->InputYawScale);
 }
 
 void AMyCharacter::TurnLeft()
 {
-	FRotator ActorRotation = this->GetActorRotation();
-	FRotator NewRotation(0, ActorRotation.Yaw - 30.0f, 0);
-	this->SetActorRotation(NewRotation);
+	playerController->AddYawInput(-30.0f / playerController->InputYawScale);
 }
 
 bool AMyCharacter::TeleportLocation()
@@ -200,17 +198,14 @@ void AMyCharacter::Shoot()
 
 	if (cooldown == false)
 	{
-		GetWorld()->SpawnActor<AActor>(Bullet, Start, GunBarrel->GetComponentRotation());
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticles, FTransform(GunBarrel->GetComponentRotation(), GunBarrel->GetComponentLocation()));
 
 		if (GetWorld()->LineTraceSingleByChannel(hitShoot, Start, End, ECC_Visibility, QueryParams))
 		{
-			if (ImpactParticles)
-			{
-				UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticles, FTransform(hitShoot.ImpactNormal.Rotation(), hitShoot.ImpactPoint));
-			}
+			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticles, FTransform(hitShoot.ImpactNormal.Rotation(), hitShoot.ImpactPoint));
 		}
 
-		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticles, FTransform(GunBarrel->GetSocketRotation("Barrel"), GunBarrel->GetSocketLocation("Barrel")));
+		GetWorld()->SpawnActor<AActor>(Bullet, Start, FRotator::ZeroRotator);
 	}
 
 	cooldown = true;

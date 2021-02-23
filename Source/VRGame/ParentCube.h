@@ -24,7 +24,7 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-	virtual void Destroy();
+	virtual void OnDestroy();
 
 	UFUNCTION()
 	virtual void OnOverlap(AActor* OverlappedActor, AActor* OtherActor);

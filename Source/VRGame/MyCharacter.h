@@ -83,5 +83,5 @@ private:
 
 	bool CanTeleport;
 
-	ABullet* BulletClass;
+	APlayerController* playerController;
 };

@@ -29,7 +29,7 @@ void AParentCube::Tick(float DeltaTime)
 
 }
 
-void AParentCube::Destroy()
+void AParentCube::OnDestroy()
 {
 	Destroy();
 }
@@ -38,7 +38,7 @@ void AParentCube::OnOverlap(AActor* OverlappedActor, AActor* OtherActor)
 {
 	if (Cast<ABullet>(OtherActor) != nullptr)
 	{
-		Destroy();
+		OnDestroy();
 	}
 }
 
