@@ -22,8 +22,6 @@ public:
 
 	void SwitchCoolDown();
 
-	void DestroyBullet();
-
 	bool cooldown;
 
 	ABullet* BulletClass;
@@ -37,7 +35,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UParticleSystem* ImpactParticles;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class UBoxComponent* CollisionBox;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSubclassOf<ABullet> Bullet;
+	TSubclassOf<ABullet> BulletSubclass;
 
 };

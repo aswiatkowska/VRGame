@@ -20,6 +20,9 @@ void ABullet::BeginPlay()
 	Super::BeginPlay();
 	
 	BulletMesh->AddImpulse(BulletArrowComponent->GetForwardVector() * BulletForce);
+
+	FTimerHandle handle;
+	GetWorld()->GetTimerManager().SetTimer(handle, this, &ABullet::OnDestroy, 3);
 }
 
 void ABullet::Tick(float DeltaTime)

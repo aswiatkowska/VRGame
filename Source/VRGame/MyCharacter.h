@@ -38,6 +38,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class ARecastNavMesh* navmesh;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class USphereComponent* CollisionSphere;
+
 private:
 	virtual void BeginPlay() override;
 
@@ -61,7 +64,13 @@ private:
 
 	void TurnLeft();
 
+	void OnOverlap(AActor* OverlappedActor, AActor* OtherActor);
+
 	void GrabWeapon();
+
+	void ReleaseWeapon();
+
+	void Shoot();
 
 	FHitResult hit;
 
@@ -71,9 +80,9 @@ private:
 
 	bool CanTeleport;
 
-	AWeapon* Weapon;
+	bool CanGrab;
 
-	AGun* Gun;
+	AWeapon* Weapon;
 
 	APlayerController* playerController;
 };

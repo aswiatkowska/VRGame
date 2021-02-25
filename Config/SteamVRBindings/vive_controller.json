@@ -76,12 +76,23 @@
 				},
 				{
 					"mode": "button",
-					"path": "/user/hand/right/input/application_menu",
+					"path": "/user/hand/right/input/grip",
 					"inputs":
 					{
 						"click":
 						{
 							"output": "/actions/main/in/GrabWeapon"
+						}
+					}
+				},
+				{
+					"mode": "button",
+					"path": "/user/hand/right/input/grip",
+					"inputs":
+					{
+						"click":
+						{
+							"output": "/actions/main/in/ReleaseWeapon"
 						}
 					}
 				},

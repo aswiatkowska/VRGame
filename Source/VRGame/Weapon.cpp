@@ -2,7 +2,9 @@
 #include "Weapon.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/SceneComponent.h"
+#include "Components/BoxComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "CustomChannels.h"
 
 AWeapon::AWeapon()
 {
@@ -11,8 +13,14 @@ AWeapon::AWeapon()
 	WeaponMesh = CreateDefaultSubobject<USkeletalMeshComponent>("Weapon");
 	WeaponMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel1, ECollisionResponse::ECR_Ignore);
 
-	Barrel = CreateDefaultSubobject<USceneComponent>(TEXT("Barrel"));
+	Barrel = CreateDefaultSubobject<USceneComponent>("Barrel");
 	Barrel->SetupAttachment(WeaponMesh);
+
+	CollisionBox = CreateDefaultSubobject<UBoxComponent>("Box");
+	CollisionBox->SetupAttachment(WeaponMesh);
+	CollisionBox->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel4);
+	CollisionBox->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+	CollisionBox->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel3, ECollisionResponse::ECR_Overlap);
 
 }
 
@@ -46,23 +54,16 @@ void AWeapon::Shoot()
 			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticles, FTransform(hitShoot.ImpactNormal.Rotation(), hitShoot.ImpactPoint));
 		}
 
-		GetWorld()->SpawnActor<AActor>(Bullet, Start, Barrel->GetComponentRotation());
+		GetWorld()->SpawnActor<AActor>(BulletSubclass, Start, Barrel->GetComponentRotation());
 	}
 
 	cooldown = true;
 	FTimerHandle handle;
 	GetWorld()->GetTimerManager().SetTimer(handle, this, &AWeapon::SwitchCoolDown, 0.5);
-	DestroyBullet();
 }
 
 void AWeapon::SwitchCoolDown()
 {
 	cooldown = false;
-}
-
-void AWeapon::DestroyBullet()
-{
-	FTimerHandle handle;
-	GetWorld()->GetTimerManager().SetTimer(handle, BulletClass, &ABullet::OnDestroy, 3);
 }
 

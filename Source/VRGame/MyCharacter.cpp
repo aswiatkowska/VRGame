@@ -7,40 +7,50 @@
 #include "Components/StaticMeshComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "Components/SphereComponent.h"
 #include "GameFramework/PlayerController.h"
 #include "NavMesh/RecastNavMesh.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "Engine/EngineTypes.h"
+#include "CustomChannels.h"
 
 AMyCharacter::AMyCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	Scene = CreateDefaultSubobject<USceneComponent>(TEXT("Scene"));
+	Scene = CreateDefaultSubobject<USceneComponent>("Scene");
 	Scene->SetupAttachment(GetRootComponent());
 
-	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
+	Camera = CreateDefaultSubobject<UCameraComponent>("Camera");
 	Camera->SetupAttachment(Scene);
 
-	LeftMotionController = CreateDefaultSubobject<UMotionControllerComponent>(TEXT("LeftMotionController"));
+	LeftMotionController = CreateDefaultSubobject<UMotionControllerComponent>("LeftMotionController");
 	LeftMotionController->SetupAttachment(Scene);
 	LeftMotionController->SetTrackingSource(EControllerHand::Left);
 
-	RightMotionController = CreateDefaultSubobject<UMotionControllerComponent>(TEXT("RightMotionController"));
+	RightMotionController = CreateDefaultSubobject<UMotionControllerComponent>("RightMotionController");
 	RightMotionController->SetupAttachment(Scene);
 	RightMotionController->SetTrackingSource(EControllerHand::Right);
 
-	LeftHandMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("LeftHand"));
+	LeftHandMesh = CreateDefaultSubobject<UStaticMeshComponent>("LeftHand");
 	LeftHandMesh->SetupAttachment(LeftMotionController);
 
-	RightHandSkeletal = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("RightHand"));
+	RightHandSkeletal = CreateDefaultSubobject<USkeletalMeshComponent>("RightHand");
 	RightHandSkeletal->SetupAttachment(RightMotionController);
 
-	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel1, ECollisionResponse::ECR_Overlap);
+	CollisionSphere = CreateDefaultSubobject<USphereComponent>("Sphere");
+	CollisionSphere->SetupAttachment(RightHandSkeletal);
+	CollisionSphere->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel3);
+	CollisionSphere->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+	CollisionSphere->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel4, ECollisionResponse::ECR_Overlap);
+
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel2, ECollisionResponse::ECR_Overlap);
 
 	navmesh = dynamic_cast<ARecastNavMesh*>(UGameplayStatics::GetActorOfClass(GetWorld(), ARecastNavMesh::StaticClass()));
+
+	OnActorBeginOverlap.AddDynamic(this, &AMyCharacter::OnOverlap);
 }
 
 void AMyCharacter::BeginPlay()
@@ -91,8 +101,9 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	PlayerInputComponent->BindAction("TurnRight", IE_Pressed, this, &AMyCharacter::TurnRight);
 	PlayerInputComponent->BindAction("TurnLeft", IE_Pressed, this, &AMyCharacter::TurnLeft);
 
-	PlayerInputComponent->BindAction("Shoot", IE_Pressed, Weapon, &AWeapon::Shoot);
+	PlayerInputComponent->BindAction("Shoot", IE_Pressed, this, &AMyCharacter::Shoot);
 	PlayerInputComponent->BindAction("GrabWeapon", IE_Pressed, this, &AMyCharacter::GrabWeapon);
+	PlayerInputComponent->BindAction("ReleaseWeapon", IE_Released, this, &AMyCharacter::ReleaseWeapon);
 
 }
 
@@ -185,8 +196,35 @@ void AMyCharacter::Teleport()
 	}
 }
 
+void AMyCharacter::OnOverlap(AActor* OverlappedActor, AActor* OtherActor)
+{
+	if (Cast<AWeapon>(RightHandSkeletal) != nullptr)
+	{
+		CanGrab = true;
+	}
+	else
+	{
+		CanGrab = false;
+	}
+}
+
+
 void AMyCharacter::GrabWeapon()
 {
-	RightHandSkeletal->HideBone(0, PBO_None);
-	Gun->WeaponMesh->SetupAttachment(RightMotionController);
+	if (CanGrab == true)
+	{
+		RightHandSkeletal->SetVisibility(false);
+		Weapon->WeaponMesh->AttachToComponent(RightMotionController, FAttachmentTransformRules::KeepWorldTransform);
+	}
+}
+
+void AMyCharacter::ReleaseWeapon()
+{
+	RightHandSkeletal->SetVisibility(true);
+	Weapon->WeaponMesh->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+}
+
+void AMyCharacter::Shoot()
+{
+	Weapon->Shoot();
 }
