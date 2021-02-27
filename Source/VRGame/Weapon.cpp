@@ -11,16 +11,20 @@ AWeapon::AWeapon()
 	PrimaryActorTick.bCanEverTick = true;
 
 	WeaponMesh = CreateDefaultSubobject<USkeletalMeshComponent>("Weapon");
-	WeaponMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel1, ECollisionResponse::ECR_Ignore);
+	WeaponMesh->SetCollisionResponseToChannel((ECollisionChannel)(CustomCollisionChannelsEnum::Bullet), ECollisionResponse::ECR_Ignore);
+	WeaponMesh->SetSimulatePhysics(true);
 
 	Barrel = CreateDefaultSubobject<USceneComponent>("Barrel");
 	Barrel->SetupAttachment(WeaponMesh);
 
 	CollisionBox = CreateDefaultSubobject<UBoxComponent>("Box");
 	CollisionBox->SetupAttachment(WeaponMesh);
-	CollisionBox->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel4);
+	CollisionBox->SetCollisionObjectType((ECollisionChannel)(CustomCollisionChannelsEnum::GrabbableObject));
 	CollisionBox->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
-	CollisionBox->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel3, ECollisionResponse::ECR_Overlap);
+	CollisionBox->SetCollisionResponseToChannel((ECollisionChannel)(CustomCollisionChannelsEnum::Hand), ECollisionResponse::ECR_Overlap);
+
+	Location = WeaponMesh->GetComponentLocation();
+	Rotation = WeaponMesh->GetComponentRotation();
 
 }
 
@@ -38,6 +42,7 @@ void AWeapon::Tick(float DeltaTime)
 
 void AWeapon::Shoot()
 {
+	IsPressed = true;
 	FHitResult hitShoot;
 	const float PistolRange = 2000.0f;
 	const FVector Start = Barrel->GetComponentLocation();
@@ -45,7 +50,7 @@ void AWeapon::Shoot()
 
 	FCollisionQueryParams QueryParams = FCollisionQueryParams(SCENE_QUERY_STAT(PistolRange), false, this);
 
-	if (cooldown == false)
+	if (cooldown == false && Ammunition > 0)
 	{
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticles, FTransform(Barrel->GetComponentRotation(), Barrel->GetComponentLocation()));
 
@@ -57,13 +62,29 @@ void AWeapon::Shoot()
 		GetWorld()->SpawnActor<AActor>(BulletSubclass, Start, Barrel->GetComponentRotation());
 	}
 
+	Ammunition = Ammunition - 1;
 	cooldown = true;
 	FTimerHandle handle;
 	GetWorld()->GetTimerManager().SetTimer(handle, this, &AWeapon::SwitchCoolDown, 0.5);
 }
 
+void AWeapon::ShootingReleased()
+{
+	IsPressed = false;
+}
+
 void AWeapon::SwitchCoolDown()
 {
 	cooldown = false;
+	
+	if (ShootingSpree() && IsPressed)
+	{
+		Shoot();
+	}
+}
+
+bool AWeapon::ShootingSpree()
+{
+	return true;
 }
 

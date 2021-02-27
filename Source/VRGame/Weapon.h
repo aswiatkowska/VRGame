@@ -22,6 +22,17 @@ public:
 
 	void SwitchCoolDown();
 
+	void ShootingReleased();
+
+	virtual bool ShootingSpree();
+
+	bool IsPressed = false;
+
+	FRotator Rotation;
+
+	FVector Location;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool cooldown;
 
 	ABullet* BulletClass;
@@ -40,5 +51,8 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<ABullet> BulletSubclass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int Ammunition;
 
 };

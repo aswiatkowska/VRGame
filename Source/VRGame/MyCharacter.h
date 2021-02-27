@@ -30,6 +30,9 @@ public:
 	class UMotionControllerComponent* RightMotionController;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class USceneComponent* GrabPoint;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class UStaticMeshComponent* LeftHandMesh;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
@@ -64,13 +67,13 @@ private:
 
 	void TurnLeft();
 
-	void OnOverlap(AActor* OverlappedActor, AActor* OtherActor);
-
 	void GrabWeapon();
 
 	void ReleaseWeapon();
 
 	void Shoot();
+
+	void ShootingReleased();
 
 	FHitResult hit;
 
@@ -82,7 +85,16 @@ private:
 
 	bool CanGrab;
 
-	AWeapon* Weapon;
+	AWeapon* Weapon = nullptr;
+
+	UFUNCTION()
+	void OnHandOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, 
+		const FHitResult& SweepResult);
+
+	UFUNCTION()
+	void OnHandOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	bool WeaponGrabbed = false;
 
 	APlayerController* playerController;
 };

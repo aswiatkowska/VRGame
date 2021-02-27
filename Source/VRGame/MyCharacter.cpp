@@ -34,6 +34,9 @@ AMyCharacter::AMyCharacter()
 	RightMotionController->SetupAttachment(Scene);
 	RightMotionController->SetTrackingSource(EControllerHand::Right);
 
+	GrabPoint = CreateDefaultSubobject<USceneComponent>("GrabPoint");
+	GrabPoint->SetupAttachment(RightMotionController);
+
 	LeftHandMesh = CreateDefaultSubobject<UStaticMeshComponent>("LeftHand");
 	LeftHandMesh->SetupAttachment(LeftMotionController);
 
@@ -42,15 +45,13 @@ AMyCharacter::AMyCharacter()
 
 	CollisionSphere = CreateDefaultSubobject<USphereComponent>("Sphere");
 	CollisionSphere->SetupAttachment(RightHandSkeletal);
-	CollisionSphere->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel3);
+	CollisionSphere->SetCollisionObjectType((ECollisionChannel)(CustomCollisionChannelsEnum::Hand));
 	CollisionSphere->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
-	CollisionSphere->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel4, ECollisionResponse::ECR_Overlap);
+	CollisionSphere->SetCollisionResponseToChannel((ECollisionChannel)(CustomCollisionChannelsEnum::GrabbableObject), ECollisionResponse::ECR_Overlap);
 
-	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel2, ECollisionResponse::ECR_Overlap);
+	GetCapsuleComponent()->SetCollisionResponseToChannel((ECollisionChannel)(CustomCollisionChannelsEnum::Player), ECollisionResponse::ECR_Overlap);
 
 	navmesh = dynamic_cast<ARecastNavMesh*>(UGameplayStatics::GetActorOfClass(GetWorld(), ARecastNavMesh::StaticClass()));
-
-	OnActorBeginOverlap.AddDynamic(this, &AMyCharacter::OnOverlap);
 }
 
 void AMyCharacter::BeginPlay()
@@ -61,6 +62,9 @@ void AMyCharacter::BeginPlay()
 	Scene->SetRelativeLocation(FVector(0.0f, 0.0f, -GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight()));
 
 	playerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+
+	CollisionSphere->OnComponentBeginOverlap.AddDynamic(this, &AMyCharacter::OnHandOverlapBegin);
+	CollisionSphere->OnComponentEndOverlap.AddDynamic(this, &AMyCharacter::OnHandOverlapEnd);
 }
 
 void AMyCharacter::Tick(float DeltaTime)
@@ -102,6 +106,7 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	PlayerInputComponent->BindAction("TurnLeft", IE_Pressed, this, &AMyCharacter::TurnLeft);
 
 	PlayerInputComponent->BindAction("Shoot", IE_Pressed, this, &AMyCharacter::Shoot);
+	PlayerInputComponent->BindAction("Shoot", IE_Released, this, &AMyCharacter::ShootingReleased);
 	PlayerInputComponent->BindAction("GrabWeapon", IE_Pressed, this, &AMyCharacter::GrabWeapon);
 	PlayerInputComponent->BindAction("ReleaseWeapon", IE_Released, this, &AMyCharacter::ReleaseWeapon);
 
@@ -196,35 +201,63 @@ void AMyCharacter::Teleport()
 	}
 }
 
-void AMyCharacter::OnOverlap(AActor* OverlappedActor, AActor* OtherActor)
-{
-	if (Cast<AWeapon>(RightHandSkeletal) != nullptr)
-	{
-		CanGrab = true;
-	}
-	else
-	{
-		CanGrab = false;
-	}
-}
-
-
 void AMyCharacter::GrabWeapon()
 {
-	if (CanGrab == true)
+	if (CanGrab)
 	{
 		RightHandSkeletal->SetVisibility(false);
-		Weapon->WeaponMesh->AttachToComponent(RightMotionController, FAttachmentTransformRules::KeepWorldTransform);
+		Weapon->WeaponMesh->SetSimulatePhysics(false);
+		Weapon->AttachToComponent(RightMotionController, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+		GrabPoint->AddRelativeRotation(Weapon->Rotation);
+		GrabPoint->AddRelativeLocation(Weapon->Location);
+		WeaponGrabbed = true;
+		CanGrab = false;
 	}
 }
 
 void AMyCharacter::ReleaseWeapon()
 {
-	RightHandSkeletal->SetVisibility(true);
-	Weapon->WeaponMesh->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+	if (WeaponGrabbed)
+	{
+		RightHandSkeletal->SetVisibility(true);
+		Weapon->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+		Weapon->WeaponMesh->SetSimulatePhysics(true);
+		WeaponGrabbed = false;
+	}
 }
 
 void AMyCharacter::Shoot()
 {
-	Weapon->Shoot();
+	if (WeaponGrabbed)
+	{
+		Weapon->Shoot();
+	}
+}
+
+void AMyCharacter::ShootingReleased()
+{
+	if (WeaponGrabbed)
+	{
+		Weapon->ShootingReleased();
+	}
+}
+
+void AMyCharacter::OnHandOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
+	const FHitResult& SweepResult)
+{
+	if (WeaponGrabbed)
+	{
+		return;
+	}
+	Weapon = Cast<AWeapon>(OtherActor);
+	CanGrab = (Weapon != nullptr);
+}
+
+void AMyCharacter::OnHandOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	if (!WeaponGrabbed)
+	{
+		Weapon = nullptr;
+		CanGrab = false;
+	}
 }

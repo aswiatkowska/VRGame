@@ -14,4 +14,5 @@ class VRGAME_API AGun : public AWeapon
 public:
 	AGun();
 
+	virtual bool ShootingSpree() override;
 };
