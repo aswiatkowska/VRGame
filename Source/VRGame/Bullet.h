@@ -14,10 +14,6 @@ class VRGAME_API ABullet : public AActor
 public:	
 	ABullet();
 
-	virtual void Tick(float DeltaTime) override;
-
-	void OnDestroy();
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UStaticMeshComponent* BulletMesh;
 
@@ -29,5 +25,9 @@ public:
 
 private:
 	virtual void BeginPlay() override;
+
+	virtual void Tick(float DeltaTime) override;
+
+	void OnDestroy();
 
 };

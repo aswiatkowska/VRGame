@@ -42,6 +42,7 @@ AMyCharacter::AMyCharacter()
 
 	RightHandSkeletal = CreateDefaultSubobject<USkeletalMeshComponent>("RightHand");
 	RightHandSkeletal->SetupAttachment(RightMotionController);
+	RightHandSkeletal->SetCollisionObjectType((ECollisionChannel)(CustomCollisionChannelsEnum::Hand));
 
 	CollisionSphere = CreateDefaultSubobject<USphereComponent>("Sphere");
 	CollisionSphere->SetupAttachment(RightHandSkeletal);
@@ -49,7 +50,7 @@ AMyCharacter::AMyCharacter()
 	CollisionSphere->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 	CollisionSphere->SetCollisionResponseToChannel((ECollisionChannel)(CustomCollisionChannelsEnum::GrabbableObject), ECollisionResponse::ECR_Overlap);
 
-	GetCapsuleComponent()->SetCollisionResponseToChannel((ECollisionChannel)(CustomCollisionChannelsEnum::Player), ECollisionResponse::ECR_Overlap);
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
 
 	navmesh = dynamic_cast<ARecastNavMesh*>(UGameplayStatics::GetActorOfClass(GetWorld(), ARecastNavMesh::StaticClass()));
 }
@@ -207,9 +208,9 @@ void AMyCharacter::GrabWeapon()
 	{
 		RightHandSkeletal->SetVisibility(false);
 		Weapon->WeaponMesh->SetSimulatePhysics(false);
-		Weapon->AttachToComponent(RightMotionController, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-		GrabPoint->AddRelativeRotation(Weapon->Rotation);
-		GrabPoint->AddRelativeLocation(Weapon->Location);
+		Weapon->AttachToComponent(GrabPoint, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+		GrabPoint->SetRelativeLocation(Weapon->Location);
+		GrabPoint->SetRelativeRotation(Weapon->Rotation);
 		WeaponGrabbed = true;
 		CanGrab = false;
 	}
@@ -236,7 +237,7 @@ void AMyCharacter::Shoot()
 
 void AMyCharacter::ShootingReleased()
 {
-	if (WeaponGrabbed)
+	if (!WeaponGrabbed)
 	{
 		Weapon->ShootingReleased();
 	}

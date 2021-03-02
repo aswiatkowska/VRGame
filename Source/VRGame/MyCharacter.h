@@ -4,7 +4,6 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Weapon.h"
-#include "Gun.h"
 #include "MyCharacter.generated.h"
 
 UCLASS()
@@ -14,8 +13,6 @@ class VRGAME_API AMyCharacter : public ACharacter
 
 public:
 	AMyCharacter();
-
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class USceneComponent* Scene;
@@ -38,16 +35,18 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class USkeletalMeshComponent* RightHandSkeletal;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	class ARecastNavMesh* navmesh;
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class USphereComponent* CollisionSphere;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class ARecastNavMesh* navmesh;
 
 private:
 	virtual void BeginPlay() override;
 
 	virtual void Tick(float DeltaTime) override;
+
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	void Teleport();
 
@@ -85,7 +84,7 @@ private:
 
 	bool CanGrab;
 
-	AWeapon* Weapon = nullptr;
+	bool WeaponGrabbed = false;
 
 	UFUNCTION()
 	void OnHandOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, 
@@ -94,7 +93,7 @@ private:
 	UFUNCTION()
 	void OnHandOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
-	bool WeaponGrabbed = false;
+	AWeapon* Weapon = nullptr;
 
 	APlayerController* playerController;
 };

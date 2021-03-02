@@ -14,28 +14,11 @@ class VRGAME_API AWeapon : public AActor
 public:	
 	AWeapon();
 
-	virtual void BeginPlay() override;
-
-	virtual void Tick(float DeltaTime) override;
-
 	virtual void Shoot();
-
-	void SwitchCoolDown();
 
 	void ShootingReleased();
 
-	virtual bool ShootingSpree();
-
-	bool IsPressed = false;
-
-	FRotator Rotation;
-
-	FVector Location;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool cooldown;
-
-	ABullet* BulletClass;
+	int OwnedMagazinesCount = 1;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class USkeletalMeshComponent* WeaponMesh;
@@ -43,16 +26,44 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class USceneComponent* Barrel;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	class UParticleSystem* ImpactParticles;
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class UBoxComponent* CollisionBox;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UParticleSystem* ImpactParticles;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<ABullet> BulletSubclass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FVector Location = FVector::ZeroVector;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FRotator Rotation = FRotator::ZeroRotator;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float cooldownTime;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool ShootingSpree;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int Ammunition;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int MagazineCapacity;
+
+protected:
+	virtual void BeginPlay() override;
+
+	virtual void Tick(float DeltaTime) override;
+
+	void SwitchCoolDown();
+
+	void AmmunitionCheck();
+
+	bool IsPressed = false;
+
+	bool cooldown;
 
 };

@@ -11,7 +11,11 @@ AWeapon::AWeapon()
 	PrimaryActorTick.bCanEverTick = true;
 
 	WeaponMesh = CreateDefaultSubobject<USkeletalMeshComponent>("Weapon");
+	WeaponMesh->SetCollisionProfileName("BlockAllDynamic");
+	WeaponMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
 	WeaponMesh->SetCollisionResponseToChannel((ECollisionChannel)(CustomCollisionChannelsEnum::Bullet), ECollisionResponse::ECR_Ignore);
+	WeaponMesh->SetCollisionResponseToChannel((ECollisionChannel)(CustomCollisionChannelsEnum::Hand), ECollisionResponse::ECR_Ignore);
+	WeaponMesh->SetCollisionResponseToChannel((ECollisionChannel)(CustomCollisionChannelsEnum::GrabbableObject), ECollisionResponse::ECR_Ignore);
 	WeaponMesh->SetSimulatePhysics(true);
 
 	Barrel = CreateDefaultSubobject<USceneComponent>("Barrel");
@@ -22,9 +26,6 @@ AWeapon::AWeapon()
 	CollisionBox->SetCollisionObjectType((ECollisionChannel)(CustomCollisionChannelsEnum::GrabbableObject));
 	CollisionBox->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 	CollisionBox->SetCollisionResponseToChannel((ECollisionChannel)(CustomCollisionChannelsEnum::Hand), ECollisionResponse::ECR_Overlap);
-
-	Location = WeaponMesh->GetComponentLocation();
-	Rotation = WeaponMesh->GetComponentRotation();
 
 }
 
@@ -63,9 +64,10 @@ void AWeapon::Shoot()
 	}
 
 	Ammunition = Ammunition - 1;
+	AmmunitionCheck();
 	cooldown = true;
 	FTimerHandle handle;
-	GetWorld()->GetTimerManager().SetTimer(handle, this, &AWeapon::SwitchCoolDown, 0.5);
+	GetWorld()->GetTimerManager().SetTimer(handle, this, &AWeapon::SwitchCoolDown, cooldownTime);
 }
 
 void AWeapon::ShootingReleased()
@@ -77,14 +79,21 @@ void AWeapon::SwitchCoolDown()
 {
 	cooldown = false;
 	
-	if (ShootingSpree() && IsPressed)
+	if (ShootingSpree && IsPressed)
 	{
 		Shoot();
 	}
 }
 
-bool AWeapon::ShootingSpree()
+void AWeapon::AmmunitionCheck()
 {
-	return true;
+	if (Ammunition == 0)
+	{
+		if (OwnedMagazinesCount > 0)
+		{
+			Ammunition = MagazineCapacity;
+			OwnedMagazinesCount = OwnedMagazinesCount - 1;
+		}
+	}
 }
 
