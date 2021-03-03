@@ -224,6 +224,7 @@ void AMyCharacter::ReleaseWeapon()
 		Weapon->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 		Weapon->WeaponMesh->SetSimulatePhysics(true);
 		WeaponGrabbed = false;
+		Weapon->ShootingReleased();
 	}
 }
 
@@ -237,7 +238,7 @@ void AMyCharacter::Shoot()
 
 void AMyCharacter::ShootingReleased()
 {
-	if (!WeaponGrabbed)
+	if (WeaponGrabbed)
 	{
 		Weapon->ShootingReleased();
 	}
@@ -262,3 +263,4 @@ void AMyCharacter::OnHandOverlapEnd(UPrimitiveComponent* OverlappedComponent, AA
 		CanGrab = false;
 	}
 }
+

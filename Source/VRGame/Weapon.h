@@ -18,8 +18,6 @@ public:
 
 	void ShootingReleased();
 
-	int OwnedMagazinesCount = 1;
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class USkeletalMeshComponent* WeaponMesh;
 
@@ -61,6 +59,12 @@ protected:
 	void SwitchCoolDown();
 
 	void AmmunitionCheck();
+
+	void OnOverlap(AActor* OverlappedActor, AActor* OtherActor);
+
+	int OwnedMagazinesCount = 1;
+
+	bool IsOverlapped = false;
 
 	bool IsPressed = false;
 
