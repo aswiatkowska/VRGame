@@ -3,18 +3,14 @@
 #include "HeadMountedDisplayFunctionLibrary.h" 
 #include "Components/SceneComponent.h"
 #include "Camera/CameraComponent.h"
-#include "MotionControllerComponent.h" 
 #include "Components/StaticMeshComponent.h"
 #include "Components/CapsuleComponent.h"
-#include "Components/SkeletalMeshComponent.h"
-#include "Components/SphereComponent.h"
 #include "GameFramework/PlayerController.h"
 #include "NavMesh/RecastNavMesh.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "Engine/EngineTypes.h"
-#include "CustomChannels.h"
 
 AMyCharacter::AMyCharacter()
 {
@@ -25,30 +21,6 @@ AMyCharacter::AMyCharacter()
 
 	Camera = CreateDefaultSubobject<UCameraComponent>("Camera");
 	Camera->SetupAttachment(Scene);
-
-	LeftMotionController = CreateDefaultSubobject<UMotionControllerComponent>("LeftMotionController");
-	LeftMotionController->SetupAttachment(Scene);
-	LeftMotionController->SetTrackingSource(EControllerHand::Left);
-
-	RightMotionController = CreateDefaultSubobject<UMotionControllerComponent>("RightMotionController");
-	RightMotionController->SetupAttachment(Scene);
-	RightMotionController->SetTrackingSource(EControllerHand::Right);
-
-	GrabPoint = CreateDefaultSubobject<USceneComponent>("GrabPoint");
-	GrabPoint->SetupAttachment(RightMotionController);
-
-	LeftHandMesh = CreateDefaultSubobject<UStaticMeshComponent>("LeftHand");
-	LeftHandMesh->SetupAttachment(LeftMotionController);
-
-	RightHandSkeletal = CreateDefaultSubobject<USkeletalMeshComponent>("RightHand");
-	RightHandSkeletal->SetupAttachment(RightMotionController);
-	RightHandSkeletal->SetCollisionObjectType((ECollisionChannel)(CustomCollisionChannelsEnum::Hand));
-
-	CollisionSphere = CreateDefaultSubobject<USphereComponent>("Sphere");
-	CollisionSphere->SetupAttachment(RightHandSkeletal);
-	CollisionSphere->SetCollisionObjectType((ECollisionChannel)(CustomCollisionChannelsEnum::Hand));
-	CollisionSphere->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
-	CollisionSphere->SetCollisionResponseToChannel((ECollisionChannel)(CustomCollisionChannelsEnum::GrabbableObject), ECollisionResponse::ECR_Overlap);
 
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
 
@@ -64,8 +36,7 @@ void AMyCharacter::BeginPlay()
 
 	playerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 
-	CollisionSphere->OnComponentBeginOverlap.AddDynamic(this, &AMyCharacter::OnHandOverlapBegin);
-	CollisionSphere->OnComponentEndOverlap.AddDynamic(this, &AMyCharacter::OnHandOverlapEnd);
+	GetWorld()->SpawnActor<AHand>(GetClass(), Scene->GetComponentLocation(), Scene->GetComponentRotation());
 }
 
 void AMyCharacter::Tick(float DeltaTime)
@@ -75,11 +46,11 @@ void AMyCharacter::Tick(float DeltaTime)
 	if (!SwitchMotion)
 	{
 		TeleportLocation();
-		
+
 		if (TeleportLocation())
 		{
-			FVector Start = FVector(LeftMotionController->GetComponentLocation());
-			FVector End = FVector(LeftMotionController->GetComponentLocation() + (LeftHandMesh->GetForwardVector() * 1000.0f));
+			FVector Start = FVector(Hand->LeftHandSkeletal->GetComponentLocation());
+			FVector End = FVector(Hand->LeftHandSkeletal->GetComponentLocation() + (Hand->LeftHandSkeletal->GetForwardVector() * 1000.0f));
 
 			TArray<AActor*> ignored;
 			ignored.Add(this);
@@ -108,8 +79,8 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 	PlayerInputComponent->BindAction("Shoot", IE_Pressed, this, &AMyCharacter::Shoot);
 	PlayerInputComponent->BindAction("Shoot", IE_Released, this, &AMyCharacter::ShootingReleased);
-	PlayerInputComponent->BindAction("GrabWeapon", IE_Pressed, this, &AMyCharacter::GrabWeapon);
-	PlayerInputComponent->BindAction("ReleaseWeapon", IE_Released, this, &AMyCharacter::ReleaseWeapon);
+	PlayerInputComponent->BindAction("GrabWeapon", IE_Pressed, this, &AMyCharacter::WeaponGrabRelease);
+	PlayerInputComponent->BindAction("ReleaseWeapon", IE_Released, this, &AMyCharacter::WeaponGrabRelease);
 
 }
 
@@ -171,8 +142,8 @@ bool AMyCharacter::TeleportLocation()
 {
 	FHitResult hitTeleport;
 	const float TeleportRange = 1000.0f;
-	const FVector Start = LeftMotionController->GetComponentLocation();
-	const FVector End = (LeftMotionController->GetForwardVector() * TeleportRange) + Start;
+	const FVector Start = Hand->LeftHandSkeletal->GetComponentLocation();
+	const FVector End = (Hand->LeftHandSkeletal->GetForwardVector() * TeleportRange) + Start;
 
 	FCollisionQueryParams QueryParams = FCollisionQueryParams(SCENE_QUERY_STAT(TeleportRange), false, this);
 
@@ -202,65 +173,18 @@ void AMyCharacter::Teleport()
 	}
 }
 
-void AMyCharacter::GrabWeapon()
+void AMyCharacter::WeaponGrabRelease()
 {
-	if (CanGrab)
-	{
-		RightHandSkeletal->SetVisibility(false);
-		Weapon->WeaponMesh->SetSimulatePhysics(false);
-		Weapon->AttachToComponent(GrabPoint, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-		GrabPoint->SetRelativeLocation(Weapon->Location);
-		GrabPoint->SetRelativeRotation(Weapon->Rotation);
-		WeaponGrabbed = true;
-		CanGrab = false;
-	}
-}
-
-void AMyCharacter::ReleaseWeapon()
-{
-	if (WeaponGrabbed)
-	{
-		RightHandSkeletal->SetVisibility(true);
-		Weapon->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
-		Weapon->WeaponMesh->SetSimulatePhysics(true);
-		WeaponGrabbed = false;
-		Weapon->ShootingReleased();
-	}
+	Hand->WeaponGrabRelease();
 }
 
 void AMyCharacter::Shoot()
 {
-	if (WeaponGrabbed)
-	{
-		Weapon->Shoot();
-	}
+	Hand->Shoot();
 }
 
 void AMyCharacter::ShootingReleased()
 {
-	if (WeaponGrabbed)
-	{
-		Weapon->ShootingReleased();
-	}
-}
-
-void AMyCharacter::OnHandOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
-	const FHitResult& SweepResult)
-{
-	if (WeaponGrabbed)
-	{
-		return;
-	}
-	Weapon = Cast<AWeapon>(OtherActor);
-	CanGrab = (Weapon != nullptr);
-}
-
-void AMyCharacter::OnHandOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
-{
-	if (!WeaponGrabbed)
-	{
-		Weapon = nullptr;
-		CanGrab = false;
-	}
+	Hand->ShootingReleased();
 }
 
