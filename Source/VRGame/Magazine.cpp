@@ -9,7 +9,6 @@ AMagazine::AMagazine()
 	PrimaryActorTick.bCanEverTick = true;
 
 	MagazineMesh = CreateDefaultSubobject<UStaticMeshComponent>("MagazineMesh");
-	MagazineMesh->SetSimulatePhysics(true);
 
 	CollisionBox = CreateDefaultSubobject<UBoxComponent>("Box");
 	CollisionBox->SetupAttachment(MagazineMesh);

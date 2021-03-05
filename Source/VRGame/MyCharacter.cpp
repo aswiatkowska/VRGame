@@ -25,6 +25,10 @@ AMyCharacter::AMyCharacter()
 	LeftMotionController->SetupAttachment(Scene);
 	LeftMotionController->SetTrackingSource(EControllerHand::Left);
 
+	RightMotionController = CreateDefaultSubobject<UMotionControllerComponent>("RightMotionController");
+	RightMotionController->SetupAttachment(Scene);
+	RightMotionController->SetTrackingSource(EControllerHand::Right);
+
 	LeftHandSkeletal = CreateDefaultSubobject<USkeletalMeshComponent>("LeftHand");
 	LeftHandSkeletal->SetupAttachment(LeftMotionController);
 	LeftHandSkeletal->SetCollisionObjectType((ECollisionChannel)(CustomCollisionChannelsEnum::Hand));
@@ -46,7 +50,8 @@ void AMyCharacter::BeginPlay()
 
 	playerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 
-	GetWorld()->SpawnActor<AHand>(AHand::StaticClass(), Scene->GetComponentLocation(), Scene->GetComponentRotation());
+	Hand = GetWorld()->SpawnActor<AHand>(HandClass, FVector::ZeroVector, FRotator::ZeroRotator/*RightMotionController->GetComponentLocation(), RightMotionController->GetComponentRotation()*/);
+	Hand->AttachToComponent(RightMotionController, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 }
 
 void AMyCharacter::Tick(float DeltaTime)

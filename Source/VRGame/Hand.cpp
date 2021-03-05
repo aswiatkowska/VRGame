@@ -14,16 +14,12 @@ AHand::AHand()
 	Scene = CreateDefaultSubobject<USceneComponent>("Scene");
 	Scene->SetupAttachment(GetRootComponent());
 
-	RightMotionController = CreateDefaultSubobject<UMotionControllerComponent>("RightMotionController");
-	RightMotionController->SetupAttachment(Scene);
-	RightMotionController->SetTrackingSource(EControllerHand::Right);
+	RightHandSkeletal = CreateDefaultSubobject<USkeletalMeshComponent>("RightHand");
+	RightHandSkeletal->SetupAttachment(Scene);
+	RightHandSkeletal->SetCollisionObjectType((ECollisionChannel)(CustomCollisionChannelsEnum::Hand));
 
 	GrabPoint = CreateDefaultSubobject<USceneComponent>("GrabPoint");
-	GrabPoint->SetupAttachment(RightMotionController);
-
-	RightHandSkeletal = CreateDefaultSubobject<USkeletalMeshComponent>("RightHand");
-	RightHandSkeletal->SetupAttachment(RightMotionController);
-	RightHandSkeletal->SetCollisionObjectType((ECollisionChannel)(CustomCollisionChannelsEnum::Hand));
+	GrabPoint->SetupAttachment(RightHandSkeletal);
 
 	CollisionSphere = CreateDefaultSubobject<USphereComponent>("Sphere");
 	CollisionSphere->SetupAttachment(RightHandSkeletal);
@@ -39,7 +35,7 @@ void AHand::BeginPlay()
 
 	CollisionSphere->OnComponentBeginOverlap.AddDynamic(this, &AHand::OnHandOverlapBegin);
 	CollisionSphere->OnComponentEndOverlap.AddDynamic(this, &AHand::OnHandOverlapEnd);
-	
+
 }
 
 void AHand::Tick(float DeltaTime)

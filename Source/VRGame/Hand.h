@@ -4,6 +4,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Weapon.h"
+#include "Magazine.h"
 #include "Hand.generated.h"
 
 UCLASS()
@@ -15,16 +16,13 @@ public:
 	AHand();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	class UMotionControllerComponent* RightMotionController;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class USceneComponent* Scene;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	class USceneComponent* GrabPoint;
+	class USkeletalMeshComponent* RightHandSkeletal;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	class USkeletalMeshComponent* RightHandSkeletal;
+	class USceneComponent* GrabPoint;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class USphereComponent* CollisionSphere;
@@ -51,6 +49,10 @@ private:
 
 	bool WeaponGrabbed = false;
 
+	bool MagazineGrabbed = false;
+
 	AWeapon* Weapon = nullptr;
+
+	AMagazine* Magazine = nullptr;
 
 };
