@@ -5,12 +5,14 @@
 #include "Camera/CameraComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "MotionControllerComponent.h"
 #include "GameFramework/PlayerController.h"
 #include "NavMesh/RecastNavMesh.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "Engine/EngineTypes.h"
+#include "CustomChannels.h"
 
 AMyCharacter::AMyCharacter()
 {
@@ -18,6 +20,14 @@ AMyCharacter::AMyCharacter()
 
 	Scene = CreateDefaultSubobject<USceneComponent>("Scene");
 	Scene->SetupAttachment(GetRootComponent());
+
+	LeftMotionController = CreateDefaultSubobject<UMotionControllerComponent>("LeftMotionController");
+	LeftMotionController->SetupAttachment(Scene);
+	LeftMotionController->SetTrackingSource(EControllerHand::Left);
+
+	LeftHandSkeletal = CreateDefaultSubobject<USkeletalMeshComponent>("LeftHand");
+	LeftHandSkeletal->SetupAttachment(LeftMotionController);
+	LeftHandSkeletal->SetCollisionObjectType((ECollisionChannel)(CustomCollisionChannelsEnum::Hand));
 
 	Camera = CreateDefaultSubobject<UCameraComponent>("Camera");
 	Camera->SetupAttachment(Scene);
@@ -36,7 +46,7 @@ void AMyCharacter::BeginPlay()
 
 	playerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 
-	GetWorld()->SpawnActor<AHand>(GetClass(), Scene->GetComponentLocation(), Scene->GetComponentRotation());
+	GetWorld()->SpawnActor<AHand>(AHand::StaticClass(), Scene->GetComponentLocation(), Scene->GetComponentRotation());
 }
 
 void AMyCharacter::Tick(float DeltaTime)
@@ -49,8 +59,8 @@ void AMyCharacter::Tick(float DeltaTime)
 
 		if (TeleportLocation())
 		{
-			FVector Start = FVector(Hand->LeftHandSkeletal->GetComponentLocation());
-			FVector End = FVector(Hand->LeftHandSkeletal->GetComponentLocation() + (Hand->LeftHandSkeletal->GetForwardVector() * 1000.0f));
+			FVector Start = FVector(LeftMotionController->GetComponentLocation());
+			FVector End = FVector(LeftMotionController->GetComponentLocation() + (LeftHandSkeletal->GetForwardVector() * 1000.0f));
 
 			TArray<AActor*> ignored;
 			ignored.Add(this);
@@ -142,8 +152,8 @@ bool AMyCharacter::TeleportLocation()
 {
 	FHitResult hitTeleport;
 	const float TeleportRange = 1000.0f;
-	const FVector Start = Hand->LeftHandSkeletal->GetComponentLocation();
-	const FVector End = (Hand->LeftHandSkeletal->GetForwardVector() * TeleportRange) + Start;
+	const FVector Start = LeftMotionController->GetComponentLocation();
+	const FVector End = (LeftMotionController->GetForwardVector() * TeleportRange) + Start;
 
 	FCollisionQueryParams QueryParams = FCollisionQueryParams(SCENE_QUERY_STAT(TeleportRange), false, this);
 

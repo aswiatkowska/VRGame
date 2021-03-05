@@ -15,9 +15,6 @@ public:
 	AHand();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	class UMotionControllerComponent* LeftMotionController;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class UMotionControllerComponent* RightMotionController;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
@@ -25,9 +22,6 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class USceneComponent* GrabPoint;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	class USkeletalMeshComponent* LeftHandSkeletal;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class USkeletalMeshComponent* RightHandSkeletal;

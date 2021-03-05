@@ -5,6 +5,7 @@
 #include "Components/SphereComponent.h"
 #include "MotionControllerComponent.h"
 #include "CustomChannels.h"
+#include "Engine/EngineTypes.h"
 
 AHand::AHand()
 {
@@ -13,20 +14,12 @@ AHand::AHand()
 	Scene = CreateDefaultSubobject<USceneComponent>("Scene");
 	Scene->SetupAttachment(GetRootComponent());
 
-	LeftMotionController = CreateDefaultSubobject<UMotionControllerComponent>("LeftMotionController");
-	LeftMotionController->SetupAttachment(Scene);
-	LeftMotionController->SetTrackingSource(EControllerHand::Left);
-
 	RightMotionController = CreateDefaultSubobject<UMotionControllerComponent>("RightMotionController");
 	RightMotionController->SetupAttachment(Scene);
 	RightMotionController->SetTrackingSource(EControllerHand::Right);
 
 	GrabPoint = CreateDefaultSubobject<USceneComponent>("GrabPoint");
 	GrabPoint->SetupAttachment(RightMotionController);
-
-	LeftHandSkeletal = CreateDefaultSubobject<USkeletalMeshComponent>("LeftHand");
-	LeftHandSkeletal->SetupAttachment(LeftMotionController);
-	LeftHandSkeletal->SetCollisionObjectType((ECollisionChannel)(CustomCollisionChannelsEnum::Hand));
 
 	RightHandSkeletal = CreateDefaultSubobject<USkeletalMeshComponent>("RightHand");
 	RightHandSkeletal->SetupAttachment(RightMotionController);
