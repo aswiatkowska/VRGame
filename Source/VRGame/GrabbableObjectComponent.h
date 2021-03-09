@@ -5,12 +5,15 @@
 #include "Components/ActorComponent.h"
 #include "GrabbableObjectComponent.generated.h"
 
-UENUM(BlueprintType)
-enum class ObjectToGrab : uint8
+UENUM()
+namespace EObjectToGrab
 {
-	WEAPON = 0,
-	MAGAZINE = 1
-};
+	enum Type
+	{
+		Weapon,
+		Magazine,
+	};
+}
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class VRGAME_API UGrabbableObjectComponent : public UActorComponent

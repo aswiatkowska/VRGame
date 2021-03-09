@@ -22,6 +22,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class UGrabbableObjectComponent* GrabbableObjComp;
 
+	UPROPERTY(EditDefaultsOnly, Category = GrabbableObject)
+	TEnumAsByte<EObjectToGrab::Type> GrabbableObjType;
+
 	void DestroyMagazine();
 
 };

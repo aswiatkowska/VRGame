@@ -12,6 +12,10 @@ AMagazine::AMagazine()
 	GrabbableObjComp = CreateDefaultSubobject<UGrabbableObjectComponent>("GrabbableObjComp");
 
 	MagazineMesh = CreateDefaultSubobject<UStaticMeshComponent>("MagazineMesh");
+	MagazineMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECR_Ignore);
+	MagazineMesh->SetCollisionResponseToChannel((ECollisionChannel)(CustomCollisionChannelsEnum::Hand), ECR_Ignore);
+	MagazineMesh->SetCollisionResponseToChannel((ECollisionChannel)(CustomCollisionChannelsEnum::GrabbableObject), ECR_Ignore);
+	MagazineMesh->SetSimulatePhysics(true);
 
 	CollisionBox = CreateDefaultSubobject<UBoxComponent>("Box");
 	CollisionBox->SetupAttachment(MagazineMesh);

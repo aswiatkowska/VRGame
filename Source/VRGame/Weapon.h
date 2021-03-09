@@ -36,6 +36,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<ABullet> BulletSubclass;
 
+	UPROPERTY(EditDefaultsOnly, Category = GrabbableObject)
+	TEnumAsByte<EObjectToGrab::Type> GrabbableObjType;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FVector Location = FVector::ZeroVector;
 
