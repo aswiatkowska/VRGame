@@ -33,7 +33,8 @@ AWeapon::AWeapon()
 void AWeapon::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	GrabbableObjComp->GrabbableType = EGrabbableTypeEnum::EWeapon;
 }
 
 void AWeapon::Tick(float DeltaTime)

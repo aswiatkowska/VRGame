@@ -37,9 +37,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<ABullet> BulletSubclass;
 
-	UPROPERTY(EditDefaultsOnly, Category = GrabbableObject)
-	TEnumAsByte<EObjectToGrab::Type> GrabbableObjType;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FVector Location = FVector::ZeroVector;
 
@@ -58,6 +55,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int MagazineCapacity;
 
+	int OwnedMagazinesCount = 1;
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -66,8 +65,6 @@ protected:
 	void SwitchCoolDown();
 
 	void AmmunitionCheck();
-
-	int OwnedMagazinesCount = 1;
 
 	bool IsOverlapped = false;
 

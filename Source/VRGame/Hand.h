@@ -27,6 +27,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class USphereComponent* CollisionSphere;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TSubclassOf<UGrabbableObjectComponent> grabbableComponentSubclass;
+
 	void ObjectGrabRelease();
 
 	void Shoot();

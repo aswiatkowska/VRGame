@@ -71,6 +71,7 @@ void AHand::ObjectGrabRelease()
 		Magazine->AttachToComponent(GrabPoint, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 		GrabPoint->SetRelativeLocation(Magazine->Location);
 		GrabPoint->SetRelativeRotation(Magazine->Rotation);
+		Magazine->AddMagazine();
 		MagazineGrabbed = true;
 		CanGrab = false;
 	}
@@ -107,6 +108,22 @@ void AHand::OnHandOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor*
 	{
 		return;
 	}
+
+	UGrabbableObjectComponent* grabbableComponent = OtherActor->FindComponentByClass<UGrabbableObjectComponent>();
+	if (grabbableComponent == nullptr)
+	{
+		return;
+	}
+	
+	if (grabbableComponent->GrabbableType == EGrabbableTypeEnum::EWeapon)
+	{
+		Weapon = Cast<AWeapon>(OtherActor);
+	}
+	else if (grabbableComponent->GrabbableType == EGrabbableTypeEnum::EMagazine)
+	{
+		Magazine = Cast<AMagazine>(OtherActor);
+	}
+	CanGrab = true;
 }
 
 void AHand::OnHandOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)

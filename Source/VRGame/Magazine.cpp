@@ -23,8 +23,20 @@ AMagazine::AMagazine()
 	CollisionBox->SetCollisionResponseToChannel((ECollisionChannel)(CustomCollisionChannelsEnum::Hand), ECollisionResponse::ECR_Overlap);
 }
 
+void AMagazine::BeginPlay()
+{
+	Super::BeginPlay();
+
+	GrabbableObjComp->GrabbableType = EGrabbableTypeEnum::EMagazine;
+}
+
 void AMagazine::DestroyMagazine()
 {
 	Destroy();
+}
+
+void AMagazine::AddMagazine()
+{
+	Weapon->OwnedMagazinesCount = Weapon->OwnedMagazinesCount + 1;
 }
 

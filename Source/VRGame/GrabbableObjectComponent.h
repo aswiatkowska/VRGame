@@ -5,15 +5,15 @@
 #include "Components/ActorComponent.h"
 #include "GrabbableObjectComponent.generated.h"
 
+
 UENUM()
-namespace EObjectToGrab
-{
-	enum Type
+	enum EGrabbableTypeEnum
 	{
-		Weapon,
-		Magazine,
+		Null,
+		EWeapon,
+		EMagazine,
 	};
-}
+
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class VRGAME_API UGrabbableObjectComponent : public UActorComponent
@@ -27,5 +27,6 @@ public:
 
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	EGrabbableTypeEnum GrabbableType = EGrabbableTypeEnum::Null;
 		
 };

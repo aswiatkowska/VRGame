@@ -4,6 +4,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "GrabbableObjectComponent.h"
+#include "Weapon.h"
 #include "Magazine.generated.h"
 
 UCLASS()
@@ -13,6 +14,8 @@ class VRGAME_API AMagazine : public AActor
 	
 public:	
 	AMagazine();
+
+	virtual void BeginPlay() override;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class UStaticMeshComponent* MagazineMesh;
@@ -29,9 +32,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FRotator Rotation = FRotator::ZeroRotator;
 
-	UPROPERTY(EditDefaultsOnly, Category = GrabbableObject)
-	TEnumAsByte<EObjectToGrab::Type> GrabbableObjType;
-
 	void DestroyMagazine();
+
+	void AddMagazine();
+
+	AWeapon* Weapon;
 
 };
