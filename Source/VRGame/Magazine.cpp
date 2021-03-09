@@ -37,6 +37,6 @@ void AMagazine::DestroyMagazine()
 
 void AMagazine::AddMagazine()
 {
-	Weapon->OwnedMagazinesCount = Weapon->OwnedMagazinesCount + 1;
+	Weapon->OwnedMagazinesCount++;
 }
 
