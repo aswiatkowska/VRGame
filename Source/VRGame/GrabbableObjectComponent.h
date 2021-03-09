@@ -5,6 +5,8 @@
 #include "Components/ActorComponent.h"
 #include "GrabbableObjectComponent.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FShootDelegate);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FShootingReleasedDelegate);
 
 UENUM()
 	enum EGrabbableTypeEnum
@@ -28,5 +30,8 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	EGrabbableTypeEnum GrabbableType = EGrabbableTypeEnum::Null;
+
+	FShootDelegate OnShootDelegate;
+	FShootingReleasedDelegate OnShootingReleasedDelegate;
 		
 };

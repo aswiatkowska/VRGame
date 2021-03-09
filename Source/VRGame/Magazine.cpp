@@ -2,6 +2,7 @@
 #include "Magazine.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/BoxComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "CustomChannels.h"
 
 AMagazine::AMagazine()
@@ -28,6 +29,8 @@ void AMagazine::BeginPlay()
 	Super::BeginPlay();
 
 	GrabbableObjComp->GrabbableType = EGrabbableTypeEnum::EMagazine;
+
+	Weapon = Cast<AWeapon>(UGameplayStatics::GetActorOfClass(GetWorld(), AWeapon::StaticClass()));
 }
 
 void AMagazine::DestroyMagazine()

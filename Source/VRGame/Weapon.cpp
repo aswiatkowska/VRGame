@@ -35,6 +35,9 @@ void AWeapon::BeginPlay()
 	Super::BeginPlay();
 
 	GrabbableObjComp->GrabbableType = EGrabbableTypeEnum::EWeapon;
+
+	GrabbableObjComp->OnShootDelegate.AddDynamic(this, &AWeapon::Shoot);
+	GrabbableObjComp->OnShootingReleasedDelegate.AddDynamic(this, &AWeapon::ShootingReleased);
 }
 
 void AWeapon::Tick(float DeltaTime)
