@@ -3,7 +3,6 @@
 #include "Components/SceneComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/SphereComponent.h"
-#include "MotionControllerComponent.h"
 #include "CustomChannels.h"
 #include "Engine/EngineTypes.h"
 

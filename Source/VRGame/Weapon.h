@@ -30,6 +30,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UParticleSystem* ImpactParticles;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class UGrabbableObjectComponent* GrabbableObjComp;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<ABullet> BulletSubclass;
 
@@ -59,8 +62,6 @@ protected:
 	void SwitchCoolDown();
 
 	void AmmunitionCheck();
-
-	void OnOverlap(AActor* OverlappedActor, AActor* OtherActor);
 
 	int OwnedMagazinesCount = 1;
 

@@ -19,6 +19,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class UBoxComponent* CollisionBox;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class UGrabbableObjectComponent* GrabbableObjComp;
+
 	void DestroyMagazine();
 
 };

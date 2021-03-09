@@ -6,9 +6,6 @@
 #include "Hand.h"
 #include "MyCharacter.generated.h"
 
-/*DECLARE_DYNAMIC_MULTICAST_DELEGATE(FShoot);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FShootingReleased);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGrabRelease);*/
 
 UCLASS()
 class VRGAME_API AMyCharacter : public ACharacter
@@ -17,12 +14,6 @@ class VRGAME_API AMyCharacter : public ACharacter
 
 public:
 	AMyCharacter();
-
-	/*FShoot OnShootDelegate;
-
-	FShootingReleased OnShootingReleasedDelegate;
-
-	FGrabRelease OnGrabReleaseDelegate;*/
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class USceneComponent* Scene;

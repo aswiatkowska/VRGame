@@ -3,12 +3,15 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/SceneComponent.h"
 #include "Components/BoxComponent.h"
+#include "GrabbableObjectComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "CustomChannels.h"
 
 AWeapon::AWeapon()
 {
 	PrimaryActorTick.bCanEverTick = true;
+
+	GrabbableObjComp = CreateDefaultSubobject<UGrabbableObjectComponent>("GrabbableObjComp");
 
 	WeaponMesh = CreateDefaultSubobject<USkeletalMeshComponent>("Weapon");
 	WeaponMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECR_Ignore);
