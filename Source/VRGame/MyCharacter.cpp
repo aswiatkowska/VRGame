@@ -50,7 +50,7 @@ void AMyCharacter::BeginPlay()
 
 	playerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 
-	Hand = GetWorld()->SpawnActor<AHand>(HandClass, FVector::ZeroVector, FRotator::ZeroRotator/*RightMotionController->GetComponentLocation(), RightMotionController->GetComponentRotation()*/);
+	Hand = GetWorld()->SpawnActor<AHand>(HandClass, FVector::ZeroVector, FRotator::ZeroRotator);
 	Hand->AttachToComponent(RightMotionController, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 }
 
@@ -94,8 +94,8 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 	PlayerInputComponent->BindAction("Shoot", IE_Pressed, this, &AMyCharacter::Shoot);
 	PlayerInputComponent->BindAction("Shoot", IE_Released, this, &AMyCharacter::ShootingReleased);
-	PlayerInputComponent->BindAction("GrabWeapon", IE_Pressed, this, &AMyCharacter::WeaponGrabRelease);
-	PlayerInputComponent->BindAction("ReleaseWeapon", IE_Released, this, &AMyCharacter::WeaponGrabRelease);
+	PlayerInputComponent->BindAction("GrabWeapon", IE_Pressed, this, &AMyCharacter::ObjectGrabRelease);
+	PlayerInputComponent->BindAction("ReleaseWeapon", IE_Released, this, &AMyCharacter::ObjectGrabRelease);
 
 }
 
@@ -188,9 +188,9 @@ void AMyCharacter::Teleport()
 	}
 }
 
-void AMyCharacter::WeaponGrabRelease()
+void AMyCharacter::ObjectGrabRelease()
 {
-	Hand->WeaponGrabRelease();
+	Hand->ObjectGrabRelease();
 }
 
 void AMyCharacter::Shoot()

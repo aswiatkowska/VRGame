@@ -61,7 +61,7 @@ private:
 
 	void TurnLeft();
 
-	void WeaponGrabRelease();
+	void ObjectGrabRelease();
 
 	void Shoot();
 

@@ -3,6 +3,7 @@
 #include "Components/SceneComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/SphereComponent.h"
+#include "GrabbableObjectComponent.h"
 #include "CustomChannels.h"
 #include "Engine/EngineTypes.h"
 
@@ -43,9 +44,9 @@ void AHand::Tick(float DeltaTime)
 
 }
 
-void AHand::WeaponGrabRelease()
+void AHand::ObjectGrabRelease()
 {
-	if (CanGrab)
+	if (CanGrab && Weapon != nullptr)
 	{
 		RightHandSkeletal->SetVisibility(false);
 		Weapon->WeaponMesh->SetSimulatePhysics(false);
@@ -62,6 +63,24 @@ void AHand::WeaponGrabRelease()
 		Weapon->WeaponMesh->SetSimulatePhysics(true);
 		WeaponGrabbed = false;
 		Weapon->ShootingReleased();
+	}
+	else if (CanGrab && Magazine != nullptr)
+	{
+		RightHandSkeletal->SetVisibility(false);
+		Magazine->MagazineMesh->SetSimulatePhysics(false);
+		Magazine->AttachToComponent(GrabPoint, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+		GrabPoint->SetRelativeLocation(Magazine->Location);
+		GrabPoint->SetRelativeRotation(Magazine->Rotation);
+		MagazineGrabbed = true;
+		CanGrab = false;
+	}
+	else if (MagazineGrabbed)
+	{
+		RightHandSkeletal->SetVisibility(true);
+		Magazine->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+		Magazine->MagazineMesh->SetSimulatePhysics(true);
+		MagazineGrabbed = false;
+		Magazine->DestroyMagazine();
 	}
 }
 
@@ -84,19 +103,18 @@ void AHand::ShootingReleased()
 void AHand::OnHandOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
 	const FHitResult& SweepResult)
 {
-	if (WeaponGrabbed)
+	if (WeaponGrabbed || MagazineGrabbed)
 	{
 		return;
 	}
-	Weapon = Cast<AWeapon>(OtherActor);
-	CanGrab = (Weapon != nullptr);
 }
 
 void AHand::OnHandOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	if (!WeaponGrabbed)
+	if (!WeaponGrabbed && !MagazineGrabbed)
 	{
 		Weapon = nullptr;
+		Magazine = nullptr;
 		CanGrab = false;
 	}
 }

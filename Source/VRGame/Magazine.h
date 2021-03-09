@@ -3,6 +3,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "GrabbableObjectComponent.h"
 #include "Magazine.generated.h"
 
 UCLASS()
@@ -21,6 +22,12 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class UGrabbableObjectComponent* GrabbableObjComp;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FVector Location = FVector::ZeroVector;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FRotator Rotation = FRotator::ZeroRotator;
 
 	UPROPERTY(EditDefaultsOnly, Category = GrabbableObject)
 	TEnumAsByte<EObjectToGrab::Type> GrabbableObjType;

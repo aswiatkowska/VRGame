@@ -27,7 +27,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class USphereComponent* CollisionSphere;
 
-	void WeaponGrabRelease();
+	void ObjectGrabRelease();
 
 	void Shoot();
 

@@ -3,7 +3,6 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/SceneComponent.h"
 #include "Components/BoxComponent.h"
-#include "GrabbableObjectComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "CustomChannels.h"
 

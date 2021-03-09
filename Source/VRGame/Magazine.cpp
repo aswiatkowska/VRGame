@@ -2,7 +2,6 @@
 #include "Magazine.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/BoxComponent.h"
-#include "GrabbableObjectComponent.h"
 #include "CustomChannels.h"
 
 AMagazine::AMagazine()
