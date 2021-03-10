@@ -15,8 +15,6 @@ class VRGAME_API AMagazine : public AActor
 public:	
 	AMagazine();
 
-	virtual void BeginPlay() override;
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class UStaticMeshComponent* MagazineMesh;
 
@@ -26,16 +24,19 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class UGrabbableObjectComponent* GrabbableObjComp;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FVector Location = FVector::ZeroVector;
+private:
+	AWeapon* Weapon;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FRotator Rotation = FRotator::ZeroRotator;
+	virtual void BeginPlay() override;
 
 	void DestroyMagazine();
 
 	void AddMagazine();
 
-	AWeapon* Weapon;
+	UFUNCTION()
+	void OnGrab();
+
+	UFUNCTION()
+	void OnRelease();
 
 };

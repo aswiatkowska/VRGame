@@ -30,6 +30,9 @@ void AMagazine::BeginPlay()
 
 	GrabbableObjComp->GrabbableType = EGrabbableTypeEnum::EMagazine;
 
+	GrabbableObjComp->OnGrabDelegate.AddDynamic(this, &AMagazine::OnGrab);
+	GrabbableObjComp->OnReleaseDelegate.AddDynamic(this, &AMagazine::OnRelease);
+
 	Weapon = Cast<AWeapon>(UGameplayStatics::GetActorOfClass(GetWorld(), AWeapon::StaticClass()));
 }
 
@@ -41,5 +44,17 @@ void AMagazine::DestroyMagazine()
 void AMagazine::AddMagazine()
 {
 	Weapon->OwnedMagazinesCount++;
+}
+
+void AMagazine::OnGrab()
+{
+	MagazineMesh->SetSimulatePhysics(false);
+	AddMagazine();
+}
+
+void AMagazine::OnRelease()
+{
+	MagazineMesh->SetSimulatePhysics(true);
+	DestroyMagazine();
 }
 

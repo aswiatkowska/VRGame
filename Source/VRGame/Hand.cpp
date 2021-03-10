@@ -46,48 +46,29 @@ void AHand::Tick(float DeltaTime)
 
 void AHand::ObjectGrabRelease()
 {
-	if (CanGrab && Weapon != nullptr)
+	if (CanGrab())
 	{
 		RightHandSkeletal->SetVisibility(false);
-		Weapon->WeaponMesh->SetSimulatePhysics(false);
-		Weapon->AttachToComponent(GrabPoint, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-		GrabPoint->SetRelativeLocation(Weapon->Location);
-		GrabPoint->SetRelativeRotation(Weapon->Rotation);
-		WeaponGrabbed = true;
-		CanGrab = false;
+		GrabbedObjectGrabbableComponent = DetectedGrabbable;
+		DetectedGrabbable = nullptr;
+		GrabbedActor->AttachToComponent(GrabPoint, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+		GrabbedObjectGrabbableComponent->OnGrabDelegate.Broadcast();
+		GrabPoint->SetRelativeLocation(GrabbedObjectGrabbableComponent->Location);
+		GrabPoint->SetRelativeRotation(GrabbedObjectGrabbableComponent->Rotation);
+
 	}
-	else if (WeaponGrabbed)
+	else if (IsAnyObjectGrabbed())
 	{
 		RightHandSkeletal->SetVisibility(true);
-		Weapon->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
-		Weapon->WeaponMesh->SetSimulatePhysics(true);
-		WeaponGrabbed = false;
-		Weapon->ShootingReleased();
-	}
-	else if (CanGrab && Magazine != nullptr)
-	{
-		RightHandSkeletal->SetVisibility(false);
-		Magazine->MagazineMesh->SetSimulatePhysics(false);
-		Magazine->AttachToComponent(GrabPoint, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-		GrabPoint->SetRelativeLocation(Magazine->Location);
-		GrabPoint->SetRelativeRotation(Magazine->Rotation);
-		Magazine->AddMagazine();
-		MagazineGrabbed = true;
-		CanGrab = false;
-	}
-	else if (MagazineGrabbed)
-	{
-		RightHandSkeletal->SetVisibility(true);
-		Magazine->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
-		Magazine->MagazineMesh->SetSimulatePhysics(true);
-		MagazineGrabbed = false;
-		Magazine->DestroyMagazine();
+		GrabbedActor->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+		GrabbedObjectGrabbableComponent->OnReleaseDelegate.Broadcast();
+		GrabbedObjectGrabbableComponent = nullptr;
 	}
 }
 
 void AHand::Shoot()
 {
-	if (WeaponGrabbed)
+	if (Weapon != nullptr)
 	{
 		Weapon->Shoot();
 	}
@@ -95,7 +76,7 @@ void AHand::Shoot()
 
 void AHand::ShootingReleased()
 {
-	if (WeaponGrabbed)
+	if (Weapon != nullptr)
 	{
 		Weapon->ShootingReleased();
 	}
@@ -104,35 +85,49 @@ void AHand::ShootingReleased()
 void AHand::OnHandOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
 	const FHitResult& SweepResult)
 {
-	if (WeaponGrabbed || MagazineGrabbed)
+	if (IsAnyObjectGrabbed())
 	{
 		return;
 	}
 
-	UGrabbableObjectComponent* grabbableComponent = OtherActor->FindComponentByClass<UGrabbableObjectComponent>();
-	if (grabbableComponent == nullptr)
+	DetectedGrabbable = OtherActor->FindComponentByClass<UGrabbableObjectComponent>();
+	if (DetectedGrabbable == nullptr)
 	{
 		return;
 	}
 	
-	if (grabbableComponent->GrabbableType == EGrabbableTypeEnum::EWeapon)
+	if (DetectedGrabbable->GrabbableType == EGrabbableTypeEnum::EWeapon)
 	{
 		Weapon = Cast<AWeapon>(OtherActor);
+		Weapon = (AWeapon*)GrabbedActor;
 	}
-	else if (grabbableComponent->GrabbableType == EGrabbableTypeEnum::EMagazine)
+	else if (DetectedGrabbable->GrabbableType == EGrabbableTypeEnum::EMagazine)
 	{
 		Magazine = Cast<AMagazine>(OtherActor);
+		Magazine = (AMagazine*)GrabbedActor;
 	}
-	CanGrab = true;
 }
 
 void AHand::OnHandOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	if (!WeaponGrabbed && !MagazineGrabbed)
+	if (!IsAnyObjectGrabbed())
 	{
-		Weapon = nullptr;
-		Magazine = nullptr;
-		CanGrab = false;
+		DetectedGrabbable = nullptr;
 	}
+}
+
+bool AHand::IsAnyObjectGrabbed()
+{
+	return (GrabbedObjectGrabbableComponent != nullptr);
+}
+
+bool AHand::CanGrab()
+{
+	return (DetectedGrabbable != nullptr);
+}
+
+UGrabbableObjectComponent* AHand::GetGrabbedObject()
+{
+	return GrabbedObjectGrabbableComponent;
 }
 

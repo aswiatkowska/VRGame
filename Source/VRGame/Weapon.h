@@ -14,10 +14,12 @@ class VRGAME_API AWeapon : public AActor
 	
 public:	
 	AWeapon();
-
+	
 	virtual void Shoot();
 
 	void ShootingReleased();
+
+	int OwnedMagazinesCount = 1;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class USkeletalMeshComponent* WeaponMesh;
@@ -38,12 +40,6 @@ public:
 	TSubclassOf<ABullet> BulletSubclass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FVector Location = FVector::ZeroVector;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FRotator Rotation = FRotator::ZeroRotator;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float cooldownTime;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -55,8 +51,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int MagazineCapacity;
 
-	int OwnedMagazinesCount = 1;
-
 protected:
 	virtual void BeginPlay() override;
 
@@ -65,6 +59,12 @@ protected:
 	void SwitchCoolDown();
 
 	void AmmunitionCheck();
+
+	UFUNCTION()
+	void OnGrab();
+
+	UFUNCTION()
+	void OnRelease();
 
 	bool IsOverlapped = false;
 

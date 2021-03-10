@@ -3,7 +3,6 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-#include "GrabbableObjectComponent.h"
 #include "Hand.h"
 #include "MyCharacter.generated.h"
 
@@ -79,6 +78,4 @@ private:
 	APlayerController* playerController;
 
 	AHand* Hand;
-
-	UGrabbableObjectComponent* GrabbableComp;
 };

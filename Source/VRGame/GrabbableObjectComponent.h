@@ -5,8 +5,8 @@
 #include "Components/ActorComponent.h"
 #include "GrabbableObjectComponent.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FShootDelegate);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FShootingReleasedDelegate);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGrabDelegate);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FReleaseDelegate);
 
 UENUM()
 	enum EGrabbableTypeEnum
@@ -31,7 +31,14 @@ public:
 
 	EGrabbableTypeEnum GrabbableType = EGrabbableTypeEnum::Null;
 
-	FShootDelegate OnShootDelegate;
-	FShootingReleasedDelegate OnShootingReleasedDelegate;
+	FGrabDelegate OnGrabDelegate;
+
+	FReleaseDelegate OnReleaseDelegate;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FVector Location = FVector::ZeroVector;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FRotator Rotation = FRotator::ZeroRotator;
 		
 };

@@ -5,6 +5,7 @@
 #include "GameFramework/Actor.h"
 #include "Weapon.h"
 #include "Magazine.h"
+#include "GrabbableObjectComponent.h"
 #include "Hand.generated.h"
 
 UCLASS()
@@ -27,19 +28,22 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class USphereComponent* CollisionSphere;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	TSubclassOf<UGrabbableObjectComponent> grabbableComponentSubclass;
-
 	void ObjectGrabRelease();
 
 	void Shoot();
 
 	void ShootingReleased();
 
+	UGrabbableObjectComponent* GetGrabbedObject();
+
 private:
 	virtual void BeginPlay() override;
 
 	virtual void Tick(float DeltaTime) override;
+
+	bool IsAnyObjectGrabbed();
+
+	bool CanGrab();
 
 	UFUNCTION()
 	void OnHandOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
@@ -48,14 +52,14 @@ private:
 	UFUNCTION()
 	void OnHandOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
-	bool CanGrab;
-
-	bool WeaponGrabbed = false;
-
-	bool MagazineGrabbed = false;
-
 	AWeapon* Weapon = nullptr;
 
 	AMagazine* Magazine = nullptr;
+
+	UGrabbableObjectComponent* GrabbedObjectGrabbableComponent = nullptr;
+
+	UGrabbableObjectComponent* DetectedGrabbable;
+
+	AActor* GrabbedActor;
 
 };

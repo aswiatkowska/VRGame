@@ -36,8 +36,8 @@ void AWeapon::BeginPlay()
 
 	GrabbableObjComp->GrabbableType = EGrabbableTypeEnum::EWeapon;
 
-	GrabbableObjComp->OnShootDelegate.AddDynamic(this, &AWeapon::Shoot);
-	GrabbableObjComp->OnShootingReleasedDelegate.AddDynamic(this, &AWeapon::ShootingReleased);
+	GrabbableObjComp->OnGrabDelegate.AddDynamic(this, &AWeapon::OnGrab);
+	GrabbableObjComp->OnReleaseDelegate.AddDynamic(this, &AWeapon::OnRelease);
 }
 
 void AWeapon::Tick(float DeltaTime)
@@ -100,5 +100,16 @@ void AWeapon::AmmunitionCheck()
 			OwnedMagazinesCount = OwnedMagazinesCount - 1;
 		}
 	}
+}
+
+void AWeapon::OnGrab()
+{
+	WeaponMesh->SetSimulatePhysics(false);
+}
+
+void AWeapon::OnRelease()
+{
+	WeaponMesh->SetSimulatePhysics(true);
+	ShootingReleased();
 }
 

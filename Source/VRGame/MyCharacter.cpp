@@ -195,11 +195,11 @@ void AMyCharacter::ObjectGrabRelease()
 
 void AMyCharacter::Shoot()
 {
-	GrabbableComp->OnShootDelegate.Broadcast();
+	Hand->Shoot();
 }
 
 void AMyCharacter::ShootingReleased()
 {
-	GrabbableComp->OnShootingReleasedDelegate.Broadcast();
+	Hand->ShootingReleased();
 }
 
