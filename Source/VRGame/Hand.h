@@ -30,10 +30,6 @@ public:
 
 	void ObjectGrabRelease();
 
-	void Shoot();
-
-	void ShootingReleased();
-
 	UGrabbableObjectComponent* GetGrabbedObject();
 
 private:
@@ -58,8 +54,8 @@ private:
 
 	UGrabbableObjectComponent* GrabbedObjectGrabbableComponent = nullptr;
 
-	UGrabbableObjectComponent* DetectedGrabbable;
+	UGrabbableObjectComponent* DetectedGrabbable = nullptr;
 
-	AActor* GrabbedActor;
+	AActor* GrabbedActor = nullptr;
 
 };

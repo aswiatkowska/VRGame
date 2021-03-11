@@ -52,6 +52,12 @@ void AMyCharacter::BeginPlay()
 
 	Hand = GetWorld()->SpawnActor<AHand>(HandClass, FVector::ZeroVector, FRotator::ZeroRotator);
 	Hand->AttachToComponent(RightMotionController, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+
+	Magazine = Cast<AMagazine>(UGameplayStatics::GetActorOfClass(GetWorld(), AMagazine::StaticClass()));
+	Magazine->OnAddToInvDelegate.AddDynamic(this, &AMyCharacter::ObjectToAdd);
+
+	WeaponClass = Cast<AWeapon>(UGameplayStatics::GetActorOfClass(GetWorld(), AWeapon::StaticClass()));
+	WeaponClass->OnRemoveFromInvDelegate.AddDynamic(this, &AMyCharacter::ObjectToRemove);
 }
 
 void AMyCharacter::Tick(float DeltaTime)
@@ -195,11 +201,56 @@ void AMyCharacter::ObjectGrabRelease()
 
 void AMyCharacter::Shoot()
 {
-	Hand->Shoot();
+	if (Hand->GetGrabbedObject() != nullptr)
+	{
+		if (Hand->GetGrabbedObject()->GrabbableType == EGrabbableTypeEnum::EWeapon)
+		{
+			Weapon = Cast<AWeapon>(Hand->GetGrabbedObject()->GetOwner());
+			Weapon->Shoot();
+		}
+	}
 }
 
 void AMyCharacter::ShootingReleased()
 {
-	Hand->ShootingReleased();
+	if (Hand->GetGrabbedObject() != nullptr)
+	{
+		if (Hand->GetGrabbedObject()->GrabbableType == EGrabbableTypeEnum::EWeapon)
+		{
+			Weapon = Cast<AWeapon>(Hand->GetGrabbedObject()->GetOwner());
+			Weapon->ShootingReleased();
+		}
+	}
 }
 
+void AMyCharacter::ObjectToAdd()
+{
+	AMagazine* GrabbedMagazine = (AMagazine*)Hand->GetGrabbedObject()->GetOwner();
+	EInventoryObjectTypes Type = GrabbedMagazine->InvObjectType;
+
+	InvMap->AddObject(Type);
+
+}
+
+void AMyCharacter::ObjectToRemove()
+{
+	AWeapon* GrabbedWeapon = (AWeapon*)Hand->GetGrabbedObject()->GetOwner();
+	EWeaponTypeEnum WeaponType = GrabbedWeapon->WeaponType;
+
+	if (WeaponType == EWeaponTypeEnum::EGun)
+	{
+		if (InvMap->IsInInventory(EInventoryObjectTypes::Magazine_pistol))
+		{
+			InvMap->RemoveObject(EInventoryObjectTypes::Magazine_pistol);
+			GrabbedWeapon->Ammunition = GrabbedWeapon->MagazineCapacity;
+		}
+	}
+	else if (WeaponType == EWeaponTypeEnum::ERifle)
+	{
+		if (InvMap->IsInInventory(EInventoryObjectTypes::Magazine_rifle))
+		{
+			InvMap->RemoveObject(EInventoryObjectTypes::Magazine_rifle);
+			GrabbedWeapon->Ammunition = GrabbedWeapon->MagazineCapacity;
+		}
+	}
+}

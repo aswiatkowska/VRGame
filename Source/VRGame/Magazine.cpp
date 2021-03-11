@@ -32,8 +32,6 @@ void AMagazine::BeginPlay()
 
 	GrabbableObjComp->OnGrabDelegate.AddDynamic(this, &AMagazine::OnGrab);
 	GrabbableObjComp->OnReleaseDelegate.AddDynamic(this, &AMagazine::OnRelease);
-
-	Weapon = Cast<AWeapon>(UGameplayStatics::GetActorOfClass(GetWorld(), AWeapon::StaticClass()));
 }
 
 void AMagazine::DestroyMagazine()
@@ -43,7 +41,7 @@ void AMagazine::DestroyMagazine()
 
 void AMagazine::AddMagazine()
 {
-	Weapon->OwnedMagazinesCount++;
+	OnAddToInvDelegate.Broadcast();
 }
 
 void AMagazine::OnGrab()

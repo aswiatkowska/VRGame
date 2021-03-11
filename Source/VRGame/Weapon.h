@@ -7,6 +7,15 @@
 #include "GrabbableObjectComponent.h"
 #include "Weapon.generated.h"
 
+UENUM()
+enum EWeaponTypeEnum
+{
+	EGun,
+	ERifle,
+};
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRemoveFromInvDelegate);
+
 UCLASS()
 class VRGAME_API AWeapon : public AActor
 {
@@ -40,6 +49,9 @@ public:
 	TSubclassOf<ABullet> BulletSubclass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TEnumAsByte<EWeaponTypeEnum> WeaponType;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float cooldownTime;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -50,6 +62,8 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int MagazineCapacity;
+
+	FRemoveFromInvDelegate OnRemoveFromInvDelegate;
 
 protected:
 	virtual void BeginPlay() override;

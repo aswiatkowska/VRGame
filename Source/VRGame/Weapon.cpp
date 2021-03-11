@@ -66,10 +66,14 @@ void AWeapon::Shoot()
 		}
 
 		GetWorld()->SpawnActor<AActor>(BulletSubclass, Start, Barrel->GetComponentRotation());
+		Ammunition = Ammunition - 1;
+	}
+	
+	if (Ammunition == 1)
+	{
+		AmmunitionCheck();
 	}
 
-	Ammunition = Ammunition - 1;
-	AmmunitionCheck();
 	cooldown = true;
 	FTimerHandle handle;
 	GetWorld()->GetTimerManager().SetTimer(handle, this, &AWeapon::SwitchCoolDown, cooldownTime);
@@ -92,14 +96,7 @@ void AWeapon::SwitchCoolDown()
 
 void AWeapon::AmmunitionCheck()
 {
-	if (Ammunition == 0)
-	{
-		if (OwnedMagazinesCount > 0)
-		{
-			Ammunition = MagazineCapacity;
-			OwnedMagazinesCount = OwnedMagazinesCount - 1;
-		}
-	}
+	OnRemoveFromInvDelegate.Broadcast();
 }
 
 void AWeapon::OnGrab()

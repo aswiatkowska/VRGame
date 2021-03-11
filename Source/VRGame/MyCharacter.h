@@ -4,8 +4,12 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Hand.h"
+#include "Magazine.h"
+#include "Weapon.h"
+#include "Inventory.h"
+#include "InventoryMap.h"
+#include "GrabbableObjectComponent.h"
 #include "MyCharacter.generated.h"
-
 
 UCLASS()
 class VRGAME_API AMyCharacter : public ACharacter
@@ -67,6 +71,12 @@ private:
 
 	void ShootingReleased();
 
+	UFUNCTION()
+	void ObjectToAdd();
+
+	UFUNCTION()
+	void ObjectToRemove();
+
 	FHitResult hit;
 
 	FVector vector = FVector(1000, 1000, 1000);
@@ -78,4 +88,14 @@ private:
 	APlayerController* playerController;
 
 	AHand* Hand;
+
+	AWeapon* Weapon;
+
+	AWeapon* WeaponClass;
+
+	AMagazine* Magazine;
+
+	AInventoryMap* InvMap;
+
+	UGrabbableObjectComponent* GrabbableObj;
 };

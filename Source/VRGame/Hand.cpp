@@ -51,11 +51,11 @@ void AHand::ObjectGrabRelease()
 		RightHandSkeletal->SetVisibility(false);
 		GrabbedObjectGrabbableComponent = DetectedGrabbable;
 		DetectedGrabbable = nullptr;
-		GrabbedActor->AttachToComponent(GrabPoint, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 		GrabbedObjectGrabbableComponent->OnGrabDelegate.Broadcast();
+		GrabbedActor = GrabbedObjectGrabbableComponent->GetOwner();
+		GrabbedActor->AttachToComponent(GrabPoint, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 		GrabPoint->SetRelativeLocation(GrabbedObjectGrabbableComponent->Location);
 		GrabPoint->SetRelativeRotation(GrabbedObjectGrabbableComponent->Rotation);
-
 	}
 	else if (IsAnyObjectGrabbed())
 	{
@@ -63,22 +63,7 @@ void AHand::ObjectGrabRelease()
 		GrabbedActor->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 		GrabbedObjectGrabbableComponent->OnReleaseDelegate.Broadcast();
 		GrabbedObjectGrabbableComponent = nullptr;
-	}
-}
-
-void AHand::Shoot()
-{
-	if (Weapon != nullptr)
-	{
-		Weapon->Shoot();
-	}
-}
-
-void AHand::ShootingReleased()
-{
-	if (Weapon != nullptr)
-	{
-		Weapon->ShootingReleased();
+		GrabbedActor = nullptr;
 	}
 }
 
@@ -99,12 +84,10 @@ void AHand::OnHandOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor*
 	if (DetectedGrabbable->GrabbableType == EGrabbableTypeEnum::EWeapon)
 	{
 		Weapon = Cast<AWeapon>(OtherActor);
-		Weapon = (AWeapon*)GrabbedActor;
 	}
 	else if (DetectedGrabbable->GrabbableType == EGrabbableTypeEnum::EMagazine)
 	{
 		Magazine = Cast<AMagazine>(OtherActor);
-		Magazine = (AMagazine*)GrabbedActor;
 	}
 }
 
