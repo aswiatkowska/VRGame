@@ -8,18 +8,12 @@ AInventoryMap::AInventoryMap()
 
 }
 
-void AInventoryMap::BeginPlay()
-{
-	Super::BeginPlay();
-	
-}
-
 void AInventoryMap::AddObject(EInventoryObjectTypes Type)
 {
 	if (IsInInventory(Type))
 	{
-		int val = inventoryMap[Type];
-		inventoryMap.Emplace(Type, val++);
+		int val = inventoryMap[Type] + 1;
+		inventoryMap.Emplace(Type, val);
 	}
 	else
 	{
@@ -29,20 +23,23 @@ void AInventoryMap::AddObject(EInventoryObjectTypes Type)
 
 void AInventoryMap::RemoveObject(EInventoryObjectTypes Type)
 {
-	int val = inventoryMap[Type];
+	int val = inventoryMap[Type] - 1;
 
-	if ( val > 1)
+	if (val >= 0)
 	{
-		inventoryMap.Emplace(Type, (val - 1));
-	}
-	else
-	{
-		inventoryMap.Remove(Type);
+		inventoryMap.Emplace(Type, val);
 	}
 }
 
 bool AInventoryMap::IsInInventory(EInventoryObjectTypes Type)
 {
-	return inventoryMap.Contains(Type);
+	if (inventoryMap.Contains(Type))
+	{
+		int count = inventoryMap[Type];
+		if (count > 0)
+		{
+			return true;
+		}
+	}
 }
 

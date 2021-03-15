@@ -4,6 +4,8 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Bullet.h"
+#include "Inventory.h"
+#include "MyCharacter.h"
 #include "GrabbableObjectComponent.h"
 #include "Weapon.generated.h"
 
@@ -13,8 +15,6 @@ enum EWeaponTypeEnum
 	EGun,
 	ERifle,
 };
-
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRemoveFromInvDelegate);
 
 UCLASS()
 class VRGAME_API AWeapon : public AActor
@@ -27,8 +27,6 @@ public:
 	virtual void Shoot();
 
 	void ShootingReleased();
-
-	int OwnedMagazinesCount = 1;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class USkeletalMeshComponent* WeaponMesh;
@@ -52,23 +50,24 @@ public:
 	TEnumAsByte<EWeaponTypeEnum> WeaponType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TEnumAsByte<EInventoryObjectTypes> MagazineType;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float cooldownTime;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool ShootingSpree;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int Ammunition;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int MagazineCapacity;
-
-	FRemoveFromInvDelegate OnRemoveFromInvDelegate;
 
 protected:
 	virtual void BeginPlay() override;
 
 	virtual void Tick(float DeltaTime) override;
+
+	UPROPERTY()
+	int Ammunition;
 
 	void SwitchCoolDown();
 
@@ -80,10 +79,10 @@ protected:
 	UFUNCTION()
 	void OnRelease();
 
-	bool IsOverlapped = false;
-
 	bool IsPressed = false;
 
 	bool cooldown;
+
+	AMyCharacter* MyCharacter;
 
 };

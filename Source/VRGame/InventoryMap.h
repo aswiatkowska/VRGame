@@ -21,7 +21,5 @@ public:
 	bool IsInInventory(EInventoryObjectTypes Type);
 
 private:
-	virtual void BeginPlay() override;
-
 	TMap<EInventoryObjectTypes, int> inventoryMap;
 };

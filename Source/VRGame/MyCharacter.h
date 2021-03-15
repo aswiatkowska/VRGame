@@ -4,8 +4,6 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Hand.h"
-#include "Magazine.h"
-#include "Weapon.h"
 #include "Inventory.h"
 #include "InventoryMap.h"
 #include "GrabbableObjectComponent.h"
@@ -40,6 +38,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<AHand> HandClass;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<AInventoryMap> InvMapClass;
+
+	bool GetFromInventory(EInventoryObjectTypes Type);
+
+	void AddToInventory(EInventoryObjectTypes Type);
+
 private:
 	virtual void BeginPlay() override;
 
@@ -71,12 +76,6 @@ private:
 
 	void ShootingReleased();
 
-	UFUNCTION()
-	void ObjectToAdd();
-
-	UFUNCTION()
-	void ObjectToRemove();
-
 	FHitResult hit;
 
 	FVector vector = FVector(1000, 1000, 1000);
@@ -90,10 +89,6 @@ private:
 	AHand* Hand;
 
 	AWeapon* Weapon;
-
-	AWeapon* WeaponClass;
-
-	AMagazine* Magazine;
 
 	AInventoryMap* InvMap;
 

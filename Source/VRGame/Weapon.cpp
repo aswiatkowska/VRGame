@@ -38,6 +38,8 @@ void AWeapon::BeginPlay()
 
 	GrabbableObjComp->OnGrabDelegate.AddDynamic(this, &AWeapon::OnGrab);
 	GrabbableObjComp->OnReleaseDelegate.AddDynamic(this, &AWeapon::OnRelease);
+
+	Ammunition = MagazineCapacity;
 }
 
 void AWeapon::Tick(float DeltaTime)
@@ -48,6 +50,11 @@ void AWeapon::Tick(float DeltaTime)
 
 void AWeapon::Shoot()
 {
+	if (cooldown || Ammunition <= 0)
+	{
+		return;
+	}
+	
 	IsPressed = true;
 	FHitResult hitShoot;
 	const float PistolRange = 2000.0f;
@@ -55,21 +62,16 @@ void AWeapon::Shoot()
 	const FVector End = (Barrel->GetForwardVector() * PistolRange) + Start;
 
 	FCollisionQueryParams QueryParams = FCollisionQueryParams(SCENE_QUERY_STAT(PistolRange), false, this);
-
-	if (cooldown == false && Ammunition > 0)
-	{
-		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticles, FTransform(Barrel->GetComponentRotation(), Barrel->GetComponentLocation()));
-
-		if (GetWorld()->LineTraceSingleByChannel(hitShoot, Start, End, ECC_Visibility, QueryParams))
-		{
-			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticles, FTransform(hitShoot.ImpactNormal.Rotation(), hitShoot.ImpactPoint));
-		}
-
-		GetWorld()->SpawnActor<AActor>(BulletSubclass, Start, Barrel->GetComponentRotation());
-		Ammunition = Ammunition - 1;
-	}
 	
-	if (Ammunition == 1)
+	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticles, FTransform(Barrel->GetComponentRotation(), Barrel->GetComponentLocation()));
+	if (GetWorld()->LineTraceSingleByChannel(hitShoot, Start, End, ECC_Visibility, QueryParams))
+	{
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticles, FTransform(hitShoot.ImpactNormal.Rotation(), hitShoot.ImpactPoint));
+	}
+	GetWorld()->SpawnActor<AActor>(BulletSubclass, Start, Barrel->GetComponentRotation());
+	Ammunition = Ammunition - 1;
+	
+	if (Ammunition <= 0)
 	{
 		AmmunitionCheck();
 	}
@@ -96,7 +98,11 @@ void AWeapon::SwitchCoolDown()
 
 void AWeapon::AmmunitionCheck()
 {
-	OnRemoveFromInvDelegate.Broadcast();
+	MyCharacter = Cast<AMyCharacter>(UGameplayStatics::GetActorOfClass(GetWorld(), AMyCharacter::StaticClass()));
+	if (MyCharacter->GetFromInventory(this->MagazineType))
+	{
+		this->Ammunition = this->MagazineCapacity;
+	}
 }
 
 void AWeapon::OnGrab()

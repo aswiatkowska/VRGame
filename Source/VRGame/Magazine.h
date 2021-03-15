@@ -5,9 +5,8 @@
 #include "GameFramework/Actor.h"
 #include "GrabbableObjectComponent.h"
 #include "Inventory.h"
+#include "MyCharacter.h"
 #include "Magazine.generated.h"
-
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FAddToInvDelegate);
 
 UCLASS()
 class VRGAME_API AMagazine : public AActor
@@ -29,19 +28,17 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TEnumAsByte<EInventoryObjectTypes> InvObjectType;
 
-	FAddToInvDelegate OnAddToInvDelegate;
-
 private:
 	virtual void BeginPlay() override;
 
 	void DestroyMagazine();
-
-	void AddMagazine();
 
 	UFUNCTION()
 	void OnGrab();
 
 	UFUNCTION()
 	void OnRelease();
+
+	AMyCharacter* MyCharacter;
 
 };

@@ -39,20 +39,16 @@ void AMagazine::DestroyMagazine()
 	Destroy();
 }
 
-void AMagazine::AddMagazine()
-{
-	OnAddToInvDelegate.Broadcast();
-}
-
 void AMagazine::OnGrab()
 {
 	MagazineMesh->SetSimulatePhysics(false);
-	AddMagazine();
 }
 
 void AMagazine::OnRelease()
 {
 	MagazineMesh->SetSimulatePhysics(true);
+	MyCharacter = Cast<AMyCharacter>(UGameplayStatics::GetActorOfClass(GetWorld(), AMyCharacter::StaticClass()));
+	MyCharacter->AddToInventory(this->InvObjectType);
 	DestroyMagazine();
 }
 
