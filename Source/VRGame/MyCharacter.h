@@ -88,8 +88,6 @@ private:
 
 	AHand* Hand;
 
-	AWeapon* Weapon;
-
 	AInventoryMap* InvMap;
 
 	UGrabbableObjectComponent* GrabbableObj;

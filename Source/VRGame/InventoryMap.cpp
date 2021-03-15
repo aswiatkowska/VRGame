@@ -40,6 +40,14 @@ bool AInventoryMap::IsInInventory(EInventoryObjectTypes Type)
 		{
 			return true;
 		}
+		else
+		{
+			return false;
+		}
+	}
+	else
+	{
+	return false;
 	}
 }
 

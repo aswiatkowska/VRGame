@@ -202,7 +202,7 @@ void AMyCharacter::Shoot()
 	{
 		if (Hand->GetGrabbedObject()->GrabbableType == EGrabbableTypeEnum::EWeapon)
 		{
-			Weapon = Cast<AWeapon>(Hand->GetGrabbedObject()->GetOwner());
+			AWeapon* Weapon = Cast<AWeapon>(Hand->GetGrabbedObject()->GetOwner());
 			Weapon->Shoot();
 		}
 	}
@@ -214,7 +214,7 @@ void AMyCharacter::ShootingReleased()
 	{
 		if (Hand->GetGrabbedObject()->GrabbableType == EGrabbableTypeEnum::EWeapon)
 		{
-			Weapon = Cast<AWeapon>(Hand->GetGrabbedObject()->GetOwner());
+			AWeapon* Weapon = Cast<AWeapon>(Hand->GetGrabbedObject()->GetOwner());
 			Weapon->ShootingReleased();
 		}
 	}

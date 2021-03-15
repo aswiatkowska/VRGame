@@ -80,15 +80,6 @@ void AHand::OnHandOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor*
 	{
 		return;
 	}
-	
-	if (DetectedGrabbable->GrabbableType == EGrabbableTypeEnum::EWeapon)
-	{
-		Weapon = Cast<AWeapon>(OtherActor);
-	}
-	else if (DetectedGrabbable->GrabbableType == EGrabbableTypeEnum::EMagazine)
-	{
-		Magazine = Cast<AMagazine>(OtherActor);
-	}
 }
 
 void AHand::OnHandOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)

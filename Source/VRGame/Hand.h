@@ -3,8 +3,6 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Weapon.h"
-#include "Magazine.h"
 #include "GrabbableObjectComponent.h"
 #include "Hand.generated.h"
 
@@ -47,10 +45,6 @@ private:
 
 	UFUNCTION()
 	void OnHandOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
-
-	AWeapon* Weapon = nullptr;
-
-	AMagazine* Magazine = nullptr;
 
 	UGrabbableObjectComponent* GrabbedObjectGrabbableComponent = nullptr;
 
