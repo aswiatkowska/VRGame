@@ -50,8 +50,11 @@ void AMyCharacter::BeginPlay()
 	InvMap = GetWorld()->SpawnActor<AInventoryMap>(AInventoryMap::StaticClass(), FVector::ZeroVector, FRotator::ZeroRotator);
 
 	Hand = GetWorld()->SpawnActor<AHand>(HandClass, FVector::ZeroVector, FRotator::ZeroRotator);
-	Hand->RightHandSkeletal->AttachToComponent(RightMotionController, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-	Hand->LeftHandSkeletal->AttachToComponent(LeftMotionController, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+	Hand->HandSkeletal->AttachToComponent(RightMotionController, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+	
+	Hand = GetWorld()->SpawnActor<AHand>(HandClass, FVector::ZeroVector, FRotator::ZeroRotator);
+	Hand->HandSkeletal->AttachToComponent(LeftMotionController, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+	Hand->HandSkeletal->SetRelativeScale3D(FVector(1.0f, -1.0f, 1.0f));
 }
 
 void AMyCharacter::Tick(float DeltaTime)

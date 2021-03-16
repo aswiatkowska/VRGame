@@ -15,19 +15,15 @@ AHand::AHand()
 	Scene = CreateDefaultSubobject<USceneComponent>("Scene");
 	Scene->SetupAttachment(GetRootComponent());
 
-	RightHandSkeletal = CreateDefaultSubobject<USkeletalMeshComponent>("RightHand");
-	RightHandSkeletal->SetupAttachment(Scene);
-	RightHandSkeletal->SetCollisionObjectType((ECollisionChannel)(CustomCollisionChannelsEnum::Hand));
-
-	LeftHandSkeletal = CreateDefaultSubobject<USkeletalMeshComponent>("LeftHand");
-	LeftHandSkeletal->SetupAttachment(Scene);
-	LeftHandSkeletal->SetCollisionObjectType((ECollisionChannel)(CustomCollisionChannelsEnum::Hand));
+	HandSkeletal = CreateDefaultSubobject<USkeletalMeshComponent>("RightHand");
+	HandSkeletal->SetupAttachment(Scene);
+	HandSkeletal->SetCollisionObjectType((ECollisionChannel)(CustomCollisionChannelsEnum::Hand));
 
 	GrabPoint = CreateDefaultSubobject<USceneComponent>("GrabPoint");
-	GrabPoint->SetupAttachment(RightHandSkeletal);
+	GrabPoint->SetupAttachment(HandSkeletal);
 
 	CollisionSphere = CreateDefaultSubobject<USphereComponent>("Sphere");
-	CollisionSphere->SetupAttachment(RightHandSkeletal);
+	CollisionSphere->SetupAttachment(HandSkeletal);
 	CollisionSphere->SetCollisionObjectType((ECollisionChannel)(CustomCollisionChannelsEnum::Hand));
 	CollisionSphere->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 	CollisionSphere->SetCollisionResponseToChannel((ECollisionChannel)(CustomCollisionChannelsEnum::GrabbableObject), ECollisionResponse::ECR_Overlap);
@@ -46,11 +42,11 @@ void AHand::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (IsOverlaping)
+	if (overlapMap.Num() > 0)
 	{
 		for (auto i = overlapMap.CreateIterator(); i; ++i)
 		{
-			float distance = FVector::Dist(i.Key()->Location, CollisionSphere->GetComponentLocation());
+			float distance = FVector::Dist(i.Key()->GetOwner()->GetActorLocation(), CollisionSphere->GetComponentLocation());
 			overlapMap.Emplace(i.Key(), distance);
 		}
 	}
@@ -59,19 +55,21 @@ void AHand::Tick(float DeltaTime)
 
 void AHand::ObjectGrabRelease()
 {
-	if (!IsAnyObjectGrabbed())
+	if (!IsAnyObjectGrabbed() && (overlapMap.Num() > 0))
 	{
-		float val1 = 0;
+		UGrabbableObjectComponent* nearestObject = nullptr;
+		float val1 = 1000;
 		for (auto i = overlapMap.CreateIterator(); i; ++i)
 		{
 			float val2 = overlapMap[i.Key()];
-			if (val2 > val1)
+			if (val2 < val1)
 			{
 				val1 = val2;
+				nearestObject = i.Key();
 			}
 		}
-		GrabbedObjectGrabbableComponent = (UGrabbableObjectComponent*)overlapMap.FindKey(val1);
-		RightHandSkeletal->SetVisibility(false);
+		GrabbedObjectGrabbableComponent = nearestObject;
+		HandSkeletal->SetVisibility(false);
 		GrabbedObjectGrabbableComponent->OnGrabDelegate.Broadcast();
 		GrabbedActor = GrabbedObjectGrabbableComponent->GetOwner();
 		GrabbedActor->AttachToComponent(GrabPoint, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
@@ -80,9 +78,13 @@ void AHand::ObjectGrabRelease()
 	}
 	else if (IsAnyObjectGrabbed())
 	{
-		RightHandSkeletal->SetVisibility(true);
+		HandSkeletal->SetVisibility(true);
 		GrabbedActor->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 		GrabbedObjectGrabbableComponent->OnReleaseDelegate.Broadcast();
+		if (GrabbedActor->IsActorBeingDestroyed())
+		{
+			overlapMap.Remove(GrabbedObjectGrabbableComponent);
+		}
 		GrabbedObjectGrabbableComponent = nullptr;
 		GrabbedActor = nullptr;
 	}
@@ -91,25 +93,27 @@ void AHand::ObjectGrabRelease()
 void AHand::OnHandOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
 	const FHitResult& SweepResult)
 {
-	if (IsAnyObjectGrabbed())
+	if (IsAnyObjectGrabbed() || OtherActor->IsActorBeingDestroyed())
 	{
 		return;
 	}
 	
-	IsOverlaping = true;
-	DetectedGrabbable = OtherActor->FindComponentByClass<UGrabbableObjectComponent>();
-	float distance = FVector::Dist(DetectedGrabbable->Location, CollisionSphere->GetComponentLocation());
-	overlapMap.Add(DetectedGrabbable, distance);
+	UGrabbableObjectComponent* DetectedGrabbable = OtherActor->FindComponentByClass<UGrabbableObjectComponent>();
 	if (DetectedGrabbable == nullptr)
 	{
 		return;
 	}
+	//UE_LOG(LogTemp, Log, TEXT("Overlap begin z %s"), *(OtherActor->GetName()))
+	float distance = FVector::Dist(OtherActor->GetActorLocation(), CollisionSphere->GetComponentLocation());
+	overlapMap.Add(DetectedGrabbable, distance);
+
+	
 }
 
 void AHand::OnHandOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	IsOverlaping = false;
-	overlapMap.Remove(DetectedGrabbable);
+	overlapMap.Remove(OtherActor->FindComponentByClass<UGrabbableObjectComponent>());
+	//UE_LOG(LogTemp, Log, TEXT("Overlap end z %s"), *(OtherActor->GetName()))
 }
 
 bool AHand::IsAnyObjectGrabbed()

@@ -18,10 +18,7 @@ public:
 	class USceneComponent* Scene;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	class USkeletalMeshComponent* RightHandSkeletal;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	class USkeletalMeshComponent* LeftHandSkeletal;
+	class USkeletalMeshComponent* HandSkeletal;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class USceneComponent* GrabPoint;
@@ -40,8 +37,6 @@ private:
 
 	bool IsAnyObjectGrabbed();
 
-	bool IsOverlaping;
-
 	UFUNCTION()
 	void OnHandOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
 		const FHitResult& SweepResult);
@@ -52,8 +47,6 @@ private:
 	TMap<UGrabbableObjectComponent*, float> overlapMap;
 
 	UGrabbableObjectComponent* GrabbedObjectGrabbableComponent = nullptr;
-
-	UGrabbableObjectComponent* DetectedGrabbable = nullptr;
 
 	AActor* GrabbedActor = nullptr;
 
