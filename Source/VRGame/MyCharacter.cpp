@@ -57,6 +57,9 @@ void AMyCharacter::BeginPlay()
 	LeftHand->HandSkeletal->AttachToComponent(LeftMotionController, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 	LeftHand->HandSkeletal->SetRelativeScale3D(FVector(1.0f, -1.0f, 1.0f));
 	LeftHand->HandType = EHandEnum::ELeft;
+
+	RightHand->OtherHand = LeftHand;
+	LeftHand->OtherHand = RightHand;
 }
 
 void AMyCharacter::Tick(float DeltaTime)

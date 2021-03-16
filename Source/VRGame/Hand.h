@@ -40,10 +40,14 @@ public:
 
 	UGrabbableObjectComponent* GetGrabbedObject();
 
+	AHand* OtherHand;
+
 private:
 	virtual void BeginPlay() override;
 
 	virtual void Tick(float DeltaTime) override;
+
+	void ForceRelease();
 
 	bool IsAnyObjectGrabbed();
 

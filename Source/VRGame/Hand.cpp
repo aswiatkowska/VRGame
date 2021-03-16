@@ -68,7 +68,13 @@ void AHand::ObjectGrabRelease()
 				nearestObject = i.Key();
 			}
 		}
+		if (nearestObject->IsGrabbed)
+		{
+			nearestObject->OnHandChangedDelegate.Broadcast();
+			ForceRelease();
+		}
 		GrabbedObjectGrabbableComponent = nearestObject;
+		nearestObject->IsGrabbed = true;
 		HandSkeletal->SetVisibility(false);
 		GrabbedObjectGrabbableComponent->OnGrabDelegate.Broadcast();
 		GrabbedActor = GrabbedObjectGrabbableComponent->GetOwner();
@@ -86,6 +92,7 @@ void AHand::ObjectGrabRelease()
 	}
 	else if (IsAnyObjectGrabbed())
 	{
+		GrabbedActor->FindComponentByClass<UGrabbableObjectComponent>()->IsGrabbed = false;
 		HandSkeletal->SetVisibility(true);
 		GrabbedActor->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 		GrabbedObjectGrabbableComponent->OnReleaseDelegate.Broadcast();
@@ -96,6 +103,15 @@ void AHand::ObjectGrabRelease()
 		GrabbedObjectGrabbableComponent = nullptr;
 		GrabbedActor = nullptr;
 	}
+}
+
+void AHand::ForceRelease()
+{
+	HandSkeletal->SetVisibility(true);
+	GrabbedActor->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+	GrabbedObjectGrabbableComponent = nullptr;
+	GrabbedActor = nullptr;
+
 }
 
 void AHand::OnHandOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,

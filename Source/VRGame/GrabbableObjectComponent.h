@@ -7,6 +7,7 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGrabDelegate);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FReleaseDelegate);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FHandChangedDelegate);
 
 UENUM()
 	enum EGrabbableTypeEnum
@@ -35,6 +36,8 @@ public:
 
 	FReleaseDelegate OnReleaseDelegate;
 
+	FHandChangedDelegate OnHandChangedDelegate;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FVector RightLocation = FVector::ZeroVector;
 
@@ -46,5 +49,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FRotator LeftRotation = FRotator::ZeroRotator;
+
+	bool IsGrabbed = false;
 		
 };
