@@ -36,9 +36,15 @@ public:
 	FReleaseDelegate OnReleaseDelegate;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FVector Location = FVector::ZeroVector;
+	FVector RightLocation = FVector::ZeroVector;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FRotator Rotation = FRotator::ZeroRotator;
+	FRotator RightRotation = FRotator::ZeroRotator;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FVector LeftLocation = FVector::ZeroVector;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FRotator LeftRotation = FRotator::ZeroRotator;
 		
 };

@@ -51,10 +51,12 @@ void AMyCharacter::BeginPlay()
 
 	RightHand = GetWorld()->SpawnActor<AHand>(HandClass, FVector::ZeroVector, FRotator::ZeroRotator);
 	RightHand->HandSkeletal->AttachToComponent(RightMotionController, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+	RightHand->HandType = EHandEnum::ERight;
 	
 	LeftHand = GetWorld()->SpawnActor<AHand>(HandClass, FVector::ZeroVector, FRotator::ZeroRotator);
 	LeftHand->HandSkeletal->AttachToComponent(LeftMotionController, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 	LeftHand->HandSkeletal->SetRelativeScale3D(FVector(1.0f, -1.0f, 1.0f));
+	LeftHand->HandType = EHandEnum::ELeft;
 }
 
 void AMyCharacter::Tick(float DeltaTime)

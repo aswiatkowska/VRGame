@@ -73,8 +73,16 @@ void AHand::ObjectGrabRelease()
 		GrabbedObjectGrabbableComponent->OnGrabDelegate.Broadcast();
 		GrabbedActor = GrabbedObjectGrabbableComponent->GetOwner();
 		GrabbedActor->AttachToComponent(GrabPoint, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-		GrabPoint->SetRelativeLocation(GrabbedObjectGrabbableComponent->Location);
-		GrabPoint->SetRelativeRotation(GrabbedObjectGrabbableComponent->Rotation);
+		if (HandType == EHandEnum::ERight)
+		{
+			GrabPoint->SetRelativeLocation(GrabbedObjectGrabbableComponent->RightLocation);
+			GrabPoint->SetRelativeRotation(GrabbedObjectGrabbableComponent->RightRotation);
+		}
+		else if (HandType == EHandEnum::ELeft)
+		{
+			GrabPoint->SetRelativeLocation(GrabbedObjectGrabbableComponent->LeftLocation);
+			GrabPoint->SetRelativeRotation(GrabbedObjectGrabbableComponent->LeftRotation);
+		}
 	}
 	else if (IsAnyObjectGrabbed())
 	{

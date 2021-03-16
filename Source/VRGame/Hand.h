@@ -6,6 +6,13 @@
 #include "GrabbableObjectComponent.h"
 #include "Hand.generated.h"
 
+UENUM()
+enum EHandEnum
+{
+	ERight,
+	ELeft,
+};
+
 UCLASS()
 class VRGAME_API AHand : public AActor
 {
@@ -25,6 +32,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class USphereComponent* CollisionSphere;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TEnumAsByte<EHandEnum> HandType;
 
 	void ObjectGrabRelease();
 
