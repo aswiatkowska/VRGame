@@ -30,10 +30,6 @@ AMyCharacter::AMyCharacter()
 	RightMotionController->SetupAttachment(Scene);
 	RightMotionController->SetTrackingSource(EControllerHand::Right);
 
-	LeftHandSkeletal = CreateDefaultSubobject<USkeletalMeshComponent>("LeftHand");
-	LeftHandSkeletal->SetupAttachment(LeftMotionController);
-	LeftHandSkeletal->SetCollisionObjectType((ECollisionChannel)(CustomCollisionChannelsEnum::Hand));
-
 	Camera = CreateDefaultSubobject<UCameraComponent>("Camera");
 	Camera->SetupAttachment(Scene);
 
@@ -51,10 +47,11 @@ void AMyCharacter::BeginPlay()
 
 	playerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 
-	InvMap = GetWorld()->SpawnActor<AInventoryMap>(InvMapClass, FVector::ZeroVector, FRotator::ZeroRotator);
+	InvMap = GetWorld()->SpawnActor<AInventoryMap>(AInventoryMap::StaticClass(), FVector::ZeroVector, FRotator::ZeroRotator);
 
 	Hand = GetWorld()->SpawnActor<AHand>(HandClass, FVector::ZeroVector, FRotator::ZeroRotator);
-	Hand->AttachToComponent(RightMotionController, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+	Hand->RightHandSkeletal->AttachToComponent(RightMotionController, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+	Hand->LeftHandSkeletal->AttachToComponent(LeftMotionController, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 }
 
 void AMyCharacter::Tick(float DeltaTime)
@@ -68,7 +65,7 @@ void AMyCharacter::Tick(float DeltaTime)
 		if (TeleportLocation())
 		{
 			FVector Start = FVector(LeftMotionController->GetComponentLocation());
-			FVector End = FVector(LeftMotionController->GetComponentLocation() + (LeftHandSkeletal->GetForwardVector() * 1000.0f));
+			FVector End = FVector(LeftMotionController->GetComponentLocation() + (LeftMotionController->GetForwardVector() * 1000.0f));
 
 			TArray<AActor*> ignored;
 			ignored.Add(this);

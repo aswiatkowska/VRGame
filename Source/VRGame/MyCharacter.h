@@ -27,9 +27,6 @@ public:
 	class UMotionControllerComponent* RightMotionController;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	class USkeletalMeshComponent* LeftHandSkeletal;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class UCameraComponent* Camera;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -37,9 +34,6 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<AHand> HandClass;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSubclassOf<AInventoryMap> InvMapClass;
 
 	bool GetFromInventory(EInventoryObjectTypes Type);
 

@@ -108,6 +108,10 @@ void AWeapon::AmmunitionCheck()
 void AWeapon::OnGrab()
 {
 	WeaponMesh->SetSimulatePhysics(false);
+	if (Ammunition <= 0)
+	{
+		AmmunitionCheck();
+	}
 }
 
 void AWeapon::OnRelease()
