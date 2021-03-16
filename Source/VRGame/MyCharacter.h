@@ -64,11 +64,17 @@ private:
 
 	void TurnLeft();
 
-	void ObjectGrabRelease();
+	void ObjectGrabReleaseRight();
 
-	void Shoot();
+	void ObjectGrabReleaseLeft();
 
-	void ShootingReleased();
+	void ShootRight();
+
+	void ShootingReleasedRight();
+
+	void ShootLeft();
+
+	void ShootingReleasedLeft();
 
 	FHitResult hit;
 
@@ -80,7 +86,9 @@ private:
 
 	APlayerController* playerController;
 
-	AHand* Hand;
+	AHand* RightHand;
+
+	AHand* LeftHand;
 
 	AInventoryMap* InvMap;
 

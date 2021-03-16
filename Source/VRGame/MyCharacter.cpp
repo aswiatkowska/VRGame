@@ -49,12 +49,12 @@ void AMyCharacter::BeginPlay()
 
 	InvMap = GetWorld()->SpawnActor<AInventoryMap>(AInventoryMap::StaticClass(), FVector::ZeroVector, FRotator::ZeroRotator);
 
-	Hand = GetWorld()->SpawnActor<AHand>(HandClass, FVector::ZeroVector, FRotator::ZeroRotator);
-	Hand->HandSkeletal->AttachToComponent(RightMotionController, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+	RightHand = GetWorld()->SpawnActor<AHand>(HandClass, FVector::ZeroVector, FRotator::ZeroRotator);
+	RightHand->HandSkeletal->AttachToComponent(RightMotionController, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 	
-	Hand = GetWorld()->SpawnActor<AHand>(HandClass, FVector::ZeroVector, FRotator::ZeroRotator);
-	Hand->HandSkeletal->AttachToComponent(LeftMotionController, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-	Hand->HandSkeletal->SetRelativeScale3D(FVector(1.0f, -1.0f, 1.0f));
+	LeftHand = GetWorld()->SpawnActor<AHand>(HandClass, FVector::ZeroVector, FRotator::ZeroRotator);
+	LeftHand->HandSkeletal->AttachToComponent(LeftMotionController, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+	LeftHand->HandSkeletal->SetRelativeScale3D(FVector(1.0f, -1.0f, 1.0f));
 }
 
 void AMyCharacter::Tick(float DeltaTime)
@@ -95,10 +95,15 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	PlayerInputComponent->BindAction("TurnRight", IE_Pressed, this, &AMyCharacter::TurnRight);
 	PlayerInputComponent->BindAction("TurnLeft", IE_Pressed, this, &AMyCharacter::TurnLeft);
 
-	PlayerInputComponent->BindAction("Shoot", IE_Pressed, this, &AMyCharacter::Shoot);
-	PlayerInputComponent->BindAction("Shoot", IE_Released, this, &AMyCharacter::ShootingReleased);
-	PlayerInputComponent->BindAction("GrabWeapon", IE_Pressed, this, &AMyCharacter::ObjectGrabRelease);
-	PlayerInputComponent->BindAction("ReleaseWeapon", IE_Released, this, &AMyCharacter::ObjectGrabRelease);
+	PlayerInputComponent->BindAction("ShootRight", IE_Pressed, this, &AMyCharacter::ShootRight);
+	PlayerInputComponent->BindAction("ShootRight", IE_Released, this, &AMyCharacter::ShootingReleasedRight);
+	PlayerInputComponent->BindAction("ShootLeft", IE_Pressed, this, &AMyCharacter::ShootLeft);
+	PlayerInputComponent->BindAction("ShootLeft", IE_Released, this, &AMyCharacter::ShootingReleasedLeft);
+
+	PlayerInputComponent->BindAction("GrabReleaseRight", IE_Pressed, this, &AMyCharacter::ObjectGrabReleaseRight);
+	PlayerInputComponent->BindAction("GrabReleaseRight", IE_Released, this, &AMyCharacter::ObjectGrabReleaseRight);
+	PlayerInputComponent->BindAction("GrabReleaseLeft", IE_Pressed, this, &AMyCharacter::ObjectGrabReleaseLeft);
+	PlayerInputComponent->BindAction("GrabReleaseLeft", IE_Released, this, &AMyCharacter::ObjectGrabReleaseLeft);
 
 }
 
@@ -191,30 +196,59 @@ void AMyCharacter::Teleport()
 	}
 }
 
-void AMyCharacter::ObjectGrabRelease()
+void AMyCharacter::ObjectGrabReleaseRight()
 {
-	Hand->ObjectGrabRelease();
+	RightHand->ObjectGrabRelease();
 }
 
-void AMyCharacter::Shoot()
+void AMyCharacter::ObjectGrabReleaseLeft()
 {
-	if (Hand->GetGrabbedObject() != nullptr)
+	LeftHand->ObjectGrabRelease();
+}
+
+void AMyCharacter::ShootRight()
+{
+	if (RightHand->GetGrabbedObject() != nullptr)
 	{
-		if (Hand->GetGrabbedObject()->GrabbableType == EGrabbableTypeEnum::EWeapon)
+		if (RightHand->GetGrabbedObject()->GrabbableType == EGrabbableTypeEnum::EWeapon)
 		{
-			AWeapon* Weapon = Cast<AWeapon>(Hand->GetGrabbedObject()->GetOwner());
+			AWeapon* Weapon = Cast<AWeapon>(RightHand->GetGrabbedObject()->GetOwner());
 			Weapon->Shoot();
 		}
 	}
 }
 
-void AMyCharacter::ShootingReleased()
+void AMyCharacter::ShootLeft()
 {
-	if (Hand->GetGrabbedObject() != nullptr)
+	if (LeftHand->GetGrabbedObject() != nullptr)
 	{
-		if (Hand->GetGrabbedObject()->GrabbableType == EGrabbableTypeEnum::EWeapon)
+		if (LeftHand->GetGrabbedObject()->GrabbableType == EGrabbableTypeEnum::EWeapon)
 		{
-			AWeapon* Weapon = Cast<AWeapon>(Hand->GetGrabbedObject()->GetOwner());
+			AWeapon* Weapon = Cast<AWeapon>(LeftHand->GetGrabbedObject()->GetOwner());
+			Weapon->Shoot();
+		}
+	}
+}
+
+void AMyCharacter::ShootingReleasedRight()
+{
+	if (RightHand->GetGrabbedObject() != nullptr)
+	{
+		if (RightHand->GetGrabbedObject()->GrabbableType == EGrabbableTypeEnum::EWeapon)
+		{
+			AWeapon* Weapon = Cast<AWeapon>(RightHand->GetGrabbedObject()->GetOwner());
+			Weapon->ShootingReleased();
+		}
+	}
+}
+
+void AMyCharacter::ShootingReleasedLeft()
+{
+	if (LeftHand->GetGrabbedObject() != nullptr)
+	{
+		if (LeftHand->GetGrabbedObject()->GrabbableType == EGrabbableTypeEnum::EWeapon)
+		{
+			AWeapon* Weapon = Cast<AWeapon>(LeftHand->GetGrabbedObject()->GetOwner());
 			Weapon->ShootingReleased();
 		}
 	}
