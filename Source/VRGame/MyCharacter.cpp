@@ -51,15 +51,13 @@ void AMyCharacter::BeginPlay()
 
 	RightHand = GetWorld()->SpawnActor<AHand>(HandClass, FVector::ZeroVector, FRotator::ZeroRotator);
 	RightHand->HandSkeletal->AttachToComponent(RightMotionController, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-	RightHand->HandType = EHandEnum::ERight;
 	
 	LeftHand = GetWorld()->SpawnActor<AHand>(HandClass, FVector::ZeroVector, FRotator::ZeroRotator);
 	LeftHand->HandSkeletal->AttachToComponent(LeftMotionController, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 	LeftHand->HandSkeletal->SetRelativeScale3D(FVector(1.0f, -1.0f, 1.0f));
-	LeftHand->HandType = EHandEnum::ELeft;
-
-	RightHand->OtherHand = LeftHand;
-	LeftHand->OtherHand = RightHand;
+	
+	LeftHand->SetupHand(EHandEnum::ELeft, RightHand);
+	RightHand->SetupHand(EHandEnum::ERight, LeftHand);
 }
 
 void AMyCharacter::Tick(float DeltaTime)
@@ -203,30 +201,22 @@ void AMyCharacter::Teleport()
 
 void AMyCharacter::ObjectGrabRight()
 {
-	RightHand->ObjectGrabRelease();
+	RightHand->ObjectGrab();
 }
 
 void AMyCharacter::ObjectReleaseRight()
 {
-	if (RightHand->OtherHand->IsActive)
-	{
-		return;
-	}
-	RightHand->ObjectGrabRelease();
+	RightHand->ObjectRelease();
 }
 
 void AMyCharacter::ObjectGrabLeft()
 {
-	LeftHand->ObjectGrabRelease();
+	LeftHand->ObjectGrab();
 }
 
 void AMyCharacter::ObjectReleaseLeft()
 {
-	if (LeftHand->OtherHand->IsActive)
-	{
-		return;
-	}
-	LeftHand->ObjectGrabRelease();
+	LeftHand->ObjectRelease();
 }
 
 void AMyCharacter::ShootRight()

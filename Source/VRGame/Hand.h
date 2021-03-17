@@ -36,14 +36,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TEnumAsByte<EHandEnum> HandType;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	bool IsActive;
+	void ObjectGrab();
 
-	void ObjectGrabRelease();
+	void ObjectRelease();
 
 	UGrabbableObjectComponent* GetGrabbedObject();
 
-	AHand* OtherHand;
+	void SetupHand(EHandEnum RightOrLeft, AHand* OppositeHand);
 
 private:
 	virtual void BeginPlay() override;
@@ -66,5 +65,7 @@ private:
 	UGrabbableObjectComponent* GrabbedObjectGrabbableComponent = nullptr;
 
 	AActor* GrabbedActor = nullptr;
+
+	AHand* OtherHand;
 
 };

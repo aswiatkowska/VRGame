@@ -53,9 +53,9 @@ void AHand::Tick(float DeltaTime)
 
 }
 
-void AHand::ObjectGrabRelease()
+void AHand::ObjectGrab()
 {
-	if (!this->IsActive && (overlapMap.Num() > 0))
+	if (!IsAnyObjectGrabbed() && overlapMap.Num() > 0)
 	{
 		UGrabbableObjectComponent* nearestObject = nullptr;
 		float val1 = 1000;
@@ -71,9 +71,8 @@ void AHand::ObjectGrabRelease()
 		if (nearestObject->IsGrabbed)
 		{
 			nearestObject->OnHandChangedDelegate.Broadcast();
-			ForceRelease();
+			OtherHand->ForceRelease();
 		}
-		IsActive = true;
 		nearestObject->IsGrabbed = true;
 		GrabbedObjectGrabbableComponent = nearestObject;
 		HandSkeletal->SetVisibility(false);
@@ -91,9 +90,12 @@ void AHand::ObjectGrabRelease()
 			GrabPoint->SetRelativeRotation(GrabbedObjectGrabbableComponent->LeftRotation);
 		}
 	}
-	else if (this->IsActive)
+}
+
+void AHand::ObjectRelease()
+{
+	if (IsAnyObjectGrabbed())
 	{
-		IsActive = false;
 		GrabbedActor->FindComponentByClass<UGrabbableObjectComponent>()->IsGrabbed = false;
 		HandSkeletal->SetVisibility(true);
 		GrabbedActor->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
@@ -109,12 +111,11 @@ void AHand::ObjectGrabRelease()
 
 void AHand::ForceRelease()
 {
-	OtherHand->GrabbedActor->FindComponentByClass<UGrabbableObjectComponent>()->IsGrabbed = false;
-	OtherHand->HandSkeletal->SetVisibility(true);
-	OtherHand->GrabbedActor->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
-	OtherHand->GrabbedObjectGrabbableComponent = nullptr;
-	OtherHand->GrabbedActor = nullptr;
-	OtherHand->IsActive = false;
+	GrabbedActor->FindComponentByClass<UGrabbableObjectComponent>()->IsGrabbed = false;
+	HandSkeletal->SetVisibility(true);
+	GrabbedActor->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+	GrabbedObjectGrabbableComponent = nullptr;
+	GrabbedActor = nullptr;
 }
 
 void AHand::OnHandOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
@@ -153,5 +154,11 @@ bool AHand::IsAnyObjectGrabbed()
 UGrabbableObjectComponent* AHand::GetGrabbedObject()
 {
 	return GrabbedObjectGrabbableComponent;
+}
+
+void AHand::SetupHand(EHandEnum RightOrLeft, AHand* OppositeHand)
+{
+	HandType = RightOrLeft;
+	OtherHand = OppositeHand;
 }
 
