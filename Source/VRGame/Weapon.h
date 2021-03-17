@@ -4,7 +4,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Bullet.h"
-#include "Inventory.h"
+#include "InventoryObjectTypes.h"
 #include "MyCharacter.h"
 #include "GrabbableObjectComponent.h"
 #include "Weapon.generated.h"
@@ -63,8 +63,6 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-
-	virtual void Tick(float DeltaTime) override;
 
 	UPROPERTY()
 	int Ammunition;

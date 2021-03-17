@@ -47,7 +47,7 @@ void AMyCharacter::BeginPlay()
 
 	playerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 
-	InvMap = GetWorld()->SpawnActor<AInventoryMap>(AInventoryMap::StaticClass(), FVector::ZeroVector, FRotator::ZeroRotator);
+	InvMap = GetWorld()->SpawnActor<AInventory>(AInventory::StaticClass(), FVector::ZeroVector, FRotator::ZeroRotator);
 
 	RightHand = GetWorld()->SpawnActor<AHand>(HandClass, FVector::ZeroVector, FRotator::ZeroRotator);
 	RightHand->HandSkeletal->AttachToComponent(RightMotionController, FAttachmentTransformRules::SnapToTargetNotIncludingScale);

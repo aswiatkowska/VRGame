@@ -25,12 +25,6 @@ void ABullet::BeginPlay()
 	GetWorld()->GetTimerManager().SetTimer(handle, this, &ABullet::OnDestroy, 3);
 }
 
-void ABullet::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
-
 void ABullet::OnDestroy()
 {
 	Destroy();

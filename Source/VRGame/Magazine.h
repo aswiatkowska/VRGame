@@ -4,7 +4,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "GrabbableObjectComponent.h"
-#include "Inventory.h"
+#include "InventoryObjectTypes.h"
 #include "MyCharacter.h"
 #include "Magazine.generated.h"
 

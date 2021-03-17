@@ -4,8 +4,8 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Hand.h"
+#include "InventoryObjectTypes.h"
 #include "Inventory.h"
-#include "InventoryMap.h"
 #include "GrabbableObjectComponent.h"
 #include "MyCharacter.generated.h"
 
@@ -94,7 +94,5 @@ private:
 
 	AHand* LeftHand;
 
-	AInventoryMap* InvMap;
-
-	UGrabbableObjectComponent* GrabbableObj;
+	AInventory* InvMap;
 };

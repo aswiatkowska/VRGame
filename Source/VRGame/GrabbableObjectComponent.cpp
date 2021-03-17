@@ -7,15 +7,3 @@ UGrabbableObjectComponent::UGrabbableObjectComponent()
 
 }
 
-void UGrabbableObjectComponent::BeginPlay()
-{
-	Super::BeginPlay();
-	
-}
-
-void UGrabbableObjectComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-}
-

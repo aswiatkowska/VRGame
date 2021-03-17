@@ -26,10 +26,6 @@ class VRGAME_API UGrabbableObjectComponent : public UActorComponent
 public:
 	UGrabbableObjectComponent();
 
-	virtual void BeginPlay() override;
-
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
 	EGrabbableTypeEnum GrabbableType = EGrabbableTypeEnum::Null;
 
 	FGrabDelegate OnGrabDelegate;

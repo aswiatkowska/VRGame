@@ -42,12 +42,6 @@ void AWeapon::BeginPlay()
 	Ammunition = MagazineCapacity;
 }
 
-void AWeapon::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
-
 void AWeapon::Shoot()
 {
 	if (cooldown || Ammunition <= 0)

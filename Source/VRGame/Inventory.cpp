@@ -1,14 +1,14 @@
 
-#include "InventoryMap.h"
+#include "Inventory.h"
 
 
-AInventoryMap::AInventoryMap()
+AInventory::AInventory()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
 }
 
-void AInventoryMap::AddObject(EInventoryObjectTypes Type)
+void AInventory::AddObject(EInventoryObjectTypes Type)
 {
 	if (IsInInventory(Type))
 	{
@@ -21,7 +21,7 @@ void AInventoryMap::AddObject(EInventoryObjectTypes Type)
 	}
 }
 
-void AInventoryMap::RemoveObject(EInventoryObjectTypes Type)
+void AInventory::RemoveObject(EInventoryObjectTypes Type)
 {
 	int val = inventoryMap[Type] - 1;
 
@@ -31,7 +31,7 @@ void AInventoryMap::RemoveObject(EInventoryObjectTypes Type)
 	}
 }
 
-bool AInventoryMap::IsInInventory(EInventoryObjectTypes Type)
+bool AInventory::IsInInventory(EInventoryObjectTypes Type)
 {
 	if (inventoryMap.Contains(Type))
 	{

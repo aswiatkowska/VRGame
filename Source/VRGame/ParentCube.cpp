@@ -17,18 +17,6 @@ AParentCube::AParentCube()
 
 }
 
-void AParentCube::BeginPlay()
-{
-	Super::BeginPlay();
-	
-}
-
-void AParentCube::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
-
 void AParentCube::OnDestroy()
 {
 	Destroy();
