@@ -64,9 +64,13 @@ private:
 
 	void TurnLeft();
 
-	void ObjectGrabReleaseRight();
+	void ObjectGrabRight();
 
-	void ObjectGrabReleaseLeft();
+	void ObjectReleaseRight();
+
+	void ObjectGrabLeft();
+
+	void ObjectReleaseLeft();
 
 	void ShootRight();
 

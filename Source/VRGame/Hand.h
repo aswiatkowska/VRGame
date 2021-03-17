@@ -36,6 +36,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TEnumAsByte<EHandEnum> HandType;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	bool IsActive;
+
 	void ObjectGrabRelease();
 
 	UGrabbableObjectComponent* GetGrabbedObject();

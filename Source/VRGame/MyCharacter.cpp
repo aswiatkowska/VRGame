@@ -105,10 +105,10 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	PlayerInputComponent->BindAction("ShootLeft", IE_Pressed, this, &AMyCharacter::ShootLeft);
 	PlayerInputComponent->BindAction("ShootLeft", IE_Released, this, &AMyCharacter::ShootingReleasedLeft);
 
-	PlayerInputComponent->BindAction("GrabReleaseRight", IE_Pressed, this, &AMyCharacter::ObjectGrabReleaseRight);
-	PlayerInputComponent->BindAction("GrabReleaseRight", IE_Released, this, &AMyCharacter::ObjectGrabReleaseRight);
-	PlayerInputComponent->BindAction("GrabReleaseLeft", IE_Pressed, this, &AMyCharacter::ObjectGrabReleaseLeft);
-	PlayerInputComponent->BindAction("GrabReleaseLeft", IE_Released, this, &AMyCharacter::ObjectGrabReleaseLeft);
+	PlayerInputComponent->BindAction("GrabReleaseRight", IE_Pressed, this, &AMyCharacter::ObjectGrabRight);
+	PlayerInputComponent->BindAction("GrabReleaseRight", IE_Released, this, &AMyCharacter::ObjectReleaseRight);
+	PlayerInputComponent->BindAction("GrabReleaseLeft", IE_Pressed, this, &AMyCharacter::ObjectGrabLeft);
+	PlayerInputComponent->BindAction("GrabReleaseLeft", IE_Released, this, &AMyCharacter::ObjectReleaseLeft);
 
 }
 
@@ -201,13 +201,31 @@ void AMyCharacter::Teleport()
 	}
 }
 
-void AMyCharacter::ObjectGrabReleaseRight()
+void AMyCharacter::ObjectGrabRight()
 {
 	RightHand->ObjectGrabRelease();
 }
 
-void AMyCharacter::ObjectGrabReleaseLeft()
+void AMyCharacter::ObjectReleaseRight()
 {
+	if (RightHand->OtherHand->IsActive)
+	{
+		return;
+	}
+	RightHand->ObjectGrabRelease();
+}
+
+void AMyCharacter::ObjectGrabLeft()
+{
+	LeftHand->ObjectGrabRelease();
+}
+
+void AMyCharacter::ObjectReleaseLeft()
+{
+	if (LeftHand->OtherHand->IsActive)
+	{
+		return;
+	}
 	LeftHand->ObjectGrabRelease();
 }
 

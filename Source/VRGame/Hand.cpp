@@ -55,7 +55,7 @@ void AHand::Tick(float DeltaTime)
 
 void AHand::ObjectGrabRelease()
 {
-	if (!IsAnyObjectGrabbed() && (overlapMap.Num() > 0))
+	if (!this->IsActive && (overlapMap.Num() > 0))
 	{
 		UGrabbableObjectComponent* nearestObject = nullptr;
 		float val1 = 1000;
@@ -73,8 +73,9 @@ void AHand::ObjectGrabRelease()
 			nearestObject->OnHandChangedDelegate.Broadcast();
 			ForceRelease();
 		}
-		GrabbedObjectGrabbableComponent = nearestObject;
+		IsActive = true;
 		nearestObject->IsGrabbed = true;
+		GrabbedObjectGrabbableComponent = nearestObject;
 		HandSkeletal->SetVisibility(false);
 		GrabbedObjectGrabbableComponent->OnGrabDelegate.Broadcast();
 		GrabbedActor = GrabbedObjectGrabbableComponent->GetOwner();
@@ -90,8 +91,9 @@ void AHand::ObjectGrabRelease()
 			GrabPoint->SetRelativeRotation(GrabbedObjectGrabbableComponent->LeftRotation);
 		}
 	}
-	else if (IsAnyObjectGrabbed())
+	else if (this->IsActive)
 	{
+		IsActive = false;
 		GrabbedActor->FindComponentByClass<UGrabbableObjectComponent>()->IsGrabbed = false;
 		HandSkeletal->SetVisibility(true);
 		GrabbedActor->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
@@ -107,10 +109,12 @@ void AHand::ObjectGrabRelease()
 
 void AHand::ForceRelease()
 {
-	HandSkeletal->SetVisibility(true);
+	GrabbedActor->FindComponentByClass<UGrabbableObjectComponent>()->IsGrabbed = false;
+	OtherHand->HandSkeletal->SetVisibility(true);
 	GrabbedActor->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 	GrabbedObjectGrabbableComponent = nullptr;
 	GrabbedActor = nullptr;
+	OtherHand->IsActive = false;
 
 }
 
@@ -144,6 +148,8 @@ bool AHand::IsAnyObjectGrabbed()
 {
 	return (GrabbedObjectGrabbableComponent != nullptr);
 }
+
+
 
 UGrabbableObjectComponent* AHand::GetGrabbedObject()
 {
