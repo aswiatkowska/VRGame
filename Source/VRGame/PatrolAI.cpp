@@ -4,11 +4,14 @@
 #include "PatrolAIController.h"
 #include "BehaviorTree/BehaviorTree.h"
 #include "Perception/PawnSensingComponent.h"
+#include "GameFramework/CharacterMovementComponent.h" 
+
 
 APatrolAI::APatrolAI()
 {
 	PawnSensingComp = CreateDefaultSubobject<UPawnSensingComponent>("PawnSensingComp");
 	PawnSensingComp->SetPeripheralVisionAngle(20.0f);
+	GetCharacterMovement()->MaxWalkSpeed = 100;
 }
 
 void APatrolAI::BeginPlay()
@@ -19,7 +22,6 @@ void APatrolAI::BeginPlay()
 	{
 		PawnSensingComp->OnSeePawn.AddDynamic(this, &APatrolAI::OnPlayerCaught);
 	}
-	
 }
 
 void APatrolAI::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
