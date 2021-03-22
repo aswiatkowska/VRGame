@@ -42,6 +42,14 @@ void APatrolAIController::SetPlayerCaught(APawn* CaughtPawn)
 	}
 }
 
+void APatrolAIController::SetPlayerNotCaught()
+{
+	if (BlackboardComp)
+	{
+		BlackboardComp->SetValueAsObject(PlayerKey, nullptr);
+	}
+}
+
 UBlackboardComponent* APatrolAIController::GetBlackboardComp()
 {
 	return BlackboardComp;

@@ -18,6 +18,8 @@ public:
 
 	void SetPlayerCaught(APawn* CaughtPawn);
 
+	void SetPlayerNotCaught();
+
 	UPROPERTY(EditDefaultsOnly, Category = AI)
 	FName DestinationKey;
 

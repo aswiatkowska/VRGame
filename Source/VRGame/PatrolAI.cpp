@@ -24,6 +24,16 @@ void APatrolAI::BeginPlay()
 	}
 }
 
+void APatrolAI::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	if (!PawnSensingComp->CouldSeePawn(SeenPawn))
+	{
+		OnPlayerNotCaught();
+	}
+}
+
 void APatrolAI::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
@@ -39,4 +49,15 @@ void APatrolAI::OnPlayerCaught(APawn* CaughtPawn)
 		ControllerAI->SetPlayerCaught(CaughtPawn);
 	}
 }
+
+void APatrolAI::OnPlayerNotCaught()
+{
+	APatrolAIController* ControllerAI = Cast<APatrolAIController>(GetController());
+
+	if (ControllerAI)
+	{
+		ControllerAI->SetPlayerNotCaught();
+	}
+}
+
 
