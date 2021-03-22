@@ -2,6 +2,7 @@
 
 #include "PatrolAI.h"
 #include "PatrolAIController.h"
+#include "Kismet/GameplayStatics.h" 
 #include "BehaviorTree/BehaviorTree.h"
 #include "Perception/PawnSensingComponent.h"
 #include "GameFramework/CharacterMovementComponent.h" 
@@ -17,6 +18,8 @@ APatrolAI::APatrolAI()
 void APatrolAI::BeginPlay()
 {
 	Super::BeginPlay();
+
+	SeenPawn = Cast<APawn>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
 
 	if (PawnSensingComp)
 	{
