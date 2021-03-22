@@ -35,6 +35,7 @@ void APatrolAI::Tick(float DeltaTime)
 	{
 		if (!PawnSensingComp->CouldSeePawn(PlayerPawn))
 		{
+			IsPawnInSight = false;
 			OnPlayerNotCaught();
 		}
 	}
@@ -70,7 +71,6 @@ void APatrolAI::OnPlayerNotCaught()
 	if (ControllerAI)
 	{
 		ControllerAI->SetPlayerNotCaught();
-		IsPawnInSight = false;
 		ControllerAI->SetIsPawnInSight(IsPawnInSight);
 	}
 }
