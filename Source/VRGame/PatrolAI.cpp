@@ -19,7 +19,7 @@ void APatrolAI::BeginPlay()
 {
 	Super::BeginPlay();
 
-	SeenPawn = Cast<APawn>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+	PlayerPawn = Cast<APawn>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
 
 	if (PawnSensingComp)
 	{
@@ -31,9 +31,12 @@ void APatrolAI::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (!PawnSensingComp->CouldSeePawn(SeenPawn))
+	if (IsPawnInSight)
 	{
-		OnPlayerNotCaught();
+		if (!PawnSensingComp->CouldSeePawn(PlayerPawn))
+		{
+			OnPlayerNotCaught();
+		}
 	}
 }
 
@@ -47,19 +50,28 @@ void APatrolAI::OnPlayerCaught(APawn* CaughtPawn)
 {
 	APatrolAIController* ControllerAI = Cast<APatrolAIController>(GetController());
 
-	if (ControllerAI)
+	if (ControllerAI && CaughtPawn == PlayerPawn)
 	{
 		ControllerAI->SetPlayerCaught(CaughtPawn);
+		IsPawnInSight = true;
+		ControllerAI->SetIsPawnInSight(IsPawnInSight);
 	}
 }
 
 void APatrolAI::OnPlayerNotCaught()
 {
+	if (IsPawnInSight)
+	{
+		return;
+	}
+
 	APatrolAIController* ControllerAI = Cast<APatrolAIController>(GetController());
 
 	if (ControllerAI)
 	{
 		ControllerAI->SetPlayerNotCaught();
+		IsPawnInSight = false;
+		ControllerAI->SetIsPawnInSight(IsPawnInSight);
 	}
 }
 

@@ -20,11 +20,16 @@ public:
 
 	void SetPlayerNotCaught();
 
+	void SetIsPawnInSight(bool IsPawnSeen);
+
 	UPROPERTY(EditDefaultsOnly, Category = AI)
 	FName DestinationKey;
 
 	UPROPERTY(EditDefaultsOnly, Category = AI)
 	FName PlayerKey;
+
+	UPROPERTY(EditDefaultsOnly, Category = AI)
+	FName SensingKey;
 
 	UBlackboardComponent* GetBlackboardComp();
 

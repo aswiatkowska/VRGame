@@ -13,6 +13,7 @@ APatrolAIController::APatrolAIController()
 
 	DestinationKey = "Destination";
 	PlayerKey = "Target";
+	SensingKey = "IsPawnInSight";
 }
 
 void APatrolAIController::OnPossess(APawn* InPawn)
@@ -47,6 +48,14 @@ void APatrolAIController::SetPlayerNotCaught()
 	if (BlackboardComp)
 	{
 		BlackboardComp->SetValueAsObject(PlayerKey, nullptr);
+	}
+}
+
+void APatrolAIController::SetIsPawnInSight(bool IsPawnSeen)
+{
+	if (Blackboard)
+	{
+		BlackboardComp->SetValueAsBool(SensingKey, IsPawnSeen);
 	}
 }
 

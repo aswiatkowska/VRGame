@@ -32,6 +32,8 @@ private:
 
 	void OnPlayerNotCaught();
 
-	APawn* SeenPawn;
+	bool IsPawnInSight;
+
+	APawn* PlayerPawn;
 
 };
