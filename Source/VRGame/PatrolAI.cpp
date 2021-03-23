@@ -21,7 +21,7 @@ void APatrolAI::BeginPlay()
 
 	PlayerPawn = Cast<APawn>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
 
-	if (PawnSensingComp)
+	if (PawnSensingComp && !IsPawnInSight)
 	{
 		PawnSensingComp->OnSeePawn.AddDynamic(this, &APatrolAI::OnPlayerCaught);
 	}
@@ -54,8 +54,6 @@ void APatrolAI::OnPlayerCaught(APawn* CaughtPawn)
 	if (ControllerAI && CaughtPawn == PlayerPawn)
 	{
 		ControllerAI->SetPlayerCaught(CaughtPawn);
-		PlayerLoc = this->GetActorLocation();
-		ControllerAI->SetPlayerLocation(PlayerLoc);
 		IsPawnInSight = true;
 		ControllerAI->SetIsPawnInSight(IsPawnInSight);
 	}
@@ -73,7 +71,23 @@ void APatrolAI::OnPlayerNotCaught()
 	if (ControllerAI)
 	{
 		ControllerAI->SetPlayerNotCaught();
+		LookForPlayer = true;
+		ControllerAI->SetLookForPlayer(LookForPlayer);
+		FTimerHandle handle;
+		GetWorld()->GetTimerManager().SetTimer(handle, this, &APatrolAI::StopLookingForPlayer, 6);
+		PlayerLoc = PlayerPawn->GetActorLocation();
+		ControllerAI->SetPlayerLocation(PlayerLoc);
 		ControllerAI->SetIsPawnInSight(IsPawnInSight);
+	}
+}
+
+void APatrolAI::StopLookingForPlayer()
+{
+	LookForPlayer = false;
+	APatrolAIController* ControllerAI = Cast<APatrolAIController>(GetController());
+	if (ControllerAI)
+	{
+		ControllerAI->SetLookForPlayer(LookForPlayer);
 	}
 }
 

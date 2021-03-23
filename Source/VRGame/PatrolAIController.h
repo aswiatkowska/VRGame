@@ -24,6 +24,8 @@ public:
 
 	void SetPlayerLocation(FVector PlayerLoc);
 
+	void SetLookForPlayer(bool LookFor);
+
 	UPROPERTY(EditDefaultsOnly, Category = AI)
 	FName DestinationKey;
 
@@ -35,6 +37,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = AI)
 	FName PlayerLocationKey;
+
+	UPROPERTY(EditDefaultsOnly, Category = AI)
+	FName LookForPlayerKey;
 
 	UBlackboardComponent* GetBlackboardComp();
 

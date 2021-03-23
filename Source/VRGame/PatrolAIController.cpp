@@ -15,6 +15,7 @@ APatrolAIController::APatrolAIController()
 	PlayerKey = "Target";
 	SensingKey = "IsPawnInSight";
 	PlayerLocationKey = "PlayerLocation";
+	LookForPlayerKey = "LookForPlayer";
 }
 
 void APatrolAIController::OnPossess(APawn* InPawn)
@@ -65,6 +66,14 @@ void APatrolAIController::SetPlayerLocation(FVector PlayerLoc)
 	if (Blackboard)
 	{
 		BlackboardComp->SetValueAsVector(PlayerLocationKey, PlayerLoc);
+	}
+}
+
+void APatrolAIController::SetLookForPlayer(bool LookFor)
+{
+	if (Blackboard)
+	{
+		BlackboardComp->SetValueAsBool(LookForPlayerKey, LookFor);
 	}
 }
 

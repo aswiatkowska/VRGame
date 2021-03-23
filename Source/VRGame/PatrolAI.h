@@ -32,7 +32,11 @@ private:
 
 	void OnPlayerNotCaught();
 
+	void StopLookingForPlayer();
+
 	bool IsPawnInSight;
+
+	bool LookForPlayer = false;
 
 	FVector PlayerLoc;
 
