@@ -22,6 +22,8 @@ public:
 
 	void SetIsPawnInSight(bool IsPawnSeen);
 
+	void SetPlayerLocation(FVector PlayerLoc);
+
 	UPROPERTY(EditDefaultsOnly, Category = AI)
 	FName DestinationKey;
 
@@ -30,6 +32,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = AI)
 	FName SensingKey;
+
+	UPROPERTY(EditDefaultsOnly, Category = AI)
+	FName PlayerLocationKey;
 
 	UBlackboardComponent* GetBlackboardComp();
 

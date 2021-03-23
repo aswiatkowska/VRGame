@@ -34,6 +34,8 @@ private:
 
 	bool IsPawnInSight;
 
+	FVector PlayerLoc;
+
 	APawn* PlayerPawn;
 
 };

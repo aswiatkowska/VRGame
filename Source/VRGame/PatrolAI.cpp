@@ -54,6 +54,8 @@ void APatrolAI::OnPlayerCaught(APawn* CaughtPawn)
 	if (ControllerAI && CaughtPawn == PlayerPawn)
 	{
 		ControllerAI->SetPlayerCaught(CaughtPawn);
+		PlayerLoc = this->GetActorLocation();
+		ControllerAI->SetPlayerLocation(PlayerLoc);
 		IsPawnInSight = true;
 		ControllerAI->SetIsPawnInSight(IsPawnInSight);
 	}
