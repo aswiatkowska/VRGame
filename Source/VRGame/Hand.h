@@ -44,6 +44,10 @@ public:
 
 	void SetupHand(EHandEnum RightOrLeft, AHand* OppositeHand);
 
+	bool RightHandGrabbing = false;
+
+	bool LeftHandGrabbing = false;
+
 private:
 	virtual void BeginPlay() override;
 

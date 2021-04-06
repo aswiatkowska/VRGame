@@ -3,6 +3,7 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/SceneComponent.h"
 #include "Components/BoxComponent.h"
+#include "MyCharacter.h"
 #include "Kismet/GameplayStatics.h"
 #include "CustomChannels.h"
 
@@ -92,7 +93,7 @@ void AWeapon::SwitchCoolDown()
 
 void AWeapon::AmmunitionCheck()
 {
-	MyCharacter = Cast<AMyCharacter>(UGameplayStatics::GetActorOfClass(GetWorld(), AMyCharacter::StaticClass()));
+	AMyCharacter* MyCharacter = Cast<AMyCharacter>(UGameplayStatics::GetActorOfClass(GetWorld(), AMyCharacter::StaticClass()));
 	if (MyCharacter->GetFromInventory(this->MagazineType))
 	{
 		this->Ammunition = this->MagazineCapacity;

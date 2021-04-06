@@ -1,6 +1,5 @@
 
 #include "MyCharacter.h"
-#include "Weapon.h"
 #include "HeadMountedDisplayFunctionLibrary.h" 
 #include "Components/SceneComponent.h"
 #include "Camera/CameraComponent.h"
@@ -202,21 +201,25 @@ void AMyCharacter::Teleport()
 void AMyCharacter::ObjectGrabRight()
 {
 	RightHand->ObjectGrab();
+	RightHand->RightHandGrabbing = true;
 }
 
 void AMyCharacter::ObjectReleaseRight()
 {
 	RightHand->ObjectRelease();
+	RightHand->RightHandGrabbing = false;
 }
 
 void AMyCharacter::ObjectGrabLeft()
 {
 	LeftHand->ObjectGrab();
+	LeftHand->LeftHandGrabbing = true;
 }
 
 void AMyCharacter::ObjectReleaseLeft()
 {
 	LeftHand->ObjectRelease();
+	LeftHand->LeftHandGrabbing = false;
 }
 
 void AMyCharacter::ShootRight()
@@ -225,7 +228,8 @@ void AMyCharacter::ShootRight()
 	{
 		if (RightHand->GetGrabbedObject()->GrabbableType == EGrabbableTypeEnum::EWeapon)
 		{
-			AWeapon* Weapon = Cast<AWeapon>(RightHand->GetGrabbedObject()->GetOwner());
+			Weapon = Cast<AWeapon>(RightHand->GetGrabbedObject()->GetOwner());
+			PatrolAI->ChangeCurrentWeaponType(Weapon->WeaponType);
 			Weapon->Shoot();
 		}
 	}
@@ -237,7 +241,8 @@ void AMyCharacter::ShootLeft()
 	{
 		if (LeftHand->GetGrabbedObject()->GrabbableType == EGrabbableTypeEnum::EWeapon)
 		{
-			AWeapon* Weapon = Cast<AWeapon>(LeftHand->GetGrabbedObject()->GetOwner());
+			Weapon = Cast<AWeapon>(LeftHand->GetGrabbedObject()->GetOwner());
+			PatrolAI->ChangeCurrentWeaponType(Weapon->WeaponType);
 			Weapon->Shoot();
 		}
 	}
@@ -249,7 +254,7 @@ void AMyCharacter::ShootingReleasedRight()
 	{
 		if (RightHand->GetGrabbedObject()->GrabbableType == EGrabbableTypeEnum::EWeapon)
 		{
-			AWeapon* Weapon = Cast<AWeapon>(RightHand->GetGrabbedObject()->GetOwner());
+			Weapon = Cast<AWeapon>(RightHand->GetGrabbedObject()->GetOwner());
 			Weapon->ShootingReleased();
 		}
 	}
@@ -261,7 +266,7 @@ void AMyCharacter::ShootingReleasedLeft()
 	{
 		if (LeftHand->GetGrabbedObject()->GrabbableType == EGrabbableTypeEnum::EWeapon)
 		{
-			AWeapon* Weapon = Cast<AWeapon>(LeftHand->GetGrabbedObject()->GetOwner());
+			Weapon = Cast<AWeapon>(LeftHand->GetGrabbedObject()->GetOwner());
 			Weapon->ShootingReleased();
 		}
 	}

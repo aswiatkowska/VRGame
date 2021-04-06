@@ -5,7 +5,6 @@
 #include "GameFramework/Actor.h"
 #include "Bullet.h"
 #include "InventoryObjectTypes.h"
-#include "MyCharacter.h"
 #include "GrabbableObjectComponent.h"
 #include "Weapon.generated.h"
 
@@ -80,7 +79,4 @@ protected:
 	bool IsPressed = false;
 
 	bool cooldown;
-
-	AMyCharacter* MyCharacter;
-
 };

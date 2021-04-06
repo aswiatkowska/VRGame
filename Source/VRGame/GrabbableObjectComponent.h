@@ -15,6 +15,7 @@ UENUM()
 		Null,
 		EWeapon,
 		EMagazine,
+		ERagdoll,
 	};
 
 

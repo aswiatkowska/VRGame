@@ -1,7 +1,9 @@
 
 
 #include "PatrolAI.h"
+#include "Bullet.h"
 #include "PatrolAIController.h"
+#include "CustomChannels.h"
 #include "Kismet/GameplayStatics.h" 
 #include "BehaviorTree/BehaviorTree.h"
 #include "Perception/PawnSensingComponent.h"
@@ -13,11 +15,21 @@ APatrolAI::APatrolAI()
 	PawnSensingComp = CreateDefaultSubobject<UPawnSensingComponent>("PawnSensingComp");
 	PawnSensingComp->SetPeripheralVisionAngle(20.0f);
 	GetCharacterMovement()->MaxWalkSpeed = 100;
+
+	GetMesh()->SetCollisionObjectType((ECollisionChannel)(CustomCollisionChannelsEnum::PatrolAI));
+	GetMesh()->SetCollisionResponseToChannel((ECollisionChannel)(CustomCollisionChannelsEnum::Bullet), ECollisionResponse::ECR_Overlap);
+
+	GrabbableObjComp = CreateDefaultSubobject<UGrabbableObjectComponent>("GrabbableObjComp");
+
+	OnActorBeginOverlap.AddDynamic(this, &APatrolAI::OnOverlap);
+
 }
 
 void APatrolAI::BeginPlay()
 {
 	Super::BeginPlay();
+
+	GrabbableObjComp->GrabbableType = EGrabbableTypeEnum::ERagdoll;
 
 	PlayerPawn = Cast<APawn>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
 
@@ -91,4 +103,29 @@ void APatrolAI::StopLookingForPlayer()
 	}
 }
 
+void APatrolAI::OnOverlap(AActor* OverlappedActor, AActor* OtherActor)
+{
+	if (Cast<ABullet>(OtherActor) != nullptr)
+	{
+		if (CurrentWeaponType == EWeaponTypeEnum::EGun)
+		{
+			NumberOfLifes = NumberOfLifes - 1;
+		}
+		else if (CurrentWeaponType == EWeaponTypeEnum::ERifle)
+		{
+			NumberOfLifes = NumberOfLifes - 2;
+		}
+
+		if (NumberOfLifes == 0)
+		{
+			GetCharacterMovement()->DisableMovement();
+			GetMesh()->SetAllBodiesSimulatePhysics(true);
+		}
+	}
+}
+
+void APatrolAI::ChangeCurrentWeaponType(TEnumAsByte<EWeaponTypeEnum> Type)
+{
+	CurrentWeaponType = Type;
+}
 

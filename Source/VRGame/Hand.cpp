@@ -68,14 +68,28 @@ void AHand::ObjectGrab()
 				nearestObject = i.Key();
 			}
 		}
-		if (nearestObject->IsGrabbed)
+		if (nearestObject->IsGrabbed && GrabbedActor->FindComponentByClass<UGrabbableObjectComponent>()->GrabbableType != EGrabbableTypeEnum::ERagdoll)
 		{
 			nearestObject->OnHandChangedDelegate.Broadcast();
 			OtherHand->ForceRelease();
 		}
+		if (GrabbedActor != nullptr)
+		{
+			if (GrabbedActor->FindComponentByClass<UGrabbableObjectComponent>()->GrabbableType == EGrabbableTypeEnum::ERagdoll)
+			{
+				if (!RightHandGrabbing || !LeftHandGrabbing)
+				{
+					return;
+				}
+			}
+		}
 		nearestObject->IsGrabbed = true;
 		GrabbedObjectGrabbableComponent = nearestObject;
 		HandSkeletal->SetVisibility(false);
+		if (GrabbedObjectGrabbableComponent->GrabbableType == EGrabbableTypeEnum::ERagdoll)
+		{
+			OtherHand->HandSkeletal->SetVisibility(false);
+		}
 		GrabbedObjectGrabbableComponent->OnGrabDelegate.Broadcast();
 		GrabbedActor = GrabbedObjectGrabbableComponent->GetOwner();
 		GrabbedActor->AttachToComponent(GrabPoint, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
@@ -98,6 +112,10 @@ void AHand::ObjectRelease()
 	{
 		GrabbedActor->FindComponentByClass<UGrabbableObjectComponent>()->IsGrabbed = false;
 		HandSkeletal->SetVisibility(true);
+		if (GrabbedActor->FindComponentByClass<UGrabbableObjectComponent>()->GrabbableType == EGrabbableTypeEnum::ERagdoll)
+		{
+			OtherHand->HandSkeletal->SetVisibility(true);
+		}
 		GrabbedActor->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 		GrabbedObjectGrabbableComponent->OnReleaseDelegate.Broadcast();
 		if (GrabbedActor->IsActorBeingDestroyed())
@@ -148,8 +166,6 @@ bool AHand::IsAnyObjectGrabbed()
 {
 	return (GrabbedObjectGrabbableComponent != nullptr);
 }
-
-
 
 UGrabbableObjectComponent* AHand::GetGrabbedObject()
 {
