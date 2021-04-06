@@ -2,8 +2,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Weapon.h"
-#include "GrabbableObjectComponent.h"
 #include "GameFramework/Character.h"
 #include "PatrolAI.generated.h"
 
@@ -23,9 +21,28 @@ public:
 	class UPawnSensingComponent* PawnSensingComp;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	class UGrabbableObjectComponent* GrabbableObjComp;
+	class UGrabbableObjectComponent* RightHandGrabbable;
 
-	void ChangeCurrentWeaponType(TEnumAsByte<EWeaponTypeEnum> Type);
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class UGrabbableObjectComponent* LeftHandGrabbable;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class UGrabbableObjectComponent* RightLegGrabbable;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class UGrabbableObjectComponent* LeftLegGrabbable;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class USphereComponent* RightHandSphere;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class USphereComponent* LeftHandSphere;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class USphereComponent* RightLegSphere;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class USphereComponent* LeftLegSphere;
 
 private:
 	virtual void BeginPlay() override;
@@ -35,7 +52,8 @@ private:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	UFUNCTION()
-	void OnOverlap(AActor* OverlappedActor, AActor* OtherActor);
+	void OnBulletOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
+		const FHitResult& SweepResult);
 
 	UFUNCTION()
 	void OnPlayerCaught(APawn* CaughtPawn);
@@ -48,11 +66,9 @@ private:
 
 	bool LookForPlayer = false;
 
-	int NumberOfLifes = 4;
+	int NumberOfLifes = 100;
 
 	FVector PlayerLoc;
-
-	TEnumAsByte<EWeaponTypeEnum> CurrentWeaponType;
 
 	APawn* PlayerPawn;
 

@@ -5,7 +5,6 @@
 #include "GameFramework/Character.h"
 #include "Hand.h"
 #include "Weapon.h"
-#include "PatrolAI.h"
 #include "InventoryObjectTypes.h"
 #include "Inventory.h"
 #include "GrabbableObjectComponent.h"
@@ -99,6 +98,4 @@ private:
 	AInventory* InvMap;
 
 	AWeapon* Weapon;
-
-	APatrolAI* PatrolAI;
 };

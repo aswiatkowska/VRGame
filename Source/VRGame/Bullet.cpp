@@ -11,7 +11,7 @@ ABullet::ABullet()
 	RootComponent = BulletMesh;
 	BulletMesh->SetSimulatePhysics(true);
 	BulletMesh->SetCollisionObjectType((ECollisionChannel)(CustomCollisionChannelsEnum::Bullet));
-	BulletMesh->SetCollisionResponseToChannel((ECollisionChannel)(CustomCollisionChannelsEnum::PatrolAI), ECR_Block);
+	BulletMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECR_Overlap);
 
 	BulletArrowComponent = CreateDefaultSubobject<UArrowComponent>("BulletArrowComponent");
 	BulletArrowComponent->SetupAttachment(BulletMesh);
