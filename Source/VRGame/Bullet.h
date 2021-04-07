@@ -23,6 +23,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float BulletForce = 50.0f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int BulletImpact;
+
 private:
 	virtual void BeginPlay() override;
 

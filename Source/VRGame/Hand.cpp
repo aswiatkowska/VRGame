@@ -125,8 +125,32 @@ void AHand::OnHandOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor*
 	{
 		return;
 	}
+
+	TArray<UActorComponent*> GrabbableCompArray = OtherActor->GetComponentsByClass(UGrabbableObjectComponent::StaticClass());
+	float compDistance;
+	float shortestDistance = 1000;
+	UGrabbableObjectComponent* CurrentComp;
+	UGrabbableObjectComponent* DetectedGrabbable = nullptr;
 	
-	UGrabbableObjectComponent* DetectedGrabbable = OtherActor->FindComponentByClass<UGrabbableObjectComponent>();
+	if (GrabbableCompArray.Num() > 1)
+	{
+		for (int i = 0; i < GrabbableCompArray.Num(); ++i)
+		{
+			CurrentComp = (UGrabbableObjectComponent*)GrabbableCompArray[i];
+			compDistance = FVector::Dist(CurrentComp->CollisionComponent->GetComponentLocation(), CollisionSphere->GetComponentLocation());
+
+			if (compDistance < shortestDistance)
+			{
+				shortestDistance = compDistance;
+				DetectedGrabbable = CurrentComp;
+			}
+		}
+	}
+	else
+	{
+		DetectedGrabbable = OtherActor->FindComponentByClass<UGrabbableObjectComponent>();
+	}
+
 	if (DetectedGrabbable == nullptr)
 	{
 		return;

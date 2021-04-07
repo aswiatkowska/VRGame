@@ -1,5 +1,6 @@
 
 #include "MyCharacter.h"
+#include "Weapon.h"
 #include "HeadMountedDisplayFunctionLibrary.h" 
 #include "Components/SceneComponent.h"
 #include "Camera/CameraComponent.h"
@@ -224,7 +225,7 @@ void AMyCharacter::ShootRight()
 	{
 		if (RightHand->GetGrabbedObject()->GrabbableType == EGrabbableTypeEnum::EWeapon)
 		{
-			Weapon = Cast<AWeapon>(RightHand->GetGrabbedObject()->GetOwner());
+			AWeapon* Weapon = Cast<AWeapon>(RightHand->GetGrabbedObject()->GetOwner());
 			Weapon->Shoot();
 		}
 	}
@@ -236,7 +237,7 @@ void AMyCharacter::ShootLeft()
 	{
 		if (LeftHand->GetGrabbedObject()->GrabbableType == EGrabbableTypeEnum::EWeapon)
 		{
-			Weapon = Cast<AWeapon>(LeftHand->GetGrabbedObject()->GetOwner());
+			AWeapon* Weapon = Cast<AWeapon>(LeftHand->GetGrabbedObject()->GetOwner());
 			Weapon->Shoot();
 		}
 	}
@@ -248,7 +249,7 @@ void AMyCharacter::ShootingReleasedRight()
 	{
 		if (RightHand->GetGrabbedObject()->GrabbableType == EGrabbableTypeEnum::EWeapon)
 		{
-			Weapon = Cast<AWeapon>(RightHand->GetGrabbedObject()->GetOwner());
+			AWeapon* Weapon = Cast<AWeapon>(RightHand->GetGrabbedObject()->GetOwner());
 			Weapon->ShootingReleased();
 		}
 	}
@@ -260,7 +261,7 @@ void AMyCharacter::ShootingReleasedLeft()
 	{
 		if (LeftHand->GetGrabbedObject()->GrabbableType == EGrabbableTypeEnum::EWeapon)
 		{
-			Weapon = Cast<AWeapon>(LeftHand->GetGrabbedObject()->GetOwner());
+			AWeapon* Weapon = Cast<AWeapon>(LeftHand->GetGrabbedObject()->GetOwner());
 			Weapon->ShootingReleased();
 		}
 	}

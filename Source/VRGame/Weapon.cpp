@@ -3,7 +3,6 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/SceneComponent.h"
 #include "Components/BoxComponent.h"
-#include "MyCharacter.h"
 #include "Kismet/GameplayStatics.h"
 #include "CustomChannels.h"
 
@@ -63,7 +62,15 @@ void AWeapon::Shoot()
 	{
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticles, FTransform(hitShoot.ImpactNormal.Rotation(), hitShoot.ImpactPoint));
 	}
-	GetWorld()->SpawnActor<AActor>(BulletSubclass, Start, Barrel->GetComponentRotation());
+
+	if (WeaponType == EWeaponTypeEnum::EGun)
+	{
+		GetWorld()->SpawnActor<AActor>(GunBulletSubclass, Start, Barrel->GetComponentRotation());
+	}
+	else
+	{
+		GetWorld()->SpawnActor<AActor>(RifleBulletSubclass, Start, Barrel->GetComponentRotation());
+	}
 	Ammunition = Ammunition - 1;
 	
 	if (Ammunition <= 0)
@@ -93,7 +100,7 @@ void AWeapon::SwitchCoolDown()
 
 void AWeapon::AmmunitionCheck()
 {
-	AMyCharacter* MyCharacter = Cast<AMyCharacter>(UGameplayStatics::GetActorOfClass(GetWorld(), AMyCharacter::StaticClass()));
+	MyCharacter = Cast<AMyCharacter>(UGameplayStatics::GetActorOfClass(GetWorld(), AMyCharacter::StaticClass()));
 	if (MyCharacter->GetFromInventory(this->MagazineType))
 	{
 		this->Ammunition = this->MagazineCapacity;

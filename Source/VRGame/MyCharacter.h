@@ -4,7 +4,6 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Hand.h"
-#include "Weapon.h"
 #include "InventoryObjectTypes.h"
 #include "Inventory.h"
 #include "GrabbableObjectComponent.h"
@@ -96,6 +95,4 @@ private:
 	AHand* LeftHand;
 
 	AInventory* InvMap;
-
-	AWeapon* Weapon;
 };

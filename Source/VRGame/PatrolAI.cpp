@@ -1,7 +1,6 @@
 
 
 #include "PatrolAI.h"
-#include "Bullet.h"
 #include "PatrolAIController.h"
 #include "CustomChannels.h"
 #include "Kismet/GameplayStatics.h" 
@@ -15,33 +14,40 @@
 
 APatrolAI::APatrolAI()
 {
-	RightHandGrabbable = CreateDefaultSubobject<UGrabbableObjectComponent>("RightHandGrabbable");
-	RightHandGrabbable->GrabbableType = EGrabbableTypeEnum::ERagdoll;
-	LeftHandGrabbable = CreateDefaultSubobject<UGrabbableObjectComponent>("LeftHandGrabbable");
-	LeftHandGrabbable->GrabbableType = EGrabbableTypeEnum::ERagdoll;
-	RightLegGrabbable = CreateDefaultSubobject<UGrabbableObjectComponent>("RightLegGrabbable");
-	RightLegGrabbable->GrabbableType = EGrabbableTypeEnum::ERagdoll;
-	LeftLegGrabbable = CreateDefaultSubobject<UGrabbableObjectComponent>("LeftLegGrabbable");
-	LeftLegGrabbable->GrabbableType = EGrabbableTypeEnum::ERagdoll;
-
 	RightHandSphere = CreateDefaultSubobject<USphereComponent>("RightHandSphere");
 	LeftHandSphere = CreateDefaultSubobject<USphereComponent>("LeftHandSphere");
 	RightLegSphere = CreateDefaultSubobject<USphereComponent>("RightLegSphere");
 	LeftLegSphere = CreateDefaultSubobject<USphereComponent>("LeftLegSphere");
 
+	RightHandGrabbable = CreateDefaultSubobject<UGrabbableObjectComponent>("RightHandGrabbable");
+	RightHandGrabbable->GrabbableType = EGrabbableTypeEnum::ERagdollHand;
+	RightHandGrabbable->CollisionComponent = (UPrimitiveComponent*)RightHandSphere;
+
+	LeftHandGrabbable = CreateDefaultSubobject<UGrabbableObjectComponent>("LeftHandGrabbable");
+	LeftHandGrabbable->GrabbableType = EGrabbableTypeEnum::ERagdollHand;
+	LeftHandGrabbable->CollisionComponent = (UPrimitiveComponent*)LeftHandSphere;
+
+	RightLegGrabbable = CreateDefaultSubobject<UGrabbableObjectComponent>("RightLegGrabbable");
+	RightLegGrabbable->GrabbableType = EGrabbableTypeEnum::ERagdollLeg;
+	RightLegGrabbable->CollisionComponent = (UPrimitiveComponent*)RightLegSphere;
+
+	LeftLegGrabbable = CreateDefaultSubobject<UGrabbableObjectComponent>("LeftLegGrabbable");
+	LeftLegGrabbable->GrabbableType = EGrabbableTypeEnum::ERagdollLeg;
+	LeftLegGrabbable->CollisionComponent = (UPrimitiveComponent*)LeftLegSphere;
+
 	PawnSensingComp = CreateDefaultSubobject<UPawnSensingComponent>("PawnSensingComp");
 	PawnSensingComp->SetPeripheralVisionAngle(20.0f);
 	GetCharacterMovement()->MaxWalkSpeed = 100;
-	GetMesh()->SetCollisionResponseToChannel((ECollisionChannel)(CustomCollisionChannelsEnum::Bullet), ECollisionResponse::ECR_Overlap);
 
-	GetMesh()->OnComponentBeginOverlap.AddDynamic(this, &APatrolAI::OnBulletOverlapBegin);
+	GetMesh()->SetCollisionResponseToChannel((ECollisionChannel)(CustomCollisionChannelsEnum::Bullet), ECollisionResponse::ECR_Overlap);
+	GetCapsuleComponent()->SetCollisionResponseToChannel((ECollisionChannel)(CustomCollisionChannelsEnum::Bullet), ECollisionResponse::ECR_Overlap);
 }
 
 void APatrolAI::BeginPlay()
 {
 	Super::BeginPlay();
 
-	GetCapsuleComponent()->SetCollisionResponseToChannel((ECollisionChannel)(CustomCollisionChannelsEnum::Bullet), ECollisionResponse::ECR_Overlap);
+	GetMesh()->OnComponentBeginOverlap.AddDynamic(this, &APatrolAI::OnBulletOverlapBegin);
 
 	PlayerPawn = Cast<APawn>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
 
@@ -120,12 +126,16 @@ void APatrolAI::OnBulletOverlapBegin(UPrimitiveComponent* OverlappedComponent, A
 {
 	if (Cast<ABullet>(OtherActor) != nullptr)
 	{
-		NumberOfLifes = NumberOfLifes - 25;
+		Bullet = Cast<ABullet>(OtherActor);
+		NumberOfLifes = NumberOfLifes - Bullet->BulletImpact;
 
 		if (NumberOfLifes == 0)
 		{
 			GetCharacterMovement()->DisableMovement();
 			GetMesh()->SetAllBodiesSimulatePhysics(true);
+			APatrolAIController* ControllerAI = Cast<APatrolAIController>(GetController());
+			ControllerAI->UnPossess();
+			ControllerAI->Destroy();
 		}
 	}
 }

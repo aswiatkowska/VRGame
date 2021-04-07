@@ -2,6 +2,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Bullet.h"
 #include "GameFramework/Character.h"
 #include "PatrolAI.generated.h"
 
@@ -72,4 +73,5 @@ private:
 
 	APawn* PlayerPawn;
 
+	ABullet* Bullet;
 };

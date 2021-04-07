@@ -3,6 +3,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Components/PrimitiveComponent.h" 
 #include "GrabbableObjectComponent.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGrabDelegate);
@@ -15,7 +16,8 @@ UENUM()
 		Null,
 		EWeapon,
 		EMagazine,
-		ERagdoll,
+		ERagdollHand,
+		ERagdollLeg,
 	};
 
 
@@ -48,5 +50,6 @@ public:
 	FRotator LeftRotation = FRotator::ZeroRotator;
 
 	bool IsGrabbed = false;
-		
+	
+	UPrimitiveComponent* CollisionComponent = nullptr;
 };
