@@ -3,8 +3,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "GunBullet.h"
-#include "RifleBullet.h"
+#include "Bullet.h"
 #include "MyCharacter.h"
 #include "InventoryObjectTypes.h"
 #include "GrabbableObjectComponent.h"
@@ -45,10 +44,7 @@ public:
 	class UGrabbableObjectComponent* GrabbableObjComp;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSubclassOf<AGunBullet> GunBulletSubclass;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSubclassOf<ARifleBullet> RifleBulletSubclass;
+	TSubclassOf<ABullet> BulletSubclass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TEnumAsByte<EWeaponTypeEnum> WeaponType;

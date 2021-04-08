@@ -63,14 +63,7 @@ void AWeapon::Shoot()
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticles, FTransform(hitShoot.ImpactNormal.Rotation(), hitShoot.ImpactPoint));
 	}
 
-	if (WeaponType == EWeaponTypeEnum::EGun)
-	{
-		GetWorld()->SpawnActor<AActor>(GunBulletSubclass, Start, Barrel->GetComponentRotation());
-	}
-	else
-	{
-		GetWorld()->SpawnActor<AActor>(RifleBulletSubclass, Start, Barrel->GetComponentRotation());
-	}
+	GetWorld()->SpawnActor<AActor>(BulletSubclass, Start, Barrel->GetComponentRotation());
 	Ammunition = Ammunition - 1;
 	
 	if (Ammunition <= 0)

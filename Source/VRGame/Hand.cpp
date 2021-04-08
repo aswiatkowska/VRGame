@@ -17,7 +17,7 @@ AHand::AHand()
 
 	HandSkeletal = CreateDefaultSubobject<USkeletalMeshComponent>("RightHand");
 	HandSkeletal->SetupAttachment(Scene);
-	HandSkeletal->SetCollisionObjectType((ECollisionChannel)(CustomCollisionChannelsEnum::Hand));
+	HandSkeletal->SetCollisionObjectType((ECollisionChannel)(CustomCollisionChannelsEnum::HandPhysical));
 
 	GrabPoint = CreateDefaultSubobject<USceneComponent>("GrabPoint");
 	GrabPoint->SetupAttachment(HandSkeletal);
@@ -155,7 +155,6 @@ void AHand::OnHandOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor*
 	{
 		return;
 	}
-	//UE_LOG(LogTemp, Log, TEXT("Overlap begin z %s"), *(OtherActor->GetName()))
 	float distance = FVector::Dist(OtherActor->GetActorLocation(), CollisionSphere->GetComponentLocation());
 	overlapMap.Add(DetectedGrabbable, distance);
 
@@ -165,7 +164,6 @@ void AHand::OnHandOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor*
 void AHand::OnHandOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
 	overlapMap.Remove(OtherActor->FindComponentByClass<UGrabbableObjectComponent>());
-	//UE_LOG(LogTemp, Log, TEXT("Overlap end z %s"), *(OtherActor->GetName()))
 }
 
 bool AHand::IsAnyObjectGrabbed()

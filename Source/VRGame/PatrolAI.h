@@ -2,7 +2,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Bullet.h"
 #include "GameFramework/Character.h"
 #include "PatrolAI.generated.h"
 
@@ -63,6 +62,10 @@ private:
 
 	void StopLookingForPlayer();
 
+	void OnGrab();
+
+	void OnRelease();
+
 	bool IsPawnInSight;
 
 	bool LookForPlayer = false;
@@ -72,6 +75,4 @@ private:
 	FVector PlayerLoc;
 
 	APawn* PlayerPawn;
-
-	ABullet* Bullet;
 };
