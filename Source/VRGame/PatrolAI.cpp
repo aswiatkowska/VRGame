@@ -35,19 +35,19 @@ APatrolAI::APatrolAI()
 	LeftLegSphere->SetCollisionObjectType((ECollisionChannel)(CustomCollisionChannelsEnum::GrabbableObject));
 	LeftLegSphere->SetCollisionResponseToChannel((ECollisionChannel)(CustomCollisionChannelsEnum::Hand), ECollisionResponse::ECR_Overlap);
 
-	RightHandGrabbable = CreateDefaultSubobject<UGrabbableObjectComponent>("RightHandGrabbable");
+	RightHandGrabbable = CreateDefaultSubobject<UGrabbableObjectComponent>("hand_r");
 	RightHandGrabbable->GrabbableType = EGrabbableTypeEnum::ERagdollHand;
 	RightHandGrabbable->CollisionComponent = (UPrimitiveComponent*)RightHandSphere;
 
-	LeftHandGrabbable = CreateDefaultSubobject<UGrabbableObjectComponent>("LeftHandGrabbable");
+	LeftHandGrabbable = CreateDefaultSubobject<UGrabbableObjectComponent>("hand_l");
 	LeftHandGrabbable->GrabbableType = EGrabbableTypeEnum::ERagdollHand;
 	LeftHandGrabbable->CollisionComponent = (UPrimitiveComponent*)LeftHandSphere;
 
-	RightLegGrabbable = CreateDefaultSubobject<UGrabbableObjectComponent>("RightLegGrabbable");
+	RightLegGrabbable = CreateDefaultSubobject<UGrabbableObjectComponent>("foot_r");
 	RightLegGrabbable->GrabbableType = EGrabbableTypeEnum::ERagdollLeg;
 	RightLegGrabbable->CollisionComponent = (UPrimitiveComponent*)RightLegSphere;
 
-	LeftLegGrabbable = CreateDefaultSubobject<UGrabbableObjectComponent>("LeftLegGrabbable");
+	LeftLegGrabbable = CreateDefaultSubobject<UGrabbableObjectComponent>("foot_l");
 	LeftLegGrabbable->GrabbableType = EGrabbableTypeEnum::ERagdollLeg;
 	LeftLegGrabbable->CollisionComponent = (UPrimitiveComponent*)LeftLegSphere;
 
@@ -70,18 +70,6 @@ void APatrolAI::BeginPlay()
 	{
 		PawnSensingComp->OnSeePawn.AddDynamic(this, &APatrolAI::OnPlayerCaught);
 	}
-
-	RightHandGrabbable->OnGrabDelegate.AddDynamic(this, &APatrolAI::OnGrab);
-	RightHandGrabbable->OnReleaseDelegate.AddDynamic(this, &APatrolAI::OnRelease);
-
-	LeftHandGrabbable->OnGrabDelegate.AddDynamic(this, &APatrolAI::OnGrab);
-	LeftHandGrabbable->OnReleaseDelegate.AddDynamic(this, &APatrolAI::OnRelease);
-
-	RightLegGrabbable->OnGrabDelegate.AddDynamic(this, &APatrolAI::OnGrab);
-	RightLegGrabbable->OnReleaseDelegate.AddDynamic(this, &APatrolAI::OnGrab);
-
-	LeftLegGrabbable->OnGrabDelegate.AddDynamic(this, &APatrolAI::OnGrab);
-	LeftLegGrabbable->OnReleaseDelegate.AddDynamic(this, &APatrolAI::OnRelease);
 }
 
 void APatrolAI::Tick(float DeltaTime)
@@ -156,7 +144,14 @@ void APatrolAI::OnBulletOverlapBegin(UPrimitiveComponent* OverlappedComponent, A
 		UE_LOG(LogTemp, Log, TEXT("Overlap begin with %s"), *(OtherActor->GetName()))
 		UE_LOG(LogTemp, Log, TEXT("Overlapped with %s"), *(OverlappedComponent->GetName()))
 		ABullet* Bullet = Cast<ABullet>(OtherActor);
+
+		if (Bullet->IsActorBeingDestroyed())
+		{
+			return;
+		}
+
 		NumberOfLifes = NumberOfLifes - Bullet->BulletImpact;
+		Bullet->OnDestroy();
 
 		if (NumberOfLifes == 0)
 		{
@@ -167,14 +162,4 @@ void APatrolAI::OnBulletOverlapBegin(UPrimitiveComponent* OverlappedComponent, A
 			ControllerAI->Destroy();
 		}
 	}
-}
-
-void APatrolAI::OnGrab()
-{
-	GetMesh()->SetSimulatePhysics(false);
-}
-
-void APatrolAI::OnRelease()
-{
-	GetMesh()->SetSimulatePhysics(true);
 }

@@ -75,10 +75,20 @@ void AHand::ObjectGrab()
 		}
 		nearestObject->IsGrabbed = true;
 		GrabbedObjectGrabbableComponent = nearestObject;
-		HandSkeletal->SetVisibility(false);
+		HandSkeletal->SetVisibility(false); 
 		GrabbedObjectGrabbableComponent->OnGrabDelegate.Broadcast();
 		GrabbedActor = GrabbedObjectGrabbableComponent->GetOwner();
-		GrabbedActor->AttachToComponent(GrabPoint, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+
+		if (GrabbedObjectGrabbableComponent->GrabbableType == EGrabbableTypeEnum::ERagdollHand)
+		{
+			FName SocketName = GrabbedObjectGrabbableComponent->GetFName();
+			GrabbedActor->AttachToComponent(GrabPoint, FAttachmentTransformRules::SnapToTargetNotIncludingScale, SocketName);
+		}
+		else
+		{
+			GrabbedActor->AttachToComponent(GrabPoint, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+		}
+
 		if (HandType == EHandEnum::ERight)
 		{
 			GrabPoint->SetRelativeLocation(GrabbedObjectGrabbableComponent->RightLocation);

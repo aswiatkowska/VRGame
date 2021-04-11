@@ -6,9 +6,9 @@
 enum class CustomCollisionChannelsEnum
 {
 	Bullet = ECollisionChannel::ECC_GameTraceChannel1,
-	Hand = ECollisionChannel::ECC_GameTraceChannel2,
-	GrabbableObject = ECollisionChannel::ECC_GameTraceChannel3,
-	HandPhysical = ECollisionChannel::ECC_GameTraceChannel4
+	Hand = ECollisionChannel::ECC_GameTraceChannel3,
+	GrabbableObject = ECollisionChannel::ECC_GameTraceChannel4,
+	HandPhysical = ECollisionChannel::ECC_GameTraceChannel2
 };
 
 USTRUCT()

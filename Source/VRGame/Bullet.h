@@ -26,9 +26,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int BulletImpact;
 
+	void OnDestroy();
+
 private:
 	virtual void BeginPlay() override;
-
-	void OnDestroy();
 
 };

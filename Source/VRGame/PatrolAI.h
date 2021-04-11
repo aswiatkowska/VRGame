@@ -62,10 +62,6 @@ private:
 
 	void StopLookingForPlayer();
 
-	void OnGrab();
-
-	void OnRelease();
-
 	bool IsPawnInSight;
 
 	bool LookForPlayer = false;
