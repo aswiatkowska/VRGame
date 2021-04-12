@@ -53,6 +53,7 @@ APatrolAI::APatrolAI()
 
 	PawnSensingComp = CreateDefaultSubobject<UPawnSensingComponent>("PawnSensingComp");
 	PawnSensingComp->SetPeripheralVisionAngle(20.0f);
+
 	GetCharacterMovement()->MaxWalkSpeed = 100;
 
 	GetMesh()->SetCollisionResponseToChannel((ECollisionChannel)(CustomCollisionChannelsEnum::Bullet), ECollisionResponse::ECR_Overlap);
@@ -68,7 +69,7 @@ void APatrolAI::BeginPlay()
 
 	if (PawnSensingComp && !IsPawnInSight)
 	{
-		PawnSensingComp->OnSeePawn.AddDynamic(this, &APatrolAI::OnPlayerCaught);
+		PawnSensingComp->OnSeePawn.AddDynamic(this, &APatrolAI::OnPawnSeen);
 	}
 }
 
@@ -81,7 +82,7 @@ void APatrolAI::Tick(float DeltaTime)
 		if (!PawnSensingComp->CouldSeePawn(PlayerPawn))
 		{
 			IsPawnInSight = false;
-			OnPlayerNotCaught();
+			OnPlayerNotSeen();
 		}
 	}
 }
@@ -92,19 +93,26 @@ void APatrolAI::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 }
 
-void APatrolAI::OnPlayerCaught(APawn* CaughtPawn)
+void APatrolAI::OnPawnSeen(APawn* SeenPawn)
 {
 	APatrolAIController* ControllerAI = Cast<APatrolAIController>(GetController());
 
-	if (ControllerAI && CaughtPawn == PlayerPawn)
+	if (ControllerAI && SeenPawn == Ragdoll)
 	{
-		ControllerAI->SetPlayerCaught(CaughtPawn);
+		ControllerAI->SetRagdollSeen(SeenPawn);
+		IsRagdollInSight = true;
+		ControllerAI->SetIsRagdollInSight(IsRagdollInSight);
+		ControllerAI->SetRandomLocation(ControllerAI->GetRandomLocation());
+	}
+	else if (ControllerAI && SeenPawn == PlayerPawn)
+	{
+		ControllerAI->SetPlayerCaught(SeenPawn);
 		IsPawnInSight = true;
 		ControllerAI->SetIsPawnInSight(IsPawnInSight);
 	}
 }
 
-void APatrolAI::OnPlayerNotCaught()
+void APatrolAI::OnPlayerNotSeen()
 {
 	if (IsPawnInSight)
 	{
@@ -160,6 +168,7 @@ void APatrolAI::OnBulletOverlapBegin(UPrimitiveComponent* OverlappedComponent, A
 			APatrolAIController* ControllerAI = Cast<APatrolAIController>(GetController());
 			ControllerAI->UnPossess();
 			ControllerAI->Destroy();
+			Ragdoll = Cast<APawn>(this);
 		}
 	}
 }

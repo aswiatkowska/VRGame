@@ -56,13 +56,15 @@ private:
 		const FHitResult& SweepResult);
 
 	UFUNCTION()
-	void OnPlayerCaught(APawn* CaughtPawn);
+	void OnPawnSeen(APawn* SeenPawn);
 
-	void OnPlayerNotCaught();
+	void OnPlayerNotSeen();
 
 	void StopLookingForPlayer();
 
 	bool IsPawnInSight;
+
+	bool IsRagdollInSight;
 
 	bool LookForPlayer = false;
 
@@ -71,4 +73,6 @@ private:
 	FVector PlayerLoc;
 
 	APawn* PlayerPawn;
+
+	APawn* Ragdoll;
 };

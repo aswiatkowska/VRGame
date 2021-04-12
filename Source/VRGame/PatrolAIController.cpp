@@ -13,8 +13,11 @@ APatrolAIController::APatrolAIController()
 
 	DestinationKey = "Destination";
 	PlayerKey = "Target";
-	SensingKey = "IsPawnInSight";
+	RagdollKey = "Ragdoll";
+	SensingPawnKey = "IsPawnInSight";
+	SensingRagdollKey = "IsRagdollInSight";
 	PlayerLocationKey = "PlayerLocation";
+	RandomLocationKey = "RandomLocation";
 	LookForPlayerKey = "LookForPlayer";
 }
 
@@ -57,7 +60,7 @@ void APatrolAIController::SetIsPawnInSight(bool IsPawnSeen)
 {
 	if (Blackboard)
 	{
-		BlackboardComp->SetValueAsBool(SensingKey, IsPawnSeen);
+		BlackboardComp->SetValueAsBool(SensingPawnKey, IsPawnSeen);
 	}
 }
 
@@ -69,12 +72,45 @@ void APatrolAIController::SetPlayerLocation(FVector PlayerLoc)
 	}
 }
 
+void APatrolAIController::SetRandomLocation(FVector RandomLoc)
+{
+	if (Blackboard)
+	{
+		BlackboardComp->SetValueAsVector(RandomLocationKey, RandomLoc);
+	}
+}
+
 void APatrolAIController::SetLookForPlayer(bool LookFor)
 {
 	if (Blackboard)
 	{
 		BlackboardComp->SetValueAsBool(LookForPlayerKey, LookFor);
 	}
+}
+
+void APatrolAIController::SetRagdollSeen(APawn* SeenRagdoll)
+{
+	if (BlackboardComp)
+	{
+		BlackboardComp->SetValueAsObject(RagdollKey, SeenRagdoll);
+	}
+}
+
+void APatrolAIController::SetIsRagdollInSight(bool IsRagdollSeen)
+{
+	if (Blackboard)
+	{
+		BlackboardComp->SetValueAsBool(SensingRagdollKey, IsRagdollSeen);
+	}
+}
+
+FVector APatrolAIController::GetRandomLocation()
+{
+	float XCoordinate = FMath::FRandRange(-450, 450);
+	float YCoordinate = FMath::FRandRange(-450, 450);
+
+	FVector RandomLocation = FVector(XCoordinate, YCoordinate, 50);
+	return RandomLocation;
 }
 
 UBlackboardComponent* APatrolAIController::GetBlackboardComp()

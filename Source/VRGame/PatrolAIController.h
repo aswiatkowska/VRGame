@@ -24,7 +24,13 @@ public:
 
 	void SetPlayerLocation(FVector PlayerLoc);
 
+	void SetRandomLocation(FVector RandomLoc);
+
 	void SetLookForPlayer(bool LookFor);
+
+	void SetRagdollSeen(APawn* SeenRagdoll);
+
+	void SetIsRagdollInSight(bool IsRagdollSeen);
 
 	UPROPERTY(EditDefaultsOnly, Category = AI)
 	FName DestinationKey;
@@ -33,10 +39,19 @@ public:
 	FName PlayerKey;
 
 	UPROPERTY(EditDefaultsOnly, Category = AI)
-	FName SensingKey;
+	FName RagdollKey;
+
+	UPROPERTY(EditDefaultsOnly, Category = AI)
+	FName SensingPawnKey;
+
+	UPROPERTY(EditDefaultsOnly, Category = AI)
+	FName SensingRagdollKey;
 
 	UPROPERTY(EditDefaultsOnly, Category = AI)
 	FName PlayerLocationKey;
+
+	UPROPERTY(EditDefaultsOnly, Category = AI)
+	FName RandomLocationKey;
 
 	UPROPERTY(EditDefaultsOnly, Category = AI)
 	FName LookForPlayerKey;
@@ -44,6 +59,8 @@ public:
 	UBlackboardComponent* GetBlackboardComp();
 
 	TArray<AActor*> GetPatrolPoints();
+
+	FVector GetRandomLocation();
 
 	int CurrentPatrolPoint = 0;
 
