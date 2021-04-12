@@ -2,6 +2,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Bullet.h"
 #include "GameFramework/Character.h"
 #include "PatrolAI.generated.h"
 
@@ -22,6 +23,15 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class USkeletalMeshComponent* WeaponMesh;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<ABullet> BulletSubclass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UParticleSystem* ImpactParticles;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class USceneComponent* Barrel;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class UGrabbableObjectComponent* RightHandGrabbable;

@@ -6,6 +6,8 @@
 #include "CustomChannels.h"
 #include "Kismet/GameplayStatics.h" 
 #include "BehaviorTree/BehaviorTree.h"
+#include "Components/SceneComponent.h"
+#include "Particles/ParticleSystem.h"
 #include "GrabbableObjectComponent.h"
 #include "Components/SphereComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -56,6 +58,9 @@ APatrolAI::APatrolAI()
 	PawnSensingComp->SetPeripheralVisionAngle(20.0f);
 
 	WeaponMesh = CreateDefaultSubobject<USkeletalMeshComponent>("WeaponMesh");
+
+	Barrel = CreateDefaultSubobject<USceneComponent>("Barrel");
+	Barrel->SetupAttachment(WeaponMesh);
 
 	GetCharacterMovement()->MaxWalkSpeed = 100;
 
