@@ -116,6 +116,7 @@ void APatrolAI::OnPawnSeen(APawn* SeenPawn)
 	}
 	else if (ControllerAI && SeenPawn == PlayerPawn)
 	{
+		ControllerAI->SetDefendSelf(false);
 		ControllerAI->SetPlayerCaught(SeenPawn);
 		IsPawnInSight = true;
 		ControllerAI->SetIsPawnInSight(IsPawnInSight);
@@ -171,11 +172,18 @@ void APatrolAI::OnBulletOverlapBegin(UPrimitiveComponent* OverlappedComponent, A
 		NumberOfLifes = NumberOfLifes - Bullet->BulletImpact;
 		Bullet->OnDestroy();
 
+		APatrolAIController* ControllerAI = Cast<APatrolAIController>(GetController());
+		if (ControllerAI)
+		{
+			CurrentPlayerLoc = PlayerPawn->GetActorLocation();
+			ControllerAI->SetCurrentPlayerLocation(CurrentPlayerLoc);
+			ControllerAI->SetDefendSelf(true);
+		}
+
 		if (NumberOfLifes == 0)
 		{
 			GetCharacterMovement()->DisableMovement();
 			GetMesh()->SetAllBodiesSimulatePhysics(true);
-			APatrolAIController* ControllerAI = Cast<APatrolAIController>(GetController());
 			ControllerAI->UnPossess();
 			ControllerAI->Destroy();
 			Ragdoll = Cast<APawn>(this);

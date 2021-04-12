@@ -24,9 +24,13 @@ public:
 
 	void SetPlayerLocation(FVector PlayerLoc);
 
+	void SetCurrentPlayerLocation(FVector CurrentPlayerLoc);
+
 	void SetRandomLocation(FVector RandomLoc);
 
 	void SetLookForPlayer(bool LookFor);
+
+	void SetDefendSelf(bool DefendSelf);
 
 	void SetRagdollSeen(APawn* SeenRagdoll);
 
@@ -48,7 +52,13 @@ public:
 	FName SensingRagdollKey;
 
 	UPROPERTY(EditDefaultsOnly, Category = AI)
+	FName DefendSelfKey;
+
+	UPROPERTY(EditDefaultsOnly, Category = AI)
 	FName PlayerLocationKey;
+
+	UPROPERTY(EditDefaultsOnly, Category = AI)
+	FName CurrentPlayerLocationKey;
 
 	UPROPERTY(EditDefaultsOnly, Category = AI)
 	FName RandomLocationKey;

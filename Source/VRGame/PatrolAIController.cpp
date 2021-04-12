@@ -17,8 +17,10 @@ APatrolAIController::APatrolAIController()
 	SensingPawnKey = "IsPawnInSight";
 	SensingRagdollKey = "IsRagdollInSight";
 	PlayerLocationKey = "PlayerLocation";
+	CurrentPlayerLocationKey = "CurrentPlayerLocation";
 	RandomLocationKey = "RandomLocation";
 	LookForPlayerKey = "LookForPlayer";
+	DefendSelfKey = "DefendSelf";
 }
 
 void APatrolAIController::OnPossess(APawn* InPawn)
@@ -72,6 +74,14 @@ void APatrolAIController::SetPlayerLocation(FVector PlayerLoc)
 	}
 }
 
+void APatrolAIController::SetCurrentPlayerLocation(FVector CurrentPlayerLoc)
+{
+	if (Blackboard)
+	{
+		BlackboardComp->SetValueAsVector(CurrentPlayerLocationKey, CurrentPlayerLoc);
+	}
+}
+
 void APatrolAIController::SetRandomLocation(FVector RandomLoc)
 {
 	if (Blackboard)
@@ -85,6 +95,14 @@ void APatrolAIController::SetLookForPlayer(bool LookFor)
 	if (Blackboard)
 	{
 		BlackboardComp->SetValueAsBool(LookForPlayerKey, LookFor);
+	}
+}
+
+void APatrolAIController::SetDefendSelf(bool DefendSelf)
+{
+	if (Blackboard)
+	{
+		BlackboardComp->SetValueAsBool(DefendSelfKey, DefendSelf);
 	}
 }
 

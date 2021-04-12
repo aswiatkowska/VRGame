@@ -85,6 +85,8 @@ private:
 
 	FVector PlayerLoc;
 
+	FVector CurrentPlayerLoc;
+
 	APawn* PlayerPawn;
 
 	APawn* Ragdoll;
