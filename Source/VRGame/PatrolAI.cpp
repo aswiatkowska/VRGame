@@ -10,6 +10,7 @@
 #include "Components/SphereComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Perception/PawnSensingComponent.h"
+#include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/CharacterMovementComponent.h" 
 
 
@@ -54,6 +55,8 @@ APatrolAI::APatrolAI()
 	PawnSensingComp = CreateDefaultSubobject<UPawnSensingComponent>("PawnSensingComp");
 	PawnSensingComp->SetPeripheralVisionAngle(20.0f);
 
+	WeaponMesh = CreateDefaultSubobject<USkeletalMeshComponent>("WeaponMesh");
+
 	GetCharacterMovement()->MaxWalkSpeed = 100;
 
 	GetMesh()->SetCollisionResponseToChannel((ECollisionChannel)(CustomCollisionChannelsEnum::Bullet), ECollisionResponse::ECR_Overlap);
@@ -62,6 +65,8 @@ APatrolAI::APatrolAI()
 void APatrolAI::BeginPlay()
 {
 	Super::BeginPlay();
+
+	WeaponMesh->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("weapon_r"));
 
 	GetMesh()->OnComponentBeginOverlap.AddDynamic(this, &APatrolAI::OnBulletOverlapBegin);
 

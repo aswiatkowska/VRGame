@@ -20,6 +20,9 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = AI)
 	class UPawnSensingComponent* PawnSensingComp;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class USkeletalMeshComponent* WeaponMesh;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class UGrabbableObjectComponent* RightHandGrabbable;
 
