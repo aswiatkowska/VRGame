@@ -26,9 +26,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<AWeapon> WeaponSubclass;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	class UParticleSystem* ImpactParticles;
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class UGrabbableObjectComponent* RightHandGrabbable;
 
@@ -72,7 +69,7 @@ private:
 
 	void OnPlayerNotSeen();
 
-	void StopLookingForPlayer();
+	void StopLookingAround();
 
 	bool IsPawnInSight;
 
@@ -82,11 +79,11 @@ private:
 
 	int NumberOfLifes = 100;
 
+	bool IsDead = false;
+
 	FVector PlayerLoc;
 
 	FVector CurrentPlayerLoc;
 
 	APawn* PlayerPawn;
-
-	APawn* Ragdoll;
 };

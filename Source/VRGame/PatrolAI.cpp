@@ -106,12 +106,19 @@ void APatrolAI::OnPawnSeen(APawn* SeenPawn)
 {
 	APatrolAIController* ControllerAI = Cast<APatrolAIController>(GetController());
 
-	if (ControllerAI && SeenPawn == Ragdoll)
+	if (ControllerAI && Cast<APatrolAI>(SeenPawn) != nullptr)
 	{
-		ControllerAI->SetRagdollSeen(SeenPawn);
-		IsRagdollInSight = true;
-		ControllerAI->SetIsRagdollInSight(IsRagdollInSight);
-		ControllerAI->SetRandomLocation(ControllerAI->GetRandomLocation());
+		APatrolAI* OtherPatrolAI = Cast<APatrolAI>(SeenPawn);
+
+		if (OtherPatrolAI->IsDead)
+		{
+			ControllerAI->SetRagdollSeen(SeenPawn);
+			IsRagdollInSight = true;
+			ControllerAI->SetIsRagdollInSight(IsRagdollInSight);
+			ControllerAI->SetRandomLocation(ControllerAI->GetRandomLocation());
+			FTimerHandle handle;
+			GetWorld()->GetTimerManager().SetTimer(handle, this, &APatrolAI::StopLookingAround, 10);
+		}
 	}
 	else if (ControllerAI && SeenPawn == PlayerPawn)
 	{
@@ -139,18 +146,28 @@ void APatrolAI::OnPlayerNotSeen()
 		LookForPlayer = true;
 		ControllerAI->SetLookForPlayer(LookForPlayer);
 		FTimerHandle handle;
-		GetWorld()->GetTimerManager().SetTimer(handle, this, &APatrolAI::StopLookingForPlayer, 6);
+		GetWorld()->GetTimerManager().SetTimer(handle, this, &APatrolAI::StopLookingAround, 6);
 		ControllerAI->SetIsPawnInSight(IsPawnInSight);
 	}
 }
 
-void APatrolAI::StopLookingForPlayer()
+void APatrolAI::StopLookingAround()
 {
-	LookForPlayer = false;
 	APatrolAIController* ControllerAI = Cast<APatrolAIController>(GetController());
-	if (ControllerAI)
+
+	if (LookForPlayer)
 	{
-		ControllerAI->SetLookForPlayer(LookForPlayer);
+		LookForPlayer = false;
+
+		if (ControllerAI)
+		{
+			ControllerAI->SetLookForPlayer(LookForPlayer);
+		}
+	}
+	else if (IsRagdollInSight)
+	{
+		IsRagdollInSight = false;
+		ControllerAI->SetIsRagdollInSight(IsRagdollInSight);
 	}
 }
 
@@ -185,7 +202,7 @@ void APatrolAI::OnBulletOverlapBegin(UPrimitiveComponent* OverlappedComponent, A
 			GetMesh()->SetAllBodiesSimulatePhysics(true);
 			ControllerAI->UnPossess();
 			ControllerAI->Destroy();
-			Ragdoll = Cast<APawn>(this);
+			IsDead = true;
 
 			Weapon->DetachAllSceneComponents(GetMesh(), FDetachmentTransformRules::KeepWorldTransform);
 			Weapon->ShootingReleased();

@@ -124,8 +124,8 @@ void APatrolAIController::SetIsRagdollInSight(bool IsRagdollSeen)
 
 FVector APatrolAIController::GetRandomLocation()
 {
-	float XCoordinate = FMath::FRandRange(-450, 450);
-	float YCoordinate = FMath::FRandRange(-450, 450);
+	float XCoordinate = FMath::FRandRange(200, 1200);
+	float YCoordinate = FMath::FRandRange(200, 1200);
 
 	FVector RandomLocation = FVector(XCoordinate, YCoordinate, 50);
 	return RandomLocation;
