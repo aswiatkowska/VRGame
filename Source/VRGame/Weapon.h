@@ -61,6 +61,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int MagazineCapacity;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool UnlimitedBullets = false;
+
 protected:
 	virtual void BeginPlay() override;
 

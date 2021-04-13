@@ -2,7 +2,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Bullet.h"
+#include "Weapon.h"
 #include "GameFramework/Character.h"
 #include "PatrolAI.generated.h"
 
@@ -15,6 +15,8 @@ class VRGAME_API APatrolAI : public ACharacter
 public:
 	APatrolAI();
 
+	AWeapon* Weapon;
+
 	UPROPERTY(EditAnywhere, Category = AI)
 	class UBehaviorTree* BehaviorTree;
 
@@ -22,16 +24,10 @@ public:
 	class UPawnSensingComponent* PawnSensingComp;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	class USkeletalMeshComponent* WeaponMesh;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSubclassOf<ABullet> BulletSubclass;
+	TSubclassOf<AWeapon> WeaponSubclass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UParticleSystem* ImpactParticles;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	class USceneComponent* Barrel;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class UGrabbableObjectComponent* RightHandGrabbable;

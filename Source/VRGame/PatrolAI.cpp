@@ -57,11 +57,6 @@ APatrolAI::APatrolAI()
 	PawnSensingComp = CreateDefaultSubobject<UPawnSensingComponent>("PawnSensingComp");
 	PawnSensingComp->SetPeripheralVisionAngle(20.0f);
 
-	WeaponMesh = CreateDefaultSubobject<USkeletalMeshComponent>("WeaponMesh");
-
-	Barrel = CreateDefaultSubobject<USceneComponent>("Barrel");
-	Barrel->SetupAttachment(WeaponMesh);
-
 	GetCharacterMovement()->MaxWalkSpeed = 100;
 
 	GetMesh()->SetCollisionResponseToChannel((ECollisionChannel)(CustomCollisionChannelsEnum::Bullet), ECollisionResponse::ECR_Overlap);
@@ -71,7 +66,9 @@ void APatrolAI::BeginPlay()
 {
 	Super::BeginPlay();
 
-	WeaponMesh->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("weapon_r"));
+	Weapon = GetWorld()->SpawnActor<AWeapon>(WeaponSubclass, GetMesh()->GetComponentLocation(), FRotator::ZeroRotator);
+	Weapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("weapon_r"));
+	Weapon->UnlimitedBullets = true;
 
 	GetMesh()->OnComponentBeginOverlap.AddDynamic(this, &APatrolAI::OnBulletOverlapBegin);
 
@@ -187,6 +184,7 @@ void APatrolAI::OnBulletOverlapBegin(UPrimitiveComponent* OverlappedComponent, A
 			ControllerAI->UnPossess();
 			ControllerAI->Destroy();
 			Ragdoll = Cast<APawn>(this);
+			Weapon->UnlimitedBullets = false;
 		}
 	}
 }

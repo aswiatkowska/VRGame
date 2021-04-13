@@ -64,11 +64,15 @@ void AWeapon::Shoot()
 	}
 
 	GetWorld()->SpawnActor<AActor>(BulletSubclass, Start, Barrel->GetComponentRotation());
-	Ammunition = Ammunition - 1;
 	
-	if (Ammunition <= 0)
+	if (!UnlimitedBullets)
 	{
-		AmmunitionCheck();
+		Ammunition = Ammunition - 1;
+
+		if (Ammunition <= 0)
+		{
+			AmmunitionCheck();
+		}
 	}
 
 	cooldown = true;

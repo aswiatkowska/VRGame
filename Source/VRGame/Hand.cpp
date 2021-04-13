@@ -2,6 +2,7 @@
 #include "Hand.h"
 #include "Components/SceneComponent.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "PhysicsEngine/PhysicsConstraintComponent.h"
 #include "Components/SphereComponent.h"
 #include "GrabbableObjectComponent.h"
 #include "CustomChannels.h"
