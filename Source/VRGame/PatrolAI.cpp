@@ -69,6 +69,7 @@ void APatrolAI::BeginPlay()
 	Weapon = GetWorld()->SpawnActor<AWeapon>(WeaponSubclass, GetMesh()->GetComponentLocation(), FRotator::ZeroRotator);
 	Weapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("weapon_r"));
 	Weapon->UnlimitedBullets = true;
+	Weapon->ShootingSpree = false;
 
 	GetMesh()->OnComponentBeginOverlap.AddDynamic(this, &APatrolAI::OnBulletOverlapBegin);
 
@@ -185,6 +186,7 @@ void APatrolAI::OnBulletOverlapBegin(UPrimitiveComponent* OverlappedComponent, A
 			ControllerAI->Destroy();
 			Ragdoll = Cast<APawn>(this);
 			Weapon->UnlimitedBullets = false;
+			Weapon->ShootingSpree = true;
 		}
 	}
 }
