@@ -53,6 +53,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class USphereComponent* LeftLegSphere;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int cooldownTimePatrolMultiplier;
+
 private:
 	virtual void BeginPlay() override;
 

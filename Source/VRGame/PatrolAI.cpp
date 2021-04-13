@@ -70,6 +70,7 @@ void APatrolAI::BeginPlay()
 	Weapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("weapon_r"));
 	Weapon->UnlimitedBullets = true;
 	Weapon->ShootingSpree = false;
+	Weapon->cooldownTime = Weapon->cooldownTime * cooldownTimePatrolMultiplier;
 
 	GetMesh()->OnComponentBeginOverlap.AddDynamic(this, &APatrolAI::OnBulletOverlapBegin);
 
@@ -185,8 +186,13 @@ void APatrolAI::OnBulletOverlapBegin(UPrimitiveComponent* OverlappedComponent, A
 			ControllerAI->UnPossess();
 			ControllerAI->Destroy();
 			Ragdoll = Cast<APawn>(this);
+
+			Weapon->DetachAllSceneComponents(GetMesh(), FDetachmentTransformRules::KeepWorldTransform);
+			Weapon->ShootingReleased();
+			Weapon->WeaponMesh->SetSimulatePhysics(true);
 			Weapon->UnlimitedBullets = false;
 			Weapon->ShootingSpree = true;
+			Weapon->cooldownTime = Weapon->cooldownTime / cooldownTimePatrolMultiplier;
 		}
 	}
 }
