@@ -69,7 +69,9 @@ private:
 
 	void OnPlayerNotSeen();
 
-	void StopLookingAround();
+	void StopLookingForPlayer();
+
+	void SetRagdollNotSeen();
 
 	void StopDefendingSelf();
 

@@ -304,12 +304,12 @@ void AMyCharacter::OnBulletOverlapBegin(UPrimitiveComponent* OverlappedComponent
 		NumberOfLifes = NumberOfLifes - Bullet->BulletImpact;
 		DamageScreen->AddToViewport();
 		FTimerHandle handle;
-		GetWorld()->GetTimerManager().SetTimer(handle, this, &AMyCharacter::RemoveDamageScreen, 0.5);
+		GetWorld()->GetTimerManager().SetTimer(handle, this, &AMyCharacter::RemoveDamageScreen, 0.2);
 
 		if (NumberOfLifes == 0)
 		{
 			FTimerHandle timerhandle;
-			GetWorld()->GetTimerManager().SetTimer(timerhandle, this, &AMyCharacter::PlayerDeath, 0.5);
+			GetWorld()->GetTimerManager().SetTimer(timerhandle, this, &AMyCharacter::PlayerDeath, 0.2);
 		}
 	}
 }

@@ -116,8 +116,12 @@ void APatrolAI::OnPawnSeen(APawn* SeenPawn)
 			IsRagdollInSight = true;
 			ControllerAI->SetIsRagdollInSight(IsRagdollInSight);
 			ControllerAI->SetRandomLocation(ControllerAI->GetRandomLocation());
+			LookForPlayer = true;
+			ControllerAI->SetLookForPlayer(LookForPlayer);
 			FTimerHandle handle;
-			GetWorld()->GetTimerManager().SetTimer(handle, this, &APatrolAI::StopLookingAround, 10);
+			GetWorld()->GetTimerManager().SetTimer(handle, this, &APatrolAI::SetRagdollNotSeen, 3);
+			FTimerHandle timerhandle;
+			GetWorld()->GetTimerManager().SetTimer(timerhandle, this, &APatrolAI::StopLookingForPlayer, 10);
 		}
 	}
 	else if (ControllerAI && SeenPawn == PlayerPawn)
@@ -126,6 +130,7 @@ void APatrolAI::OnPawnSeen(APawn* SeenPawn)
 		ControllerAI->SetPlayerCaught(SeenPawn);
 		IsPawnInSight = true;
 		ControllerAI->SetIsPawnInSight(IsPawnInSight);
+		ControllerAI->SetRandomLocationNearPlayer(ControllerAI->GetRandomLocationNearPlayer(PlayerLoc));
 	}
 }
 
@@ -145,14 +150,13 @@ void APatrolAI::OnPlayerNotSeen()
 		ControllerAI->SetPlayerLocation(PlayerLoc);
 		LookForPlayer = true;
 		ControllerAI->SetLookForPlayer(LookForPlayer);
-		ControllerAI->SetRandomLocationNearPlayer(ControllerAI->GetRandomLocationNearPlayer(PlayerLoc));
 		FTimerHandle handle;
-		GetWorld()->GetTimerManager().SetTimer(handle, this, &APatrolAI::StopLookingAround, 6);
+		GetWorld()->GetTimerManager().SetTimer(handle, this, &APatrolAI::StopLookingForPlayer, 6);
 		ControllerAI->SetIsPawnInSight(IsPawnInSight);
 	}
 }
 
-void APatrolAI::StopLookingAround()
+void APatrolAI::StopLookingForPlayer()
 {
 	APatrolAIController* ControllerAI = Cast<APatrolAIController>(GetController());
 
@@ -165,7 +169,13 @@ void APatrolAI::StopLookingAround()
 			ControllerAI->SetLookForPlayer(LookForPlayer);
 		}
 	}
-	else if (IsRagdollInSight)
+}
+
+void APatrolAI::SetRagdollNotSeen()
+{
+	APatrolAIController* ControllerAI = Cast<APatrolAIController>(GetController());
+
+	if (IsRagdollInSight)
 	{
 		IsRagdollInSight = false;
 		ControllerAI->SetIsRagdollInSight(IsRagdollInSight);
@@ -194,7 +204,16 @@ void APatrolAI::OnBulletOverlapBegin(UPrimitiveComponent* OverlappedComponent, A
 		{
 			CurrentPlayerLoc = PlayerPawn->GetActorLocation();
 			ControllerAI->SetCurrentPlayerLocation(CurrentPlayerLoc);
+			PlayerLoc = PlayerPawn->GetActorLocation();
+			ControllerAI->SetPlayerLocation(PlayerLoc);
+			ControllerAI->SetRandomLocationNearPlayer(ControllerAI->GetRandomLocationNearPlayer(PlayerLoc));
+
 			ControllerAI->SetDefendSelf(true);
+			LookForPlayer = true;
+			ControllerAI->SetLookForPlayer(LookForPlayer);
+
+			FTimerHandle timerhandle;
+			GetWorld()->GetTimerManager().SetTimer(timerhandle, this, &APatrolAI::StopLookingForPlayer, 10);
 			FTimerHandle handle;
 			GetWorld()->GetTimerManager().SetTimer(handle, this, &APatrolAI::StopDefendingSelf, 5);
 
