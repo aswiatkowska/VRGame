@@ -195,7 +195,7 @@ void APatrolAI::OnBulletOverlapBegin(UPrimitiveComponent* OverlappedComponent, A
 			ControllerAI->SetCurrentPlayerLocation(CurrentPlayerLoc);
 			ControllerAI->SetDefendSelf(true);
 			FTimerHandle handle;
-			GetWorld()->GetTimerManager().SetTimer(handle, this, &APatrolAI::StopDefendingSelf, 4);
+			GetWorld()->GetTimerManager().SetTimer(handle, this, &APatrolAI::StopDefendingSelf, 5);
 
 		}
 
