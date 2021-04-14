@@ -1,6 +1,9 @@
 
 #include "MyCharacter.h"
 #include "Weapon.h"
+#include "Bullet.h"
+#include "CustomChannels.h"
+#include "Blueprint/UserWidget.h"
 #include "HeadMountedDisplayFunctionLibrary.h" 
 #include "Components/SceneComponent.h"
 #include "Camera/CameraComponent.h"
@@ -34,6 +37,7 @@ AMyCharacter::AMyCharacter()
 	Camera->SetupAttachment(Scene);
 
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
+	GetCapsuleComponent()->SetCollisionResponseToChannel((ECollisionChannel)(CustomCollisionChannelsEnum::Bullet), ECollisionResponse::ECR_Overlap);
 
 	navmesh = dynamic_cast<ARecastNavMesh*>(UGameplayStatics::GetActorOfClass(GetWorld(), ARecastNavMesh::StaticClass()));
 }
@@ -58,6 +62,11 @@ void AMyCharacter::BeginPlay()
 	
 	LeftHand->SetupHand(EHandEnum::ELeft, RightHand);
 	RightHand->SetupHand(EHandEnum::ERight, LeftHand);
+
+	DamageScreen = CreateWidget<UDamageScreen>(GetGameInstance(), DamageWidget);
+	DeathScreen = CreateWidget<UDeathScreen>(GetGameInstance(), DeathWidget);
+
+	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &AMyCharacter::OnBulletOverlapBegin);
 }
 
 void AMyCharacter::Tick(float DeltaTime)
@@ -283,4 +292,40 @@ bool AMyCharacter::GetFromInventory(EInventoryObjectTypes Type)
 void AMyCharacter::AddToInventory(EInventoryObjectTypes Type)
 {
 	InvMap->AddObject(Type);
+}
+
+void AMyCharacter::OnBulletOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
+	const FHitResult& SweepResult)
+{
+	if (Cast<ABullet>(OtherActor) != nullptr)
+	{
+		ABullet* Bullet = Cast<ABullet>(OtherActor);
+		NumberOfLifes = NumberOfLifes - Bullet->BulletImpact;
+		DamageScreen->AddToViewport();
+		FTimerHandle handle;
+		GetWorld()->GetTimerManager().SetTimer(handle, this, &AMyCharacter::RemoveDamageScreen, 1);
+
+		if (NumberOfLifes == 0)
+		{
+			FTimerHandle timerhandle;
+			GetWorld()->GetTimerManager().SetTimer(timerhandle, this, &AMyCharacter::PlayerDeath, 1);
+		}
+	}
+}
+
+void AMyCharacter::RemoveDamageScreen()
+{
+	DamageScreen->RemoveFromViewport();
+}
+
+void AMyCharacter::PlayerDeath()
+{
+	DeathScreen->AddToViewport();
+	FTimerHandle handle;
+	GetWorld()->GetTimerManager().SetTimer(handle, this, &AMyCharacter::RestartGame, 2);
+}
+
+void AMyCharacter::RestartGame()
+{
+	UGameplayStatics::OpenLevel(this, "NewLevel", false);
 }
