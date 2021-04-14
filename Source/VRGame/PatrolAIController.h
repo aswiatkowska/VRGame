@@ -77,7 +77,7 @@ public:
 
 	FVector GetRandomLocation();
 
-	FVector GetRandomLocationNearPlayer(FVector CurrentPlayerLoc);
+	FVector GetRandomLocationNearPlayer(FVector PlayerLoc);
 
 	int CurrentPatrolPoint = 0;
 

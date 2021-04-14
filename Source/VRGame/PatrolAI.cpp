@@ -126,8 +126,6 @@ void APatrolAI::OnPawnSeen(APawn* SeenPawn)
 		ControllerAI->SetPlayerCaught(SeenPawn);
 		IsPawnInSight = true;
 		ControllerAI->SetIsPawnInSight(IsPawnInSight);
-		CurrentPlayerLoc = PlayerPawn->GetActorLocation();
-		ControllerAI->SetRandomLocationNearPlayer(ControllerAI->GetRandomLocationNearPlayer(CurrentPlayerLoc));
 	}
 }
 
@@ -147,6 +145,7 @@ void APatrolAI::OnPlayerNotSeen()
 		ControllerAI->SetPlayerLocation(PlayerLoc);
 		LookForPlayer = true;
 		ControllerAI->SetLookForPlayer(LookForPlayer);
+		ControllerAI->SetRandomLocationNearPlayer(ControllerAI->GetRandomLocationNearPlayer(PlayerLoc));
 		FTimerHandle handle;
 		GetWorld()->GetTimerManager().SetTimer(handle, this, &APatrolAI::StopLookingAround, 6);
 		ControllerAI->SetIsPawnInSight(IsPawnInSight);
