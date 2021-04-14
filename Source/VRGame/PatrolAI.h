@@ -71,6 +71,8 @@ private:
 
 	void StopLookingAround();
 
+	void StopDefendingSelf();
+
 	bool IsPawnInSight;
 
 	bool IsRagdollInSight;

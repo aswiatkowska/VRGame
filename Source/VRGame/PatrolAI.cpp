@@ -122,7 +122,7 @@ void APatrolAI::OnPawnSeen(APawn* SeenPawn)
 	}
 	else if (ControllerAI && SeenPawn == PlayerPawn)
 	{
-		ControllerAI->SetDefendSelf(false);
+		StopDefendingSelf();
 		ControllerAI->SetPlayerCaught(SeenPawn);
 		IsPawnInSight = true;
 		ControllerAI->SetIsPawnInSight(IsPawnInSight);
@@ -194,6 +194,9 @@ void APatrolAI::OnBulletOverlapBegin(UPrimitiveComponent* OverlappedComponent, A
 			CurrentPlayerLoc = PlayerPawn->GetActorLocation();
 			ControllerAI->SetCurrentPlayerLocation(CurrentPlayerLoc);
 			ControllerAI->SetDefendSelf(true);
+			FTimerHandle handle;
+			GetWorld()->GetTimerManager().SetTimer(handle, this, &APatrolAI::StopDefendingSelf, 4);
+
 		}
 
 		if (NumberOfLifes == 0)
@@ -211,5 +214,15 @@ void APatrolAI::OnBulletOverlapBegin(UPrimitiveComponent* OverlappedComponent, A
 			Weapon->ShootingSpree = true;
 			Weapon->cooldownTime = Weapon->cooldownTime / cooldownTimePatrolMultiplier;
 		}
+	}
+}
+
+void APatrolAI::StopDefendingSelf()
+{
+	APatrolAIController* ControllerAI = Cast<APatrolAIController>(GetController());
+
+	if (ControllerAI)
+	{
+		ControllerAI->SetDefendSelf(false);
 	}
 }
