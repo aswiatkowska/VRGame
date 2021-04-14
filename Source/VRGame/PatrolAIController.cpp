@@ -19,6 +19,7 @@ APatrolAIController::APatrolAIController()
 	PlayerLocationKey = "PlayerLocation";
 	CurrentPlayerLocationKey = "CurrentPlayerLocation";
 	RandomLocationKey = "RandomLocation";
+	RandomLocationNearPlayerKey = "RandomLocationNearPlayer";
 	LookForPlayerKey = "LookForPlayer";
 	DefendSelfKey = "DefendSelf";
 }
@@ -90,6 +91,14 @@ void APatrolAIController::SetRandomLocation(FVector RandomLoc)
 	}
 }
 
+void APatrolAIController::SetRandomLocationNearPlayer(FVector RandomLocNearPlayer)
+{
+	if (Blackboard)
+	{
+		BlackboardComp->SetValueAsVector(RandomLocationNearPlayerKey, RandomLocNearPlayer);
+	}
+}
+
 void APatrolAIController::SetLookForPlayer(bool LookFor)
 {
 	if (Blackboard)
@@ -129,6 +138,17 @@ FVector APatrolAIController::GetRandomLocation()
 
 	FVector RandomLocation = FVector(XCoordinate, YCoordinate, 50);
 	return RandomLocation;
+}
+
+FVector APatrolAIController::GetRandomLocationNearPlayer(FVector CurrentPlayerLoc)
+{
+	float PlayerLocX = CurrentPlayerLoc.X;
+	float PlayerLocY = CurrentPlayerLoc.Y;
+	float XCoordinate = FMath::FRandRange(PlayerLocX - 200, PlayerLocX + 200);
+	float YCoordinate = FMath::FRandRange(PlayerLocY - 200, PlayerLocY + 200);
+
+	FVector RandLocNearPlayer = FVector(XCoordinate, YCoordinate, 50);
+	return RandLocNearPlayer;
 }
 
 UBlackboardComponent* APatrolAIController::GetBlackboardComp()

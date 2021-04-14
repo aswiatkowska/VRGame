@@ -122,11 +122,14 @@ void AHand::ObjectRelease()
 
 void AHand::ForceRelease()
 {
-	GrabbedActor->FindComponentByClass<UGrabbableObjectComponent>()->IsGrabbed = false;
-	HandSkeletal->SetVisibility(true);
-	GrabbedActor->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
-	GrabbedObjectGrabbableComponent = nullptr;
-	GrabbedActor = nullptr;
+	if (GrabbedActor != nullptr)
+	{
+		GrabbedActor->FindComponentByClass<UGrabbableObjectComponent>()->IsGrabbed = false;
+		HandSkeletal->SetVisibility(true);
+		GrabbedActor->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+		GrabbedObjectGrabbableComponent = nullptr;
+		GrabbedActor = nullptr;
+	}
 }
 
 void AHand::OnHandOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,

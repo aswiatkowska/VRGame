@@ -2,7 +2,7 @@
 #include "MyCharacter.h"
 #include "Weapon.h"
 #include "Bullet.h"
-#include "CustomChannels.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Blueprint/UserWidget.h"
 #include "HeadMountedDisplayFunctionLibrary.h" 
 #include "Components/SceneComponent.h"
@@ -17,6 +17,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Engine/EngineTypes.h"
 #include "CustomChannels.h"
+
 
 AMyCharacter::AMyCharacter()
 {
@@ -320,6 +321,9 @@ void AMyCharacter::RemoveDamageScreen()
 
 void AMyCharacter::PlayerDeath()
 {
+	RightHand->ForceRelease();
+	LeftHand->ForceRelease();
+	GetCharacterMovement()->DisableMovement();
 	DeathScreen->AddToViewport();
 	FTimerHandle handle;
 	GetWorld()->GetTimerManager().SetTimer(handle, this, &AMyCharacter::RestartGame, 1);

@@ -28,6 +28,8 @@ public:
 
 	void SetRandomLocation(FVector RandomLoc);
 
+	void SetRandomLocationNearPlayer(FVector RandomLocNearPlayer);
+
 	void SetLookForPlayer(bool LookFor);
 
 	void SetDefendSelf(bool DefendSelf);
@@ -64,6 +66,9 @@ public:
 	FName RandomLocationKey;
 
 	UPROPERTY(EditDefaultsOnly, Category = AI)
+	FName RandomLocationNearPlayerKey;
+
+	UPROPERTY(EditDefaultsOnly, Category = AI)
 	FName LookForPlayerKey;
 
 	UBlackboardComponent* GetBlackboardComp();
@@ -71,6 +76,8 @@ public:
 	TArray<AActor*> GetPatrolPoints();
 
 	FVector GetRandomLocation();
+
+	FVector GetRandomLocationNearPlayer(FVector CurrentPlayerLoc);
 
 	int CurrentPatrolPoint = 0;
 

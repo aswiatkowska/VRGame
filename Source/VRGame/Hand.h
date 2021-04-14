@@ -40,6 +40,8 @@ public:
 
 	void ObjectRelease();
 
+	void ForceRelease();
+
 	UGrabbableObjectComponent* GetGrabbedObject();
 
 	void SetupHand(EHandEnum RightOrLeft, AHand* OppositeHand);
@@ -48,8 +50,6 @@ private:
 	virtual void BeginPlay() override;
 
 	virtual void Tick(float DeltaTime) override;
-
-	void ForceRelease();
 
 	bool IsAnyObjectGrabbed();
 
