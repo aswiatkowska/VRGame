@@ -144,8 +144,8 @@ FVector APatrolAIController::GetRandomLocationNearPlayer(FVector PlayerLoc)
 {
 	float PlayerLocX = PlayerLoc.X;
 	float PlayerLocY = PlayerLoc.Y;
-	float XCoordinate = FMath::FRandRange(PlayerLocX - 500, PlayerLocX + 500);
-	float YCoordinate = FMath::FRandRange(PlayerLocY - 500, PlayerLocY + 500);
+	float XCoordinate = FMath::FRandRange(PlayerLocX - 200, PlayerLocX + 200);
+	float YCoordinate = FMath::FRandRange(PlayerLocY - 200, PlayerLocY + 200);
 
 	FVector RandLocNearPlayer = FVector(XCoordinate, YCoordinate, 50);
 	return RandLocNearPlayer;
