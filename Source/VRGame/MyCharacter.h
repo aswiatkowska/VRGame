@@ -4,8 +4,6 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Hand.h"
-#include "DeathScreen.h"
-#include "DamageScreen.h"
 #include "InventoryObjectTypes.h"
 #include "Inventory.h"
 #include "GrabbableObjectComponent.h"
@@ -31,17 +29,17 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class UCameraComponent* Camera;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class UStaticMeshComponent* DamageScreen;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class ARecastNavMesh* navmesh;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<AHand> HandClass;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSubclassOf<UUserWidget> DeathWidget;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSubclassOf<UUserWidget> DamageWidget;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UMaterialInstanceDynamic* DamageDynamicMaterial;
 
 	bool GetFromInventory(EInventoryObjectTypes Type);
 
@@ -88,9 +86,9 @@ private:
 
 	void ShootingReleasedLeft();
 
-	void RemoveDamageScreen();
-
 	void PlayerDeath();
+
+	void RemoveDamageMaterial();
 
 	void RestartGame();
 
@@ -115,8 +113,4 @@ private:
 	AHand* LeftHand;
 
 	AInventory* InvMap;
-
-	UDamageScreen* DamageScreen;
-
-	UDeathScreen* DeathScreen;
 };

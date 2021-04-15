@@ -37,6 +37,9 @@ AMyCharacter::AMyCharacter()
 	Camera = CreateDefaultSubobject<UCameraComponent>("Camera");
 	Camera->SetupAttachment(Scene);
 
+	DamageScreen = CreateDefaultSubobject<UStaticMeshComponent>("DamageScreen");
+	DamageScreen->SetupAttachment(Camera);
+
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
 	GetCapsuleComponent()->SetCollisionResponseToChannel((ECollisionChannel)(CustomCollisionChannelsEnum::Bullet), ECollisionResponse::ECR_Overlap);
 
@@ -64,10 +67,10 @@ void AMyCharacter::BeginPlay()
 	LeftHand->SetupHand(EHandEnum::ELeft, RightHand);
 	RightHand->SetupHand(EHandEnum::ERight, LeftHand);
 
-	DamageScreen = CreateWidget<UDamageScreen>(GetGameInstance(), DamageWidget);
-	DeathScreen = CreateWidget<UDeathScreen>(GetGameInstance(), DeathWidget);
-
 	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &AMyCharacter::OnBulletOverlapBegin);
+
+	DamageDynamicMaterial = DamageScreen->CreateAndSetMaterialInstanceDynamic(0);
+	DamageDynamicMaterial->SetScalarParameterValue(FName("Opacity"), 0);
 }
 
 void AMyCharacter::Tick(float DeltaTime)
@@ -302,11 +305,19 @@ void AMyCharacter::OnBulletOverlapBegin(UPrimitiveComponent* OverlappedComponent
 	{
 		ABullet* Bullet = Cast<ABullet>(OtherActor);
 		NumberOfLifes = NumberOfLifes - Bullet->BulletImpact;
-		DamageScreen->AddToViewport();
-		FTimerHandle handle;
-		GetWorld()->GetTimerManager().SetTimer(handle, this, &AMyCharacter::RemoveDamageScreen, 0.2);
 
-		if (NumberOfLifes == 0)
+		if (NumberOfLifes <= 0)
+		{
+			DamageDynamicMaterial->SetScalarParameterValue(FName("Opacity"), 1);
+		}
+		else
+		{
+			DamageDynamicMaterial->SetScalarParameterValue(FName("Opacity"), 0.5);
+		}
+		FTimerHandle handle;
+		GetWorld()->GetTimerManager().SetTimer(handle, this, &AMyCharacter::RemoveDamageMaterial, 0.2);
+
+		if (NumberOfLifes <= 0)
 		{
 			FTimerHandle timerhandle;
 			GetWorld()->GetTimerManager().SetTimer(timerhandle, this, &AMyCharacter::PlayerDeath, 0.2);
@@ -314,9 +325,9 @@ void AMyCharacter::OnBulletOverlapBegin(UPrimitiveComponent* OverlappedComponent
 	}
 }
 
-void AMyCharacter::RemoveDamageScreen()
+void AMyCharacter::RemoveDamageMaterial()
 {
-	DamageScreen->RemoveFromViewport();
+	DamageDynamicMaterial->SetScalarParameterValue(FName("Opacity"), 0);
 }
 
 void AMyCharacter::PlayerDeath()
@@ -324,7 +335,8 @@ void AMyCharacter::PlayerDeath()
 	RightHand->ForceRelease();
 	LeftHand->ForceRelease();
 	GetCharacterMovement()->DisableMovement();
-	DeathScreen->AddToViewport();
+	DamageDynamicMaterial->SetVectorParameterValue(FName("Color"), FLinearColor(0, 0, 0, 1));
+	DamageDynamicMaterial->SetScalarParameterValue(FName("Color"), 1);
 	FTimerHandle handle;
 	GetWorld()->GetTimerManager().SetTimer(handle, this, &AMyCharacter::RestartGame, 1);
 }
