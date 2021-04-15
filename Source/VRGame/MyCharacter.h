@@ -27,6 +27,18 @@ public:
 	class UMotionControllerComponent* RightMotionController;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class UPhysicsConstraintComponent* RightPhysicsConstraint;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class UPhysicsConstraintComponent* LeftPhysicsConstraint;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class UStaticMeshComponent* RHandPosition;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class UStaticMeshComponent* LHandPosition;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class UCameraComponent* Camera;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)

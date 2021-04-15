@@ -3,6 +3,7 @@
 #include "Weapon.h"
 #include "Bullet.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "PhysicsEngine/PhysicsConstraintComponent.h"
 #include "Blueprint/UserWidget.h"
 #include "HeadMountedDisplayFunctionLibrary.h" 
 #include "Components/SceneComponent.h"
@@ -33,6 +34,18 @@ AMyCharacter::AMyCharacter()
 	RightMotionController = CreateDefaultSubobject<UMotionControllerComponent>("RightMotionController");
 	RightMotionController->SetupAttachment(Scene);
 	RightMotionController->SetTrackingSource(EControllerHand::Right);
+
+	RHandPosition = CreateDefaultSubobject<UStaticMeshComponent>("RHandPosition");
+	RHandPosition->SetupAttachment(RightMotionController);
+
+	LHandPosition = CreateDefaultSubobject<UStaticMeshComponent>("LHandPosition");
+	LHandPosition->SetupAttachment(LeftMotionController);
+
+	RightPhysicsConstraint = CreateDefaultSubobject<UPhysicsConstraintComponent>("RightPhysicsHandle");
+	RightPhysicsConstraint->SetupAttachment(RHandPosition);
+
+	LeftPhysicsConstraint = CreateDefaultSubobject<UPhysicsConstraintComponent>("LeftPhysicsHandle");
+	LeftPhysicsConstraint->SetupAttachment(LHandPosition);
 
 	Camera = CreateDefaultSubobject<UCameraComponent>("Camera");
 	Camera->SetupAttachment(Scene);
@@ -71,6 +84,12 @@ void AMyCharacter::BeginPlay()
 
 	DamageDynamicMaterial = DamageScreen->CreateAndSetMaterialInstanceDynamic(0);
 	DamageDynamicMaterial->SetScalarParameterValue(FName("Opacity"), 0);
+
+	RightPhysicsConstraint->SetConstrainedComponents(RHandPosition, NAME_None, RightHand->HandSkeletal, FName("hand_r"));
+	LeftPhysicsConstraint->SetConstrainedComponents(LHandPosition, NAME_None, LeftHand->HandSkeletal, FName("hand_l"));
+
+	RightHand->HandSkeletal->SetSimulatePhysics(true);
+	LeftHand->HandSkeletal->SetSimulatePhysics(true);
 }
 
 void AMyCharacter::Tick(float DeltaTime)
