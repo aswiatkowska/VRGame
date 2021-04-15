@@ -309,18 +309,20 @@ void AMyCharacter::OnBulletOverlapBegin(UPrimitiveComponent* OverlappedComponent
 		if (NumberOfLifes <= 0)
 		{
 			DamageDynamicMaterial->SetScalarParameterValue(FName("Opacity"), 1);
+			FTimerHandle handle;
+			GetWorld()->GetTimerManager().SetTimer(handle, this, &AMyCharacter::RemoveDamageMaterial, 1);
 		}
 		else
 		{
 			DamageDynamicMaterial->SetScalarParameterValue(FName("Opacity"), 0.5);
+			FTimerHandle timerHandle;
+			GetWorld()->GetTimerManager().SetTimer(timerHandle, this, &AMyCharacter::RemoveDamageMaterial, 0.5);
 		}
-		FTimerHandle handle;
-		GetWorld()->GetTimerManager().SetTimer(handle, this, &AMyCharacter::RemoveDamageMaterial, 0.2);
 
 		if (NumberOfLifes <= 0)
 		{
 			FTimerHandle timerhandle;
-			GetWorld()->GetTimerManager().SetTimer(timerhandle, this, &AMyCharacter::PlayerDeath, 0.2);
+			GetWorld()->GetTimerManager().SetTimer(timerhandle, this, &AMyCharacter::PlayerDeath, 1);
 		}
 	}
 }
@@ -332,11 +334,11 @@ void AMyCharacter::RemoveDamageMaterial()
 
 void AMyCharacter::PlayerDeath()
 {
-	RightHand->ForceRelease();
-	LeftHand->ForceRelease();
-	GetCharacterMovement()->DisableMovement();
 	DamageDynamicMaterial->SetVectorParameterValue(FName("Color"), FLinearColor(0, 0, 0, 1));
-	DamageDynamicMaterial->SetScalarParameterValue(FName("Color"), 1);
+	DamageDynamicMaterial->SetScalarParameterValue(FName("Opacity"), 1);
+	RightHand->ObjectRelease();
+	LeftHand->ObjectRelease();
+	GetCharacterMovement()->DisableMovement();
 	FTimerHandle handle;
 	GetWorld()->GetTimerManager().SetTimer(handle, this, &AMyCharacter::RestartGame, 1);
 }

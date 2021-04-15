@@ -130,6 +130,8 @@ void APatrolAI::OnPawnSeen(APawn* SeenPawn)
 		ControllerAI->SetPlayerCaught(SeenPawn);
 		IsPawnInSight = true;
 		ControllerAI->SetIsPawnInSight(IsPawnInSight);
+		PlayerLoc = PlayerPawn->GetActorLocation();
+		ControllerAI->SetPlayerLocation(PlayerLoc);
 		ControllerAI->SetRandomLocationNearPlayer(ControllerAI->GetRandomLocationNearPlayer(PlayerLoc));
 	}
 }
