@@ -29,6 +29,14 @@ AHand::AHand()
 	CollisionSphere->SetCollisionObjectType((ECollisionChannel)(CustomCollisionChannelsEnum::Hand));
 	CollisionSphere->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 	CollisionSphere->SetCollisionResponseToChannel((ECollisionChannel)(CustomCollisionChannelsEnum::GrabbableObject), ECollisionResponse::ECR_Overlap);
+
+	PhysicalHand = CreateDefaultSubobject<UStaticMeshComponent>("PhysicalHand");
+	PhysicalHand->SetupAttachment(Scene);
+
+	PhysicsConstraint = CreateDefaultSubobject<UPhysicsConstraintComponent>("PhysicsConstraint");
+	PhysicsConstraint->SetupAttachment(PhysicalHand);
+
+	HandSkeletal->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
 }
 
 void AHand::BeginPlay()
@@ -80,21 +88,13 @@ void AHand::ObjectGrab()
 		GrabbedObjectGrabbableComponent->OnGrabDelegate.Broadcast();
 		GrabbedActor = GrabbedObjectGrabbableComponent->GetOwner();
 
-		if (Cast<APatrolAI>(GrabbedActor) != nullptr)
+		if (GrabbedObjectGrabbableComponent->IsPatrolAI && GrabbedObjectGrabbableComponent->IsPatrolAIDead)
 		{
-			if (Cast<APatrolAI>(GrabbedActor)->IsDead)
-			{
-				APatrolAI* PatrolAI = Cast<APatrolAI>(GrabbedActor);
-				HandSkeletal->SetVisibility(false);
-				FName SocketName = GrabbedObjectGrabbableComponent->GetFName();
-				GrabbedActor->AttachToComponent(GrabPoint, FAttachmentTransformRules::SnapToTargetNotIncludingScale, SocketName);
-			}
-			else
-			{
-				return;
-			}
+			HandSkeletal->SetVisibility(false);
+			FName SocketName = GrabbedObjectGrabbableComponent->GetFName();
+			GrabbedActor->AttachToComponent(GrabPoint, FAttachmentTransformRules::SnapToTargetNotIncludingScale, SocketName);
 		}
-		else
+		else if (!GrabbedObjectGrabbableComponent->IsPatrolAI)
 		{
 			if (Cast<AWeapon>(GrabbedActor) != nullptr)
 			{
@@ -103,6 +103,10 @@ void AHand::ObjectGrab()
 			}
 			HandSkeletal->SetVisibility(false);
 			GrabbedActor->AttachToComponent(GrabPoint, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+		}
+		else
+		{
+			return;
 		}
 
 		if (HandType == EHandEnum::ERight)

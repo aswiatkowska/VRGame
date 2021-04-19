@@ -106,6 +106,7 @@ void AWeapon::AmmunitionCheck()
 
 void AWeapon::OnGrab()
 {
+	WeaponMesh->SetCollisionResponseToChannel((ECollisionChannel)(CustomCollisionChannelsEnum::HandPhysical), ECollisionResponse::ECR_Ignore);
 	WeaponMesh->SetSimulatePhysics(false);
 	if (Ammunition <= 0)
 	{
@@ -115,6 +116,7 @@ void AWeapon::OnGrab()
 
 void AWeapon::OnRelease()
 {
+	WeaponMesh->SetCollisionResponseToChannel((ECollisionChannel)(CustomCollisionChannelsEnum::HandPhysical), ECollisionResponse::ECR_Ignore);
 	WeaponMesh->SetSimulatePhysics(true);
 	ShootingReleased();
 }

@@ -43,6 +43,10 @@ AMyCharacter::AMyCharacter()
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
 	GetCapsuleComponent()->SetCollisionResponseToChannel((ECollisionChannel)(CustomCollisionChannelsEnum::Bullet), ECollisionResponse::ECR_Overlap);
 
+	DamageScreen->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+	GetMesh()->SetCollisionResponseToChannel((ECollisionChannel)(CustomCollisionChannelsEnum::HandPhysical), ECollisionResponse::ECR_Ignore);
+	GetCapsuleComponent()->SetCollisionResponseToChannel((ECollisionChannel)(CustomCollisionChannelsEnum::HandPhysical), ECollisionResponse::ECR_Ignore);
+
 	navmesh = dynamic_cast<ARecastNavMesh*>(UGameplayStatics::GetActorOfClass(GetWorld(), ARecastNavMesh::StaticClass()));
 }
 
@@ -58,10 +62,10 @@ void AMyCharacter::BeginPlay()
 	InvMap = GetWorld()->SpawnActor<AInventory>(AInventory::StaticClass(), FVector::ZeroVector, FRotator::ZeroRotator);
 
 	RightHand = GetWorld()->SpawnActor<AHand>(HandClass, FVector::ZeroVector, FRotator::ZeroRotator);
-	RightHand->HandSkeletal->AttachToComponent(RightMotionController, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+	RightHand->AttachToComponent(RightMotionController, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 	
 	LeftHand = GetWorld()->SpawnActor<AHand>(HandClass, FVector::ZeroVector, FRotator::ZeroRotator);
-	LeftHand->HandSkeletal->AttachToComponent(LeftMotionController, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+	LeftHand->AttachToComponent(LeftMotionController, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 	LeftHand->HandSkeletal->SetRelativeScale3D(FVector(1.0f, -1.0f, 1.0f));
 	
 	LeftHand->SetupHand(EHandEnum::ELeft, RightHand);
@@ -187,6 +191,8 @@ bool AMyCharacter::TeleportLocation()
 	const FVector End = (LeftMotionController->GetForwardVector() * TeleportRange) + Start;
 
 	FCollisionQueryParams QueryParams = FCollisionQueryParams(SCENE_QUERY_STAT(TeleportRange), false, this);
+	QueryParams.AddIgnoredActor(RightHand);
+	QueryParams.AddIgnoredActor(LeftHand);
 
 	if (GetWorld()->LineTraceSingleByChannel(hitTeleport, Start, End, ECC_Visibility, QueryParams))
 	{
@@ -290,8 +296,8 @@ void AMyCharacter::CrouchPlayer()
 	}
 	else
 	{
-		Crouch();
 		GetCharacterMovement()->GetNavAgentPropertiesRef().bCanCrouch = true;
+		Crouch();
 	}
 }
 
@@ -333,18 +339,16 @@ void AMyCharacter::OnBulletOverlapBegin(UPrimitiveComponent* OverlappedComponent
 			FTimerHandle timerHandle;
 			GetWorld()->GetTimerManager().SetTimer(timerHandle, this, &AMyCharacter::RemoveDamageMaterial, 0.5);
 		}
-
-		if (NumberOfLifes <= 0)
-		{
-			FTimerHandle timerhandle;
-			GetWorld()->GetTimerManager().SetTimer(timerhandle, this, &AMyCharacter::PlayerDeath, 1);
-		}
 	}
 }
 
 void AMyCharacter::RemoveDamageMaterial()
 {
 	DamageDynamicMaterial->SetScalarParameterValue(FName("Opacity"), 0);
+	if (NumberOfLifes <= 0)
+	{
+		PlayerDeath();
+	}
 }
 
 void AMyCharacter::PlayerDeath()

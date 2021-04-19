@@ -36,6 +36,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TEnumAsByte<EHandEnum> HandType;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class UStaticMeshComponent* PhysicalHand;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class UPhysicsConstraintComponent* PhysicsConstraint;
+
 	void ObjectGrab();
 
 	void ObjectRelease();

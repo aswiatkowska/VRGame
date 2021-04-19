@@ -17,8 +17,6 @@ public:
 
 	AWeapon* Weapon;
 
-	bool IsDead = false;
-
 	UPROPERTY(EditAnywhere, Category = AI)
 	class UBehaviorTree* BehaviorTree;
 
@@ -82,6 +80,8 @@ private:
 	bool IsRagdollInSight;
 
 	bool LookForPlayer = false;
+
+	bool IsDead = false;
 
 	int NumberOfLifes = 100;
 

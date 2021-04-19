@@ -50,6 +50,10 @@ public:
 	FRotator LeftRotation = FRotator::ZeroRotator;
 
 	bool IsGrabbed = false;
+
+	bool IsPatrolAI = false;
+
+	bool IsPatrolAIDead = false;
 	
 	UPrimitiveComponent* CollisionComponent = nullptr;
 };

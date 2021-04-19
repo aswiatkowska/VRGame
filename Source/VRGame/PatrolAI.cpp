@@ -41,18 +41,22 @@ APatrolAI::APatrolAI()
 	RightHandGrabbable = CreateDefaultSubobject<UGrabbableObjectComponent>("hand_r");
 	RightHandGrabbable->GrabbableType = EGrabbableTypeEnum::ERagdollHand;
 	RightHandGrabbable->CollisionComponent = (UPrimitiveComponent*)RightHandSphere;
+	RightHandGrabbable->IsPatrolAI = true;
 
 	LeftHandGrabbable = CreateDefaultSubobject<UGrabbableObjectComponent>("hand_l");
 	LeftHandGrabbable->GrabbableType = EGrabbableTypeEnum::ERagdollHand;
 	LeftHandGrabbable->CollisionComponent = (UPrimitiveComponent*)LeftHandSphere;
+	LeftHandGrabbable->IsPatrolAI = true;
 
 	RightLegGrabbable = CreateDefaultSubobject<UGrabbableObjectComponent>("foot_r");
 	RightLegGrabbable->GrabbableType = EGrabbableTypeEnum::ERagdollLeg;
 	RightLegGrabbable->CollisionComponent = (UPrimitiveComponent*)RightLegSphere;
+	RightLegGrabbable->IsPatrolAI = true;
 
 	LeftLegGrabbable = CreateDefaultSubobject<UGrabbableObjectComponent>("foot_l");
 	LeftLegGrabbable->GrabbableType = EGrabbableTypeEnum::ERagdollLeg;
 	LeftLegGrabbable->CollisionComponent = (UPrimitiveComponent*)LeftLegSphere;
+	LeftLegGrabbable->IsPatrolAI = true;
 
 	PawnSensingComp = CreateDefaultSubobject<UPawnSensingComponent>("PawnSensingComp");
 	PawnSensingComp->SetPeripheralVisionAngle(20.0f);
@@ -225,6 +229,10 @@ void APatrolAI::OnBulletOverlapBegin(UPrimitiveComponent* OverlappedComponent, A
 
 		if (NumberOfLifes == 0)
 		{
+			RightHandGrabbable->IsPatrolAIDead = true;
+			RightLegGrabbable->IsPatrolAIDead = true;
+			LeftHandGrabbable->IsPatrolAIDead = true;
+			LeftLegGrabbable->IsPatrolAIDead = true;
 			GetCharacterMovement()->DisableMovement();
 			GetMesh()->SetAllBodiesSimulatePhysics(true);
 			ControllerAI->UnPossess();
