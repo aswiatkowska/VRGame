@@ -1,5 +1,6 @@
 
 #include "Hand.h"
+#include "PatrolAI.h"
 #include "Components/SceneComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "PhysicsEngine/PhysicsConstraintComponent.h"
@@ -76,17 +77,26 @@ void AHand::ObjectGrab()
 		}
 		nearestObject->IsGrabbed = true;
 		GrabbedObjectGrabbableComponent = nearestObject;
-		HandSkeletal->SetVisibility(false); 
 		GrabbedObjectGrabbableComponent->OnGrabDelegate.Broadcast();
 		GrabbedActor = GrabbedObjectGrabbableComponent->GetOwner();
 
-		if (GrabbedObjectGrabbableComponent->GrabbableType == EGrabbableTypeEnum::ERagdollHand)
+		if (Cast<APatrolAI>(GrabbedActor) != nullptr)
 		{
-			FName SocketName = GrabbedObjectGrabbableComponent->GetFName();
-			GrabbedActor->AttachToComponent(GrabPoint, FAttachmentTransformRules::SnapToTargetNotIncludingScale, SocketName);
+			if (Cast<APatrolAI>(GrabbedActor)->IsDead)
+			{
+				APatrolAI* PatrolAI = Cast<APatrolAI>(GrabbedActor);
+				HandSkeletal->SetVisibility(false);
+				FName SocketName = GrabbedObjectGrabbableComponent->GetFName();
+				GrabbedActor->AttachToComponent(GrabPoint, FAttachmentTransformRules::SnapToTargetNotIncludingScale, SocketName);
+			}
+			else
+			{
+				return;
+			}
 		}
 		else
 		{
+			HandSkeletal->SetVisibility(false);
 			GrabbedActor->AttachToComponent(GrabPoint, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 		}
 

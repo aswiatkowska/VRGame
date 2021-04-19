@@ -339,6 +339,8 @@ void AMyCharacter::PlayerDeath()
 	RightHand->ObjectRelease();
 	LeftHand->ObjectRelease();
 	GetCharacterMovement()->DisableMovement();
+	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+	this->DisableInput(PlayerController);
 	FTimerHandle handle;
 	GetWorld()->GetTimerManager().SetTimer(handle, this, &AMyCharacter::RestartGame, 1);
 }
