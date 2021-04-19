@@ -121,6 +121,8 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	PlayerInputComponent->BindAction("GrabReleaseLeft", IE_Pressed, this, &AMyCharacter::ObjectGrabLeft);
 	PlayerInputComponent->BindAction("GrabReleaseLeft", IE_Released, this, &AMyCharacter::ObjectReleaseLeft);
 
+	PlayerInputComponent->BindAction("Crouch", IE_Pressed, this, &AMyCharacter::CrouchPlayer);
+
 }
 
 void AMyCharacter::ChangeMotion()
@@ -277,6 +279,19 @@ void AMyCharacter::ShootingReleasedLeft()
 			AWeapon* Weapon = Cast<AWeapon>(LeftHand->GetGrabbedObject()->GetOwner());
 			Weapon->ShootingReleased();
 		}
+	}
+}
+
+void AMyCharacter::CrouchPlayer()
+{
+	if (GetCharacterMovement()->IsCrouching())
+	{
+		UnCrouch();
+	}
+	else
+	{
+		Crouch();
+		GetCharacterMovement()->GetNavAgentPropertiesRef().bCanCrouch = true;
 	}
 }
 

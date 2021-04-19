@@ -86,6 +86,8 @@ private:
 
 	void ShootingReleasedLeft();
 
+	void CrouchPlayer();
+
 	void PlayerDeath();
 
 	void RemoveDamageMaterial();
