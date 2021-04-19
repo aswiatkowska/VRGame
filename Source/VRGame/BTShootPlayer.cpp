@@ -15,7 +15,14 @@ EBTNodeResult::Type UBTShootPlayer::ExecuteTask(UBehaviorTreeComponent& OwnerCom
 		UBlackboardComponent* BlackboardComp = ControllerAI->GetBlackboardComp();
 		APatrolAI* PatrolAI = Cast<APatrolAI>(ControllerAI->GetPawn());
 
-		PatrolAI->Weapon->Shoot();
+		if (!PatrolAI->Weapon->IsHeldByPlayer)
+		{
+			PatrolAI->Weapon->Shoot();
+		}
+		else
+		{
+			return EBTNodeResult::Failed;
+		}
 
 		return EBTNodeResult::Succeeded;
 	}

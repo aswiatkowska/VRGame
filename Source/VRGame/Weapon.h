@@ -28,6 +28,8 @@ public:
 
 	void ShootingReleased();
 
+	bool IsHeldByPlayer = false;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class USkeletalMeshComponent* WeaponMesh;
 

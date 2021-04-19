@@ -231,12 +231,15 @@ void APatrolAI::OnBulletOverlapBegin(UPrimitiveComponent* OverlappedComponent, A
 			ControllerAI->Destroy();
 			IsDead = true;
 
-			Weapon->DetachAllSceneComponents(GetMesh(), FDetachmentTransformRules::KeepWorldTransform);
-			Weapon->ShootingReleased();
-			Weapon->WeaponMesh->SetSimulatePhysics(true);
-			Weapon->UnlimitedBullets = false;
-			Weapon->ShootingSpree = true;
-			Weapon->cooldownTime = Weapon->cooldownTime / cooldownTimePatrolMultiplier;
+			if (!Weapon->IsHeldByPlayer)
+			{
+				Weapon->DetachAllSceneComponents(GetMesh(), FDetachmentTransformRules::KeepWorldTransform);
+				Weapon->ShootingReleased();
+				Weapon->WeaponMesh->SetSimulatePhysics(true);
+				Weapon->UnlimitedBullets = false;
+				Weapon->ShootingSpree = true;
+				Weapon->cooldownTime = Weapon->cooldownTime / cooldownTimePatrolMultiplier;
+			}
 		}
 	}
 }

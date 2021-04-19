@@ -96,6 +96,11 @@ void AHand::ObjectGrab()
 		}
 		else
 		{
+			if (Cast<AWeapon>(GrabbedActor) != nullptr)
+			{
+				AWeapon* Weapon = Cast<AWeapon>(GrabbedActor);
+				Weapon->IsHeldByPlayer = true;
+			}
 			HandSkeletal->SetVisibility(false);
 			GrabbedActor->AttachToComponent(GrabPoint, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 		}
