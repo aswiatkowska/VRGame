@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "PatrolAI.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGetHelpDelegate);
 
 UCLASS()
 class VRGAME_API APatrolAI : public ACharacter
@@ -16,6 +17,10 @@ public:
 	APatrolAI();
 
 	AWeapon* Weapon;
+
+	FGetHelpDelegate OnGetHelpDelegate;
+
+	void StopLookingForPlayer();
 
 	UPROPERTY(EditAnywhere, Category = AI)
 	class UBehaviorTree* BehaviorTree;
@@ -68,8 +73,6 @@ private:
 	void OnPawnSeen(APawn* SeenPawn);
 
 	void OnPlayerNotSeen();
-
-	void StopLookingForPlayer();
 
 	void SetRagdollNotSeen();
 

@@ -7,7 +7,6 @@
 #include "BehaviorTree/BehaviorTreeComponent.h"
 #include "PatrolAIController.generated.h"
 
-
 UCLASS()
 class VRGAME_API APatrolAIController : public AAIController
 {
@@ -84,6 +83,9 @@ public:
 private:
 	virtual void OnPossess(APawn* InPawn) override;
 
+	UFUNCTION()
+	void OnGetHelp();
+
 	UBlackboardComponent* BlackboardComp;
 
 	UBehaviorTreeComponent* BehaviorTreeComp;
@@ -91,5 +93,4 @@ private:
 	TArray<AActor*> PatrolPoints;
 
 	APatrolAI* CharacterAI = nullptr;
-	
 };

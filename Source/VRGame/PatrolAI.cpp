@@ -131,6 +131,7 @@ void APatrolAI::OnPawnSeen(APawn* SeenPawn)
 	else if (ControllerAI && SeenPawn == PlayerPawn)
 	{
 		StopDefendingSelf();
+		OnGetHelpDelegate.Broadcast();
 		ControllerAI->SetPlayerCaught(SeenPawn);
 		IsPawnInSight = true;
 		ControllerAI->SetIsPawnInSight(IsPawnInSight);
@@ -210,6 +211,7 @@ void APatrolAI::OnBulletOverlapBegin(UPrimitiveComponent* OverlappedComponent, A
 		APatrolAIController* ControllerAI = Cast<APatrolAIController>(GetController());
 		if (ControllerAI)
 		{
+			OnGetHelpDelegate.Broadcast();
 			CurrentPlayerLoc = PlayerPawn->GetActorLocation();
 			ControllerAI->SetCurrentPlayerLocation(CurrentPlayerLoc);
 			PlayerLoc = PlayerPawn->GetActorLocation();

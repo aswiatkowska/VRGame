@@ -85,11 +85,11 @@ void AHand::ObjectGrab()
 		}
 		nearestObject->IsGrabbed = true;
 		GrabbedObjectGrabbableComponent = nearestObject;
-		GrabbedObjectGrabbableComponent->OnGrabDelegate.Broadcast();
 		GrabbedActor = GrabbedObjectGrabbableComponent->GetOwner();
 
 		if (GrabbedObjectGrabbableComponent->IsPatrolAI && GrabbedObjectGrabbableComponent->IsPatrolAIDead)
 		{
+			GrabbedObjectGrabbableComponent->OnGrabDelegate.Broadcast();
 			HandSkeletal->SetVisibility(false);
 			FName SocketName = GrabbedObjectGrabbableComponent->GetFName();
 			GrabbedActor->AttachToComponent(GrabPoint, FAttachmentTransformRules::SnapToTargetNotIncludingScale, SocketName);
@@ -101,6 +101,7 @@ void AHand::ObjectGrab()
 				AWeapon* Weapon = Cast<AWeapon>(GrabbedActor);
 				Weapon->IsHeldByPlayer = true;
 			}
+			GrabbedObjectGrabbableComponent->OnGrabDelegate.Broadcast();
 			HandSkeletal->SetVisibility(false);
 			GrabbedActor->AttachToComponent(GrabPoint, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 		}

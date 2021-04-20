@@ -2,6 +2,7 @@
 
 #include "PatrolAIController.h"
 #include "PatrolAIPoint.h"
+#include "GameFramework/Pawn.h"
 #include "Kismet/GameplayStatics.h"
 #include "BehaviorTree/BehaviorTree.h"
 #include "BehaviorTree/BlackboardComponent.h"
@@ -37,6 +38,8 @@ void APatrolAIController::OnPossess(APawn* InPawn)
 			BlackboardComp->InitializeBlackboard(*CharacterAI->BehaviorTree->BlackboardAsset);
 		}
 	}
+
+	CharacterAI->OnGetHelpDelegate.AddDynamic(this, &APatrolAIController::OnGetHelp);
 
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), APatrolAIPoint::StaticClass(), PatrolPoints);
 
@@ -159,4 +162,27 @@ UBlackboardComponent* APatrolAIController::GetBlackboardComp()
 TArray<AActor*> APatrolAIController::GetPatrolPoints()
 {
 	return PatrolPoints;
+}
+
+void APatrolAIController::OnGetHelp()
+{
+	AController* CurrentController;
+	APawn* PlayerPawn = Cast<APawn>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+
+	for (auto i = GetWorld()->GetControllerIterator(); i; ++i)
+	{
+		CurrentController = (AController*)i->Get();
+		if (CurrentController != CharacterAI->GetController() && CurrentController != PlayerPawn->GetController())
+		{
+			APatrolAIController* AIController = Cast<APatrolAIController>(CurrentController);
+			APatrolAI* OtherPatrolAI = (APatrolAI*)AIController->GetOwner();
+			FVector Location = PlayerPawn->GetActorLocation();
+			AIController->SetCurrentPlayerLocation(Location);
+			AIController->SetRandomLocationNearPlayer(Location);
+			AIController->SetLookForPlayer(true);
+
+			FTimerHandle handle;
+			GetWorld()->GetTimerManager().SetTimer(handle, OtherPatrolAI, &APatrolAI::StopLookingForPlayer, 6);
+		}
+	}
 }
