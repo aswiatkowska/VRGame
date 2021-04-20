@@ -32,6 +32,8 @@ AHand::AHand()
 
 	PhysicalHand = CreateDefaultSubobject<UStaticMeshComponent>("PhysicalHand");
 	PhysicalHand->SetupAttachment(Scene);
+	PhysicalHand->SetCanEverAffectNavigation(false);
+	PhysicalHand->SetVisibility(false);
 
 	PhysicsConstraint = CreateDefaultSubobject<UPhysicsConstraintComponent>("PhysicsConstraint");
 	PhysicsConstraint->SetupAttachment(PhysicalHand);
@@ -87,23 +89,26 @@ void AHand::ObjectGrab()
 		GrabbedObjectGrabbableComponent = nearestObject;
 		GrabbedActor = GrabbedObjectGrabbableComponent->GetOwner();
 
-		if (GrabbedObjectGrabbableComponent->IsPatrolAI && GrabbedObjectGrabbableComponent->IsPatrolAIDead)
+		if (GrabbedObjectGrabbableComponent->CanBeGrabbed)
 		{
-			GrabbedObjectGrabbableComponent->OnGrabDelegate.Broadcast();
-			HandSkeletal->SetVisibility(false);
-			FName SocketName = GrabbedObjectGrabbableComponent->GetFName();
-			GrabbedActor->AttachToComponent(GrabPoint, FAttachmentTransformRules::SnapToTargetNotIncludingScale, SocketName);
-		}
-		else if (!GrabbedObjectGrabbableComponent->IsPatrolAI)
-		{
-			if (Cast<AWeapon>(GrabbedActor) != nullptr)
+			if (GrabbedObjectGrabbableComponent->GrabbableType == EGrabbableTypeEnum::ERagdollHand || EGrabbableTypeEnum::ERagdollLeg)
 			{
-				AWeapon* Weapon = Cast<AWeapon>(GrabbedActor);
-				Weapon->IsHeldByPlayer = true;
+				GrabbedObjectGrabbableComponent->OnGrabDelegate.Broadcast();
+				HandSkeletal->SetVisibility(false);
+				FName SocketName = GrabbedObjectGrabbableComponent->GetFName();
+				GrabbedActor->AttachToComponent(GrabPoint, FAttachmentTransformRules::SnapToTargetNotIncludingScale, SocketName);
 			}
-			GrabbedObjectGrabbableComponent->OnGrabDelegate.Broadcast();
-			HandSkeletal->SetVisibility(false);
-			GrabbedActor->AttachToComponent(GrabPoint, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+			else
+			{
+				if (Cast<AWeapon>(GrabbedActor) != nullptr)
+				{
+					AWeapon* Weapon = Cast<AWeapon>(GrabbedActor);
+					Weapon->IsHeldByPlayer = true;
+				}
+				GrabbedObjectGrabbableComponent->OnGrabDelegate.Broadcast();
+				HandSkeletal->SetVisibility(false);
+				GrabbedActor->AttachToComponent(GrabPoint, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+			}
 		}
 		else
 		{

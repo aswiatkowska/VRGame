@@ -51,9 +51,7 @@ public:
 
 	bool IsGrabbed = false;
 
-	bool IsPatrolAI = false;
-
-	bool IsPatrolAIDead = false;
+	bool CanBeGrabbed = true;
 	
 	UPrimitiveComponent* CollisionComponent = nullptr;
 };

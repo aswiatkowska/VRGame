@@ -31,16 +31,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<AWeapon> WeaponSubclass;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class UGrabbableObjectComponent* RightHandGrabbable;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class UGrabbableObjectComponent* LeftHandGrabbable;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class UGrabbableObjectComponent* RightLegGrabbable;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class UGrabbableObjectComponent* LeftLegGrabbable;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)

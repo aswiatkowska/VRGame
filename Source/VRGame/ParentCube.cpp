@@ -1,5 +1,6 @@
 
 #include "ParentCube.h"
+#include "CustomChannels.h"
 #include "Components/StaticMeshComponent.h"
 #include "Bullet.h"
 
@@ -11,7 +12,8 @@ AParentCube::AParentCube()
 	RootComponent = Root;
 	CubeMesh = CreateDefaultSubobject<UStaticMeshComponent>("CubeMesh");
 	CubeMesh->SetupAttachment(Root);
-	CubeMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
+	CubeMesh->SetCollisionResponseToChannel((ECollisionChannel)(CustomCollisionChannelsEnum::Bullet), ECollisionResponse::ECR_Overlap);
+	CubeMesh->SetCollisionResponseToChannel((ECollisionChannel)(CustomCollisionChannelsEnum::HandPhysical), ECollisionResponse::ECR_Block);
 
 	OnActorBeginOverlap.AddDynamic(this, &AParentCube::OnOverlap);
 

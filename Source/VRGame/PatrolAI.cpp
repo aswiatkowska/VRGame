@@ -41,22 +41,22 @@ APatrolAI::APatrolAI()
 	RightHandGrabbable = CreateDefaultSubobject<UGrabbableObjectComponent>("hand_r");
 	RightHandGrabbable->GrabbableType = EGrabbableTypeEnum::ERagdollHand;
 	RightHandGrabbable->CollisionComponent = (UPrimitiveComponent*)RightHandSphere;
-	RightHandGrabbable->IsPatrolAI = true;
+	RightHandGrabbable->CanBeGrabbed = false;
 
 	LeftHandGrabbable = CreateDefaultSubobject<UGrabbableObjectComponent>("hand_l");
 	LeftHandGrabbable->GrabbableType = EGrabbableTypeEnum::ERagdollHand;
 	LeftHandGrabbable->CollisionComponent = (UPrimitiveComponent*)LeftHandSphere;
-	LeftHandGrabbable->IsPatrolAI = true;
+	LeftHandGrabbable->CanBeGrabbed = false;
 
 	RightLegGrabbable = CreateDefaultSubobject<UGrabbableObjectComponent>("foot_r");
 	RightLegGrabbable->GrabbableType = EGrabbableTypeEnum::ERagdollLeg;
 	RightLegGrabbable->CollisionComponent = (UPrimitiveComponent*)RightLegSphere;
-	RightLegGrabbable->IsPatrolAI = true;
+	RightLegGrabbable->CanBeGrabbed = false;
 
 	LeftLegGrabbable = CreateDefaultSubobject<UGrabbableObjectComponent>("foot_l");
 	LeftLegGrabbable->GrabbableType = EGrabbableTypeEnum::ERagdollLeg;
 	LeftLegGrabbable->CollisionComponent = (UPrimitiveComponent*)LeftLegSphere;
-	LeftLegGrabbable->IsPatrolAI = true;
+	LeftLegGrabbable->CanBeGrabbed = false;
 
 	PawnSensingComp = CreateDefaultSubobject<UPawnSensingComponent>("PawnSensingComp");
 	PawnSensingComp->SetPeripheralVisionAngle(20.0f);
@@ -231,10 +231,10 @@ void APatrolAI::OnBulletOverlapBegin(UPrimitiveComponent* OverlappedComponent, A
 
 		if (NumberOfLifes == 0)
 		{
-			RightHandGrabbable->IsPatrolAIDead = true;
-			RightLegGrabbable->IsPatrolAIDead = true;
-			LeftHandGrabbable->IsPatrolAIDead = true;
-			LeftLegGrabbable->IsPatrolAIDead = true;
+			RightHandGrabbable->CanBeGrabbed = true;
+			RightLegGrabbable->CanBeGrabbed = true;
+			LeftHandGrabbable->CanBeGrabbed = true;
+			LeftLegGrabbable->CanBeGrabbed = true;
 			GetCharacterMovement()->DisableMovement();
 			GetMesh()->SetAllBodiesSimulatePhysics(true);
 			ControllerAI->UnPossess();

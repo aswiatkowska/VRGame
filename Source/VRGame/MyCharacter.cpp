@@ -83,8 +83,6 @@ void AMyCharacter::Tick(float DeltaTime)
 
 	if (!SwitchMotion)
 	{
-		TeleportLocation();
-
 		if (TeleportLocation())
 		{
 			FVector Start = FVector(LeftMotionController->GetComponentLocation());
@@ -92,6 +90,8 @@ void AMyCharacter::Tick(float DeltaTime)
 
 			TArray<AActor*> ignored;
 			ignored.Add(this);
+			ignored.Add(RightHand);
+			ignored.Add(LeftHand);
 
 			CanTeleport = UKismetSystemLibrary::LineTraceSingle(GetWorld(), Start, End, UEngineTypes::ConvertToTraceType(ECollisionChannel::ECC_WorldStatic),
 				false, ignored, EDrawDebugTrace::ForOneFrame, hit, true);
