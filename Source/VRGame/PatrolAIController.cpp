@@ -4,6 +4,7 @@
 #include "PatrolAIPoint.h"
 #include "GameFramework/Pawn.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "BehaviorTree/BehaviorTree.h"
 #include "BehaviorTree/BlackboardComponent.h"
 
@@ -166,23 +167,31 @@ TArray<AActor*> APatrolAIController::GetPatrolPoints()
 
 void APatrolAIController::OnGetHelp()
 {
-	AController* CurrentController;
 	APawn* PlayerPawn = Cast<APawn>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
 
-	for (auto i = GetWorld()->GetControllerIterator(); i; ++i)
-	{
-		CurrentController = (AController*)i->Get();
-		if (CurrentController != CharacterAI->GetController() && CurrentController != PlayerPawn->GetController())
-		{
-			APatrolAIController* AIController = Cast<APatrolAIController>(CurrentController);
-			APatrolAI* OtherPatrolAI = (APatrolAI*)AIController->GetOwner();
-			FVector Location = PlayerPawn->GetActorLocation();
-			AIController->SetCurrentPlayerLocation(Location);
-			AIController->SetRandomLocationNearPlayer(Location);
-			AIController->SetLookForPlayer(true);
+	TArray<AActor*> ActorArray;
+	FVector PatrolAILoc = CharacterAI->GetActorLocation();
+	float SphereRadius = 500.0;
+	AActor* CurrentActor;
 
-			FTimerHandle handle;
-			GetWorld()->GetTimerManager().SetTimer(handle, OtherPatrolAI, &APatrolAI::StopLookingForPlayer, 6);
+	if (UKismetSystemLibrary::SphereOverlapActors(GetWorld(), PatrolAILoc, SphereRadius, {}, TSubclassOf<APatrolAI>(), { this, PlayerPawn }, ActorArray))
+	{
+		if (ActorArray.Num() > 0)
+		{
+			for (int i = 0; i < ActorArray.Num(); ++i)
+			{
+				CurrentActor = ActorArray[i];
+				APatrolAI* CurrentPatrolAI = Cast<APatrolAI>(CurrentActor);
+				AController* CurrentController = CurrentPatrolAI->GetController();
+				APatrolAIController* AIController = Cast<APatrolAIController>(CurrentController);
+				FVector PlayerLocation = PlayerPawn->GetActorLocation();
+				AIController->SetCurrentPlayerLocation(PlayerLocation);
+				AIController->SetRandomLocationNearPlayer(PlayerLocation);
+				AIController->SetLookForPlayer(true);
+
+				FTimerHandle handle;
+				GetWorld()->GetTimerManager().SetTimer(handle, CurrentPatrolAI, &APatrolAI::StopLookingForPlayer, 6);
+			}
 		}
 	}
 }
