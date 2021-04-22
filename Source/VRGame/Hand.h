@@ -42,6 +42,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class UPhysicsConstraintComponent* PhysicsConstraint;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class UPhysicsHandleComponent* PhysicsHandle;
+
 	void ObjectGrab();
 
 	void ObjectRelease();

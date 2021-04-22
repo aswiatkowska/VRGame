@@ -326,7 +326,7 @@ void AMyCharacter::TakeOutAmmoRight()
 						if (Magazine->InvObjectType == Weapon->MagazineType)
 						{
 							Magazine->MagazineMesh->SetVisibility(true);
-							Magazine->MagazineMesh->SetRelativeLocation(RightHand->GrabPoint->GetComponentLocation(), false, nullptr, ETeleportType::None);
+							Magazine->MagazineMesh->SetRelativeLocation(RightHand->GrabPoint->GetComponentLocation());
 							return;
 						}
 					}
@@ -358,7 +358,7 @@ void AMyCharacter::TakeOutAmmoLeft()
 						if (Magazine->InvObjectType == Weapon->MagazineType)
 						{
 							Magazine->MagazineMesh->SetVisibility(true);
-							Magazine->MagazineMesh->SetRelativeLocation(LeftHand->GrabPoint->GetComponentLocation(), false, nullptr, ETeleportType::None);
+							Magazine->MagazineMesh->SetRelativeLocation(LeftHand->GrabPoint->GetComponentLocation());
 							return;
 						}
 					}

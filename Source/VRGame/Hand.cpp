@@ -4,6 +4,7 @@
 #include "Components/SceneComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "PhysicsEngine/PhysicsConstraintComponent.h"
+#include "PhysicsEngine/PhysicsHandleComponent.h"
 #include "Components/SphereComponent.h"
 #include "GrabbableObjectComponent.h"
 #include "CustomChannels.h"
@@ -38,6 +39,8 @@ AHand::AHand()
 	PhysicsConstraint = CreateDefaultSubobject<UPhysicsConstraintComponent>("PhysicsConstraint");
 	PhysicsConstraint->SetupAttachment(PhysicalHand);
 
+	PhysicsHandle = CreateDefaultSubobject<UPhysicsHandleComponent>("PhysicsHandle");
+
 	HandSkeletal->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
 }
 
@@ -56,9 +59,18 @@ void AHand::Tick(float DeltaTime)
 
 	if (overlapMap.Num() > 0)
 	{
+		float distance;
 		for (auto i = overlapMap.CreateIterator(); i; ++i)
 		{
-			float distance = FVector::Dist(i.Key()->GetOwner()->GetActorLocation(), CollisionSphere->GetComponentLocation());
+			if (Cast<APatrolAI>(i.Key()->GetOwner()) != nullptr)
+			{
+				distance = FVector::Dist(i.Key()->CollisionComponent->GetComponentLocation(), CollisionSphere->GetComponentLocation());
+			}
+			else
+			{
+				distance = FVector::Dist(i.Key()->GetOwner()->GetActorLocation(), CollisionSphere->GetComponentLocation());
+			}
+
 			overlapMap.Emplace(i.Key(), distance);
 		}
 	}
@@ -91,12 +103,11 @@ void AHand::ObjectGrab()
 
 		if (GrabbedObjectGrabbableComponent->CanBeGrabbed)
 		{
-			if (GrabbedObjectGrabbableComponent->GrabbableType == EGrabbableTypeEnum::ERagdollHand || EGrabbableTypeEnum::ERagdollLeg)
+			if (Cast<APatrolAI>(GrabbedActor) != nullptr)
 			{
-				GrabbedObjectGrabbableComponent->OnGrabDelegate.Broadcast();
 				HandSkeletal->SetVisibility(false);
-				FName SocketName = GrabbedObjectGrabbableComponent->GetFName();
-				GrabbedActor->AttachToComponent(GrabPoint, FAttachmentTransformRules::SnapToTargetNotIncludingScale, SocketName);
+				APatrolAI* GrabbedPatrolAI = Cast<APatrolAI>(GrabbedActor);
+				PhysicsHandle->GrabComponentAtLocation(GrabbedPatrolAI->GetMesh(), GrabbedObjectGrabbableComponent->GetFName(), GrabPoint->GetComponentLocation());
 			}
 			else
 			{
@@ -132,9 +143,16 @@ void AHand::ObjectRelease()
 {
 	if (IsAnyObjectGrabbed())
 	{
+		if (Cast<APatrolAI>(GrabbedActor) != nullptr)
+		{
+			PhysicsHandle->ReleaseComponent();
+		}
+		else
+		{
+			GrabbedActor->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+		}
 		GrabbedActor->FindComponentByClass<UGrabbableObjectComponent>()->IsGrabbed = false;
 		HandSkeletal->SetVisibility(true);
-		GrabbedActor->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 		GrabbedObjectGrabbableComponent->OnReleaseDelegate.Broadcast();
 		if (GrabbedActor->IsActorBeingDestroyed())
 		{
