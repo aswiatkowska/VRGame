@@ -42,6 +42,8 @@ void AMagazine::DestroyMagazine()
 void AMagazine::OnGrab()
 {
 	MagazineMesh->SetSimulatePhysics(false);
+	MyCharacter = Cast<AMyCharacter>(UGameplayStatics::GetActorOfClass(GetWorld(), AMyCharacter::StaticClass()));
+	MyCharacter->AddToInventory(this->InvObjectType);
 	MagazineMesh->SetCollisionResponseToChannel((ECollisionChannel)(CustomCollisionChannelsEnum::HandPhysical), ECollisionResponse::ECR_Ignore);
 }
 
@@ -49,8 +51,7 @@ void AMagazine::OnRelease()
 {
 	MagazineMesh->SetCollisionResponseToChannel((ECollisionChannel)(CustomCollisionChannelsEnum::HandPhysical), ECollisionResponse::ECR_Block);
 	MagazineMesh->SetSimulatePhysics(true);
-	MyCharacter = Cast<AMyCharacter>(UGameplayStatics::GetActorOfClass(GetWorld(), AMyCharacter::StaticClass()));
-	MyCharacter->AddToInventory(this->InvObjectType);
-	DestroyMagazine();
+	MagazineMesh->SetVisibility(false);
+	//DestroyMagazine();
 }
 

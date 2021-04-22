@@ -69,10 +69,10 @@ void AWeapon::Shoot()
 	{
 		Ammunition = Ammunition - 1;
 
-		if (Ammunition <= 0)
+		/*if (Ammunition <= 0)
 		{
 			AmmunitionCheck();
-		}
+		}*/
 	}
 
 	cooldown = true;

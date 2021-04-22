@@ -88,6 +88,10 @@ private:
 
 	void CrouchPlayer();
 
+	void TakeOutAmmoRight();
+
+	void TakeOutAmmoLeft();
+
 	void PlayerDeath();
 
 	void RemoveDamageMaterial();

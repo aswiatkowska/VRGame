@@ -2,6 +2,7 @@
 #include "MyCharacter.h"
 #include "Weapon.h"
 #include "Bullet.h"
+#include "Magazine.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Blueprint/UserWidget.h"
 #include "HeadMountedDisplayFunctionLibrary.h" 
@@ -126,6 +127,8 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	PlayerInputComponent->BindAction("GrabReleaseLeft", IE_Released, this, &AMyCharacter::ObjectReleaseLeft);
 
 	PlayerInputComponent->BindAction("Crouch", IE_Pressed, this, &AMyCharacter::CrouchPlayer);
+	PlayerInputComponent->BindAction("TakeOutAmmoRight", IE_Pressed, this, &AMyCharacter::TakeOutAmmoRight);
+	PlayerInputComponent->BindAction("TakeOutAmmoLeft", IE_Pressed, this, &AMyCharacter::TakeOutAmmoLeft);
 
 }
 
@@ -298,6 +301,70 @@ void AMyCharacter::CrouchPlayer()
 	{
 		GetCharacterMovement()->GetNavAgentPropertiesRef().bCanCrouch = true;
 		Crouch();
+	}
+}
+
+void AMyCharacter::TakeOutAmmoRight()
+{
+	if (RightHand->GetGrabbedObject() == nullptr && LeftHand->GetGrabbedObject() != nullptr)
+	{
+		if (LeftHand->GetGrabbedObject()->GrabbableType == EGrabbableTypeEnum::EWeapon)
+		{
+			AWeapon* Weapon = Cast<AWeapon>(LeftHand->GetGrabbedObject()->GetOwner());
+
+			if (InvMap->IsInInventory(Weapon->MagazineType))
+			{
+				TArray<AActor*> FoundActors;
+				UGameplayStatics::GetAllActorsOfClass(GetWorld(), AMagazine::StaticClass(), FoundActors);
+				AMagazine* Magazine;
+
+				for (int i = 0; i < FoundActors.Num(); ++i)
+				{
+					if (Cast<AMagazine>(FoundActors[i]) != nullptr)
+					{
+						Magazine = Cast<AMagazine>(FoundActors[i]);
+						if (Magazine->InvObjectType == Weapon->MagazineType)
+						{
+							Magazine->MagazineMesh->SetVisibility(true);
+							Magazine->MagazineMesh->SetRelativeLocation(RightHand->GrabPoint->GetComponentLocation(), false, nullptr, ETeleportType::None);
+							return;
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+void AMyCharacter::TakeOutAmmoLeft()
+{
+	if (LeftHand->GetGrabbedObject() == nullptr && RightHand->GetGrabbedObject() != nullptr)
+	{
+		if (RightHand->GetGrabbedObject()->GrabbableType == EGrabbableTypeEnum::EWeapon)
+		{
+			AWeapon* Weapon = Cast<AWeapon>(RightHand->GetGrabbedObject()->GetOwner());
+
+			if (InvMap->IsInInventory(Weapon->MagazineType))
+			{
+				TArray<AActor*> FoundActors;
+				UGameplayStatics::GetAllActorsOfClass(GetWorld(), AMagazine::StaticClass(), FoundActors);
+				AMagazine* Magazine;
+
+				for (int i = 0; i < FoundActors.Num(); ++i)
+				{
+					if (Cast<AMagazine>(FoundActors[i]) != nullptr)
+					{
+						Magazine = Cast<AMagazine>(FoundActors[i]);
+						if (Magazine->InvObjectType == Weapon->MagazineType)
+						{
+							Magazine->MagazineMesh->SetVisibility(true);
+							Magazine->MagazineMesh->SetRelativeLocation(LeftHand->GrabPoint->GetComponentLocation(), false, nullptr, ETeleportType::None);
+							return;
+						}
+					}
+				}
+			}
+		}
 	}
 }
 

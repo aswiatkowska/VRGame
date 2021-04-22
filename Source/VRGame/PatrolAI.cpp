@@ -98,6 +98,11 @@ void APatrolAI::Tick(float DeltaTime)
 			OnPlayerNotSeen();
 		}
 	}
+
+	if (Weapon->IsHeldByPlayer)
+	{
+		StartRunningAway();
+	}
 }
 
 void APatrolAI::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -261,5 +266,16 @@ void APatrolAI::StopDefendingSelf()
 	if (ControllerAI)
 	{
 		ControllerAI->SetDefendSelf(false);
+	}
+}
+
+void APatrolAI::StartRunningAway()
+{
+	APatrolAIController* ControllerAI = Cast<APatrolAIController>(GetController());
+
+	if (ControllerAI)
+	{
+		ControllerAI->SetRandomLocation(ControllerAI->GetRandomLocation());
+		ControllerAI->SetRunAway(true);
 	}
 }

@@ -22,6 +22,8 @@ public:
 
 	void StopLookingForPlayer();
 
+	bool IsDead = false;
+
 	UPROPERTY(EditAnywhere, Category = AI)
 	class UBehaviorTree* BehaviorTree;
 
@@ -74,13 +76,13 @@ private:
 
 	void StopDefendingSelf();
 
+	void StartRunningAway();
+
 	bool IsPawnInSight;
 
 	bool IsRagdollInSight;
 
 	bool LookForPlayer = false;
-
-	bool IsDead = false;
 
 	int NumberOfLifes = 100;
 

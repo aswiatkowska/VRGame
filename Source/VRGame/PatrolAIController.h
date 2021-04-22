@@ -33,6 +33,8 @@ public:
 
 	void SetDefendSelf(bool DefendSelf);
 
+	void SetRunAway(bool RunAway);
+
 	void SetRagdollSeen(APawn* SeenRagdoll);
 
 	void SetIsRagdollInSight(bool IsRagdollSeen);
@@ -69,6 +71,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = AI)
 	FName LookForPlayerKey;
+
+	UPROPERTY(EditDefaultsOnly, Category = AI)
+	FName RunAwayKey;
 
 	UBlackboardComponent* GetBlackboardComp();
 
