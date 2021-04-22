@@ -275,6 +275,7 @@ void APatrolAI::StartRunningAway()
 
 	if (ControllerAI)
 	{
+		OnGetHelpDelegate.Broadcast();
 		ControllerAI->SetRandomLocation(ControllerAI->GetRandomLocation());
 		ControllerAI->SetRunAway(true);
 	}
