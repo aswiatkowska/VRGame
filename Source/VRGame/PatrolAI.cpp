@@ -38,25 +38,29 @@ APatrolAI::APatrolAI()
 	LeftLegSphere->SetCollisionObjectType((ECollisionChannel)(CustomCollisionChannelsEnum::GrabbableObject));
 	LeftLegSphere->SetCollisionResponseToChannel((ECollisionChannel)(CustomCollisionChannelsEnum::Hand), ECollisionResponse::ECR_Overlap);
 
-	RightHandGrabbable = CreateDefaultSubobject<UGrabbableObjectComponent>("hand_r");
+	RightHandGrabbable = CreateDefaultSubobject<UGrabbableObjectComponent>("RightHandGrababble");
 	RightHandGrabbable->GrabbableType = EGrabbableTypeEnum::ERagdollHand;
 	RightHandGrabbable->CollisionComponent = (UPrimitiveComponent*)RightHandSphere;
 	RightHandGrabbable->CanBeGrabbed = false;
+	RightHandGrabbable->BoneName = "hand_r";
 
-	LeftHandGrabbable = CreateDefaultSubobject<UGrabbableObjectComponent>("hand_l");
+	LeftHandGrabbable = CreateDefaultSubobject<UGrabbableObjectComponent>("LeftHandGrabbable");
 	LeftHandGrabbable->GrabbableType = EGrabbableTypeEnum::ERagdollHand;
 	LeftHandGrabbable->CollisionComponent = (UPrimitiveComponent*)LeftHandSphere;
 	LeftHandGrabbable->CanBeGrabbed = false;
+	LeftHandGrabbable->BoneName = "hand_l";
 
-	RightLegGrabbable = CreateDefaultSubobject<UGrabbableObjectComponent>("foot_r");
+	RightLegGrabbable = CreateDefaultSubobject<UGrabbableObjectComponent>("RightLegGrabbable");
 	RightLegGrabbable->GrabbableType = EGrabbableTypeEnum::ERagdollLeg;
 	RightLegGrabbable->CollisionComponent = (UPrimitiveComponent*)RightLegSphere;
 	RightLegGrabbable->CanBeGrabbed = false;
+	RightLegGrabbable->BoneName = "foot_r";
 
-	LeftLegGrabbable = CreateDefaultSubobject<UGrabbableObjectComponent>("foot_l");
+	LeftLegGrabbable = CreateDefaultSubobject<UGrabbableObjectComponent>("LeftLegGrabbable");
 	LeftLegGrabbable->GrabbableType = EGrabbableTypeEnum::ERagdollLeg;
 	LeftLegGrabbable->CollisionComponent = (UPrimitiveComponent*)LeftLegSphere;
 	LeftLegGrabbable->CanBeGrabbed = false;
+	LeftLegGrabbable->BoneName = "foot_l";
 
 	PawnSensingComp = CreateDefaultSubobject<UPawnSensingComponent>("PawnSensingComp");
 	PawnSensingComp->SetPeripheralVisionAngle(20.0f);

@@ -62,7 +62,7 @@ void AHand::Tick(float DeltaTime)
 		float distance;
 		for (auto i = overlapMap.CreateIterator(); i; ++i)
 		{
-			if (Cast<APatrolAI>(i.Key()->GetOwner()) != nullptr)
+			if (i.Key()->CollisionComponent != nullptr)
 			{
 				distance = FVector::Dist(i.Key()->CollisionComponent->GetComponentLocation(), CollisionSphere->GetComponentLocation());
 			}
@@ -103,15 +103,27 @@ void AHand::ObjectGrab()
 
 		if (GrabbedObjectGrabbableComponent->CanBeGrabbed)
 		{
-			if (Cast<APatrolAI>(GrabbedActor) != nullptr)
+			if (GrabbedObjectGrabbableComponent->GrabbableType == EGrabbableTypeEnum::ERagdollHand || GrabbedObjectGrabbableComponent->GrabbableType == EGrabbableTypeEnum::ERagdollLeg)
 			{
-				HandSkeletal->SetVisibility(false);
-				APatrolAI* GrabbedPatrolAI = Cast<APatrolAI>(GrabbedActor);
-				PhysicsHandle->GrabComponentAtLocation(GrabbedPatrolAI->GetMesh(), GrabbedObjectGrabbableComponent->GetFName(), GrabPoint->GetComponentLocation());
+				if (OtherHand->GrabbedActor != nullptr)
+				{
+					if (GrabbedObjectGrabbableComponent->GrabbableType == OtherHand->GrabbedObjectGrabbableComponent->GrabbableType)
+					{
+						APatrolAI* GrabbedPatrolAI = Cast<APatrolAI>(GrabbedActor);
+						APatrolAI* OtherGrabbedPatrolAI = Cast<APatrolAI>(OtherHand->GrabbedActor);
+
+						HandSkeletal->SetVisibility(false);
+						OtherHand->HandSkeletal->SetVisibility(false);
+
+						PhysicsHandle->GrabComponentAtLocation(GrabbedPatrolAI->GetMesh(), GrabbedObjectGrabbableComponent->BoneName, GrabPoint->GetComponentLocation());
+						OtherHand->PhysicsHandle->GrabComponentAtLocation(OtherGrabbedPatrolAI->GetMesh(), OtherHand->GrabbedObjectGrabbableComponent->BoneName,
+							GrabPoint->GetComponentLocation());
+					}
+				}
 			}
 			else
 			{
-				if (Cast<AWeapon>(GrabbedActor) != nullptr)
+				if (GrabbedObjectGrabbableComponent->GrabbableType == EGrabbableTypeEnum::EWeapon)
 				{
 					AWeapon* Weapon = Cast<AWeapon>(GrabbedActor);
 					Weapon->IsHeldByPlayer = true;
@@ -143,7 +155,7 @@ void AHand::ObjectRelease()
 {
 	if (IsAnyObjectGrabbed())
 	{
-		if (Cast<APatrolAI>(GrabbedActor) != nullptr)
+		if (GrabbedObjectGrabbableComponent->GrabbableType == EGrabbableTypeEnum::ERagdollHand || GrabbedObjectGrabbableComponent->GrabbableType == EGrabbableTypeEnum::ERagdollLeg)
 		{
 			PhysicsHandle->ReleaseComponent();
 		}

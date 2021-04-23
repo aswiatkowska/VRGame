@@ -1,5 +1,6 @@
 
 #include "Weapon.h"
+#include "Magazine.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/SceneComponent.h"
 #include "Components/BoxComponent.h"
@@ -39,6 +40,8 @@ void AWeapon::BeginPlay()
 	GrabbableObjComp->OnGrabDelegate.AddDynamic(this, &AWeapon::OnGrab);
 	GrabbableObjComp->OnReleaseDelegate.AddDynamic(this, &AWeapon::OnRelease);
 
+	CollisionBox->OnComponentBeginOverlap.AddDynamic(this, &AWeapon::OnMagazineOverlapBegin);
+
 	Ammunition = MagazineCapacity;
 }
 
@@ -68,11 +71,6 @@ void AWeapon::Shoot()
 	if (!UnlimitedBullets)
 	{
 		Ammunition = Ammunition - 1;
-
-		/*if (Ammunition <= 0)
-		{
-			AmmunitionCheck();
-		}*/
 	}
 
 	cooldown = true;
@@ -119,5 +117,21 @@ void AWeapon::OnRelease()
 	WeaponMesh->SetCollisionResponseToChannel((ECollisionChannel)(CustomCollisionChannelsEnum::HandPhysical), ECollisionResponse::ECR_Block);
 	WeaponMesh->SetSimulatePhysics(true);
 	ShootingReleased();
+}
+
+void AWeapon::OnMagazineOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
+	const FHitResult& SweepResult)
+{
+	if (Cast<AMagazine>(OtherActor) != nullptr)
+	{
+		AMagazine* CurrentMagazine = Cast<AMagazine>(OtherActor);
+		if (CurrentMagazine->InvObjectType == MagazineType)
+		{
+			MyCharacter = Cast<AMyCharacter>(UGameplayStatics::GetActorOfClass(GetWorld(), AMyCharacter::StaticClass()));
+			MyCharacter->GetFromInventory(MagazineType);
+			this->Ammunition = this->MagazineCapacity;
+			CurrentMagazine->DestroyMagazine();
+		}
+	}
 }
 

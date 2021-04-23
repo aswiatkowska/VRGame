@@ -52,6 +52,8 @@ public:
 	bool IsGrabbed = false;
 
 	bool CanBeGrabbed = true;
+
+	FName BoneName;
 	
 	UPrimitiveComponent* CollisionComponent = nullptr;
 };

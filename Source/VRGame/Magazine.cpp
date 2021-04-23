@@ -52,6 +52,5 @@ void AMagazine::OnRelease()
 	MagazineMesh->SetCollisionResponseToChannel((ECollisionChannel)(CustomCollisionChannelsEnum::HandPhysical), ECollisionResponse::ECR_Block);
 	MagazineMesh->SetSimulatePhysics(true);
 	MagazineMesh->SetVisibility(false);
-	//DestroyMagazine();
 }
 

@@ -16,6 +16,8 @@ class VRGAME_API AMagazine : public AActor
 public:	
 	AMagazine();
 
+	void DestroyMagazine();
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class UStaticMeshComponent* MagazineMesh;
 
@@ -30,8 +32,6 @@ public:
 
 private:
 	virtual void BeginPlay() override;
-
-	void DestroyMagazine();
 
 	UFUNCTION()
 	void OnGrab();
