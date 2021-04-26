@@ -132,7 +132,7 @@ void APatrolAI::OnPawnSeen(APawn* SeenPawn)
 			LookForPlayer = true;
 			ControllerAI->SetLookForPlayer(LookForPlayer);
 			FTimerHandle handle;
-			GetWorld()->GetTimerManager().SetTimer(handle, this, &APatrolAI::SetRagdollNotSeen, 3);
+			GetWorld()->GetTimerManager().SetTimer(handle, this, &APatrolAI::SetRagdollNotSeen, 6);
 			FTimerHandle timerhandle;
 			GetWorld()->GetTimerManager().SetTimer(timerhandle, this, &APatrolAI::StopLookingForPlayer, 10);
 		}
@@ -193,7 +193,7 @@ void APatrolAI::SetRagdollNotSeen()
 {
 	APatrolAIController* ControllerAI = Cast<APatrolAIController>(GetController());
 
-	if (IsRagdollInSight)
+	if (IsRagdollInSight && !IsDead)
 	{
 		IsRagdollInSight = false;
 		ControllerAI->SetIsRagdollInSight(IsRagdollInSight);
