@@ -39,6 +39,9 @@ AHand::AHand()
 	PhysicsConstraint = CreateDefaultSubobject<UPhysicsConstraintComponent>("PhysicsConstraint");
 	PhysicsConstraint->SetupAttachment(PhysicalHand);
 
+	PhysicsConstraintGrab = CreateDefaultSubobject<UPhysicsConstraintComponent>("PhysicsConstraintGrab");
+	PhysicsConstraintGrab->SetupAttachment(HandSkeletal);
+
 	PhysicsHandle = CreateDefaultSubobject<UPhysicsHandleComponent>("PhysicsHandle");
 
 	HandSkeletal->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
@@ -105,21 +108,10 @@ void AHand::ObjectGrab()
 		{
 			if (GrabbedObjectGrabbableComponent->GrabbableType == EGrabbableTypeEnum::ERagdollHand || GrabbedObjectGrabbableComponent->GrabbableType == EGrabbableTypeEnum::ERagdollLeg)
 			{
-				if (OtherHand->GrabbedActor != nullptr)
-				{
-					if (GrabbedObjectGrabbableComponent->GrabbableType == OtherHand->GrabbedObjectGrabbableComponent->GrabbableType)
-					{
-						APatrolAI* GrabbedPatrolAI = Cast<APatrolAI>(GrabbedActor);
-						APatrolAI* OtherGrabbedPatrolAI = Cast<APatrolAI>(OtherHand->GrabbedActor);
-
-						HandSkeletal->SetVisibility(false);
-						OtherHand->HandSkeletal->SetVisibility(false);
-
-						PhysicsHandle->GrabComponentAtLocation(GrabbedPatrolAI->GetMesh(), GrabbedObjectGrabbableComponent->BoneName, GrabPoint->GetComponentLocation());
-						OtherHand->PhysicsHandle->GrabComponentAtLocation(OtherGrabbedPatrolAI->GetMesh(), OtherHand->GrabbedObjectGrabbableComponent->BoneName,
-							GrabPoint->GetComponentLocation());
-					}
-				}
+				APatrolAI* GrabbedPatrolAI = Cast<APatrolAI>(GrabbedActor);
+				HandSkeletal->SetVisibility(false);
+				PhysicsConstraintGrab->SetConstrainedComponents(GrabbedPatrolAI->GetMesh(), GrabbedObjectGrabbableComponent->BoneName,
+					HandSkeletal, "hand_r");
 			}
 			else
 			{
@@ -157,7 +149,7 @@ void AHand::ObjectRelease()
 	{
 		if (GrabbedObjectGrabbableComponent->GrabbableType == EGrabbableTypeEnum::ERagdollHand || GrabbedObjectGrabbableComponent->GrabbableType == EGrabbableTypeEnum::ERagdollLeg)
 		{
-			PhysicsHandle->ReleaseComponent();
+			PhysicsConstraintGrab->TermComponentConstraint();
 		}
 		else
 		{
@@ -181,7 +173,14 @@ void AHand::ForceRelease()
 	{
 		GrabbedActor->FindComponentByClass<UGrabbableObjectComponent>()->IsGrabbed = false;
 		HandSkeletal->SetVisibility(true);
-		GrabbedActor->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+		if (GrabbedObjectGrabbableComponent->GrabbableType == EGrabbableTypeEnum::ERagdollHand || GrabbedObjectGrabbableComponent->GrabbableType == EGrabbableTypeEnum::ERagdollLeg)
+		{
+			PhysicsConstraintGrab->TermComponentConstraint();
+		}
+		else
+		{
+			GrabbedActor->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+		}
 		GrabbedObjectGrabbableComponent = nullptr;
 		GrabbedActor = nullptr;
 	}
@@ -232,7 +231,32 @@ void AHand::OnHandOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor*
 
 void AHand::OnHandOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	overlapMap.Remove(OtherActor->FindComponentByClass<UGrabbableObjectComponent>());
+	TArray<UActorComponent*> CompArray = OtherActor->GetComponentsByClass(UGrabbableObjectComponent::StaticClass());
+	if (CompArray.Num() > 1)
+	{
+		float compDistance;
+		float shortestDistance = 1000;
+		UGrabbableObjectComponent* CurrentComp;
+		UGrabbableObjectComponent* NearestComp = nullptr;
+
+		for (int i = 0; i < CompArray.Num(); ++i)
+		{
+			CurrentComp = Cast<UGrabbableObjectComponent>(CompArray[i]);
+			compDistance = FVector::Dist(CurrentComp->CollisionComponent->GetComponentLocation(), CollisionSphere->GetComponentLocation());
+
+			if (compDistance < shortestDistance)
+			{
+				shortestDistance = compDistance;
+				NearestComp = CurrentComp;
+			}
+		}
+
+		overlapMap.Remove(NearestComp);
+	}
+	else
+	{
+		overlapMap.Remove(OtherActor->FindComponentByClass<UGrabbableObjectComponent>());
+	}
 }
 
 bool AHand::IsAnyObjectGrabbed()

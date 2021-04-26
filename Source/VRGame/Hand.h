@@ -43,6 +43,9 @@ public:
 	class UPhysicsConstraintComponent* PhysicsConstraint;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class UPhysicsConstraintComponent* PhysicsConstraintGrab;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class UPhysicsHandleComponent* PhysicsHandle;
 
 	void ObjectGrab();
