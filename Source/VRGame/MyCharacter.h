@@ -6,6 +6,7 @@
 #include "Hand.h"
 #include "InventoryObjectTypes.h"
 #include "Inventory.h"
+#include "Magazine.h"
 #include "GrabbableObjectComponent.h"
 #include "MyCharacter.generated.h"
 
@@ -40,6 +41,12 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UMaterialInstanceDynamic* DamageDynamicMaterial;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<AMagazine> MagazineSubclassRifle;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<AMagazine> MagazineSubclassGun;
 
 	bool GetFromInventory(EInventoryObjectTypes Type);
 
@@ -110,6 +117,8 @@ private:
 
 	bool CanTeleport;
 
+	bool IsMagazineSpawned = false;
+
 	int NumberOfLifes = 100;
 
 	APlayerController* playerController;
@@ -119,4 +128,6 @@ private:
 	AHand* LeftHand;
 
 	AInventory* InvMap;
+
+	AMagazine* Magazine;
 };

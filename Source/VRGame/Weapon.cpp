@@ -93,23 +93,10 @@ void AWeapon::SwitchCoolDown()
 	}
 }
 
-void AWeapon::AmmunitionCheck()
-{
-	MyCharacter = Cast<AMyCharacter>(UGameplayStatics::GetActorOfClass(GetWorld(), AMyCharacter::StaticClass()));
-	if (MyCharacter->GetFromInventory(this->MagazineType))
-	{
-		this->Ammunition = this->MagazineCapacity;
-	}
-}
-
 void AWeapon::OnGrab()
 {
 	WeaponMesh->SetCollisionResponseToChannel((ECollisionChannel)(CustomCollisionChannelsEnum::HandPhysical), ECollisionResponse::ECR_Ignore);
 	WeaponMesh->SetSimulatePhysics(false);
-	if (Ammunition <= 0)
-	{
-		AmmunitionCheck();
-	}
 }
 
 void AWeapon::OnRelease()
@@ -124,13 +111,16 @@ void AWeapon::OnMagazineOverlapBegin(UPrimitiveComponent* OverlappedComponent, A
 {
 	if (Cast<AMagazine>(OtherActor) != nullptr)
 	{
-		AMagazine* CurrentMagazine = Cast<AMagazine>(OtherActor);
-		if (CurrentMagazine->InvObjectType == MagazineType)
+		AMagazine* Magazine = Cast<AMagazine>(OtherActor);
+
+		if (Magazine->InvObjectType == MagazineType)
 		{
-			MyCharacter = Cast<AMyCharacter>(UGameplayStatics::GetActorOfClass(GetWorld(), AMyCharacter::StaticClass()));
-			MyCharacter->GetFromInventory(MagazineType);
-			this->Ammunition = this->MagazineCapacity;
-			CurrentMagazine->DestroyMagazine();
+			if (Magazine->IsActorBeingDestroyed())
+			{
+				MyCharacter = Cast<AMyCharacter>(UGameplayStatics::GetActorOfClass(GetWorld(), AMyCharacter::StaticClass()));
+				MyCharacter->GetFromInventory(MagazineType);
+				this->Ammunition = this->MagazineCapacity;
+			}
 		}
 	}
 }

@@ -1,5 +1,6 @@
 
 #include "Magazine.h"
+#include "MyCharacter.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/BoxComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -42,7 +43,7 @@ void AMagazine::DestroyMagazine()
 void AMagazine::OnGrab()
 {
 	MagazineMesh->SetSimulatePhysics(false);
-	MyCharacter = Cast<AMyCharacter>(UGameplayStatics::GetActorOfClass(GetWorld(), AMyCharacter::StaticClass()));
+	AMyCharacter* MyCharacter = Cast<AMyCharacter>(UGameplayStatics::GetActorOfClass(GetWorld(), AMyCharacter::StaticClass()));
 	MyCharacter->AddToInventory(this->InvObjectType);
 	MagazineMesh->SetCollisionResponseToChannel((ECollisionChannel)(CustomCollisionChannelsEnum::HandPhysical), ECollisionResponse::ECR_Ignore);
 }
@@ -50,7 +51,6 @@ void AMagazine::OnGrab()
 void AMagazine::OnRelease()
 {
 	MagazineMesh->SetCollisionResponseToChannel((ECollisionChannel)(CustomCollisionChannelsEnum::HandPhysical), ECollisionResponse::ECR_Block);
-	MagazineMesh->SetSimulatePhysics(true);
-	MagazineMesh->SetVisibility(false);
+	DestroyMagazine();
 }
 

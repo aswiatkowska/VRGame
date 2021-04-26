@@ -2,7 +2,6 @@
 #include "MyCharacter.h"
 #include "Weapon.h"
 #include "Bullet.h"
-#include "Magazine.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Blueprint/UserWidget.h"
 #include "HeadMountedDisplayFunctionLibrary.h" 
@@ -306,7 +305,12 @@ void AMyCharacter::CrouchPlayer()
 
 void AMyCharacter::TakeOutAmmoRight()
 {
-	if (RightHand->GetGrabbedObject() == nullptr && LeftHand->GetGrabbedObject() != nullptr)
+	if (IsMagazineSpawned)
+	{
+		Magazine->DestroyMagazine();
+		RightHand->HandSkeletal->SetVisibility(true);
+	}
+	else if (RightHand->GetGrabbedObject() == nullptr && LeftHand->GetGrabbedObject() != nullptr)
 	{
 		if (LeftHand->GetGrabbedObject()->GrabbableType == EGrabbableTypeEnum::EWeapon)
 		{
@@ -314,23 +318,18 @@ void AMyCharacter::TakeOutAmmoRight()
 
 			if (InvMap->IsInInventory(Weapon->MagazineType))
 			{
-				TArray<AActor*> FoundActors;
-				UGameplayStatics::GetAllActorsOfClass(GetWorld(), AMagazine::StaticClass(), FoundActors);
-				AMagazine* Magazine;
-
-				for (int i = 0; i < FoundActors.Num(); ++i)
+				if (Weapon->MagazineType == EInventoryObjectTypes::Magazine_rifle)
 				{
-					if (Cast<AMagazine>(FoundActors[i]) != nullptr)
-					{
-						Magazine = Cast<AMagazine>(FoundActors[i]);
-						if (Magazine->InvObjectType == Weapon->MagazineType)
-						{
-							Magazine->MagazineMesh->SetVisibility(true);
-							Magazine->MagazineMesh->SetRelativeLocation(RightHand->GrabPoint->GetComponentLocation());
-							return;
-						}
-					}
+					Magazine = GetWorld()->SpawnActor<AMagazine>(MagazineSubclassRifle, RightHand->GrabPoint->GetComponentLocation(), FRotator::ZeroRotator);
 				}
+				else
+				{
+					Magazine = GetWorld()->SpawnActor<AMagazine>(MagazineSubclassGun, RightHand->GrabPoint->GetComponentLocation(), FRotator::ZeroRotator);
+				}
+				Magazine->MagazineMesh->SetSimulatePhysics(false);
+				Magazine->AttachToComponent(RightHand->GrabPoint, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+				RightHand->HandSkeletal->SetVisibility(false);
+				IsMagazineSpawned = true;
 			}
 		}
 	}
@@ -338,7 +337,13 @@ void AMyCharacter::TakeOutAmmoRight()
 
 void AMyCharacter::TakeOutAmmoLeft()
 {
-	if (LeftHand->GetGrabbedObject() == nullptr && RightHand->GetGrabbedObject() != nullptr)
+	if (IsMagazineSpawned)
+	{
+		Magazine->DestroyMagazine();
+		LeftHand->HandSkeletal->SetVisibility(true);
+		IsMagazineSpawned = false;
+	}
+	else if (LeftHand->GetGrabbedObject() == nullptr && RightHand->GetGrabbedObject() != nullptr)
 	{
 		if (RightHand->GetGrabbedObject()->GrabbableType == EGrabbableTypeEnum::EWeapon)
 		{
@@ -346,23 +351,18 @@ void AMyCharacter::TakeOutAmmoLeft()
 
 			if (InvMap->IsInInventory(Weapon->MagazineType))
 			{
-				TArray<AActor*> FoundActors;
-				UGameplayStatics::GetAllActorsOfClass(GetWorld(), AMagazine::StaticClass(), FoundActors);
-				AMagazine* Magazine;
-
-				for (int i = 0; i < FoundActors.Num(); ++i)
+				if (Weapon->MagazineType == EInventoryObjectTypes::Magazine_rifle)
 				{
-					if (Cast<AMagazine>(FoundActors[i]) != nullptr)
-					{
-						Magazine = Cast<AMagazine>(FoundActors[i]);
-						if (Magazine->InvObjectType == Weapon->MagazineType)
-						{
-							Magazine->MagazineMesh->SetVisibility(true);
-							Magazine->MagazineMesh->SetRelativeLocation(LeftHand->GrabPoint->GetComponentLocation());
-							return;
-						}
-					}
+					Magazine = GetWorld()->SpawnActor<AMagazine>(MagazineSubclassRifle, LeftHand->GrabPoint->GetComponentLocation(), FRotator::ZeroRotator);
 				}
+				else
+				{
+					Magazine = GetWorld()->SpawnActor<AMagazine>(MagazineSubclassGun, LeftHand->GrabPoint->GetComponentLocation(), FRotator::ZeroRotator);
+				}
+				Magazine->MagazineMesh->SetSimulatePhysics(false);
+				Magazine->AttachToComponent(LeftHand->GrabPoint, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+				LeftHand->HandSkeletal->SetVisibility(false);
+				IsMagazineSpawned = true;
 			}
 		}
 	}

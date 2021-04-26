@@ -5,7 +5,6 @@
 #include "GameFramework/Actor.h"
 #include "GrabbableObjectComponent.h"
 #include "InventoryObjectTypes.h"
-#include "MyCharacter.h"
 #include "Magazine.generated.h"
 
 UCLASS()
@@ -38,7 +37,5 @@ private:
 
 	UFUNCTION()
 	void OnRelease();
-
-	AMyCharacter* MyCharacter;
 
 };

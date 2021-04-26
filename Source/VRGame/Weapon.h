@@ -74,8 +74,6 @@ protected:
 
 	void SwitchCoolDown();
 
-	void AmmunitionCheck();
-
 	UFUNCTION()
 	void OnGrab();
 
